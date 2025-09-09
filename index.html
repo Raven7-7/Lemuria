@@ -60,6 +60,14 @@
             object-fit: cover; /* 这一行保证图片能填满相框且不变形 */
         }
 
+        .avatar-frame .perch-avatar {
+            /* 当perch-avatar在avatar-frame内部时，移除margin避免偏移 */
+            margin-right: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+
         /* CSS变量定义 */
         :root {
             --moments-cover-image: url('https://placehold.co/375x192/333/fff?text=Cover');
@@ -9244,26 +9252,27 @@
             background: linear-gradient(145deg, #8b6559 0%, #795548 50%, #6d4c41 100%);
         }
 
-        /* ====== 栖木 App 样式 (文字卡片) ====== */
+        /* ====== 栖木 App 样式 (文字卡片) - 栖木主题美化 ====== */
 
         /* ====== 【【新增】】行内评论框样式 ====== */
         .perch-inline-comment-box {
             margin-top: 0.75rem;
             padding: 0.75rem;
-            background-color: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, rgba(107, 135, 112, 0.15), rgba(108, 169, 132, 0.08));
             border-radius: 0.5rem;
-            border: 1px solid #374151;
+            border: 1px solid rgba(107, 135, 112, 0.3);
             animation: slideDown 0.3s ease-out;
+            backdrop-filter: blur(10px);
         }
         .light-mode .perch-inline-comment-box {
-            background-color: rgba(0, 0, 0, 0.03);
-            border-color: #e5e7eb;
+            background: linear-gradient(135deg, rgba(192, 214, 149, 0.2), rgba(248, 247, 240, 0.8));
+            border-color: rgba(107, 135, 112, 0.4);
         }
         .perch-inline-comment-box textarea {
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.2);
-            color: #f3f4f6;
-            border: 1px solid #4b5563;
+            background: rgba(16, 139, 150, 0.1);
+            color: #EDEDED;
+            border: 1px solid rgba(107, 135, 112, 0.4);
             border-radius: 0.375rem;
             padding: 0.5rem;
             resize: vertical;
@@ -9273,13 +9282,13 @@
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .light-mode .perch-inline-comment-box textarea {
-            background-color: #ffffff;
-            color: #1f2937;
-            border-color: #d1d5db;
+            background: rgba(248, 247, 240, 0.9);
+            color: #70695D;
+            border-color: rgba(107, 135, 112, 0.5);
         }
         .perch-inline-comment-box textarea:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+            border-color: #6CA984;
+            box-shadow: 0 0 0 2px rgba(108, 169, 132, 0.3);
         }
         .perch-inline-comment-actions {
             display: flex;
@@ -9297,42 +9306,44 @@
             transition: background-color 0.2s;
         }
         .perch-inline-comment-actions .cancel-btn {
-            background-color: #4b5563;
-            color: #f3f4f6;
+            background: rgba(112, 105, 93, 0.8);
+            color: #EDEDED;
         }
         .light-mode .perch-inline-comment-actions .cancel-btn {
-            background-color: #e5e7eb;
-            color: #4b5563;
+            background: rgba(107, 135, 112, 0.2);
+            color: #70695D;
         }
         .perch-inline-comment-actions .post-btn {
-            background-color: #3b82f6;
-            color: white;
+            background: linear-gradient(135deg, #6CA984, #8ABCD1);
+            color: #EDEDED;
         }
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 栖木互动栏样式 */
+        /* 栖木互动栏样式 - 树木栖息主题 */
         .perch-interaction-bar {
             display: flex; /* 【核心】将此容器设置为Flex布局 */
             justify-content: space-between; /* 【核心】让内部元素两端对齐 */
             align-items: center; /* 【核心】让内部元素垂直居中 */
             padding: 0.25rem 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(16, 139, 150, 0.1), rgba(107, 135, 112, 0.08));
+            border-bottom: 1px solid rgba(108, 169, 132, 0.3);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 2px 10px rgba(107, 135, 112, 0.1);
         }
 
         .light-mode .perch-interaction-bar {
-            background: rgba(0, 0, 0, 0.03);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, rgba(192, 214, 149, 0.15), rgba(248, 247, 240, 0.8));
+            border-bottom: 1px solid rgba(107, 135, 112, 0.4);
+            box-shadow: 0 2px 10px rgba(107, 135, 112, 0.15);
         }
 
         .perch-user-profile {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.375rem;
             cursor: pointer;
             /* 确保左侧部分不会过度伸展 */
             flex-shrink: 1; 
@@ -9342,16 +9353,17 @@
             width: 2.5rem;
             height: 2.5rem;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #6CA984 0%, #8ABCD1 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: #EDEDED;
             font-size: 1.25rem;
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(108, 169, 132, 0.4);
             overflow: hidden; /* 确保图片不会超出圆形边界 */
+            box-shadow: 0 4px 15px rgba(107, 135, 112, 0.2);
 
             /* 【核心修正】在这里添加这三行，强制处理所有背景图 */
             background-size: cover !important;
@@ -9360,18 +9372,21 @@
         }
         
         .light-mode .perch-user-avatar {
-            border: 2px solid rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(107, 135, 112, 0.5);
+            background: linear-gradient(135deg, #C0D695 0%, #6CA984 100%);
+            color: #70695D;
+            box-shadow: 0 4px 15px rgba(107, 135, 112, 0.3);
         }
         
         .perch-user-avatar:hover {
             transform: scale(1.05);
-            border-color: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+            border-color: rgba(108, 169, 132, 0.7);
+            box-shadow: 0 0 25px rgba(108, 169, 132, 0.5);
         }
         
         .light-mode .perch-user-avatar:hover {
-            border-color: rgba(0, 0, 0, 0.4);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+            border-color: rgba(107, 135, 112, 0.8);
+            box-shadow: 0 0 25px rgba(107, 135, 112, 0.4);
         }
         
         .perch-user-avatar.has-custom-image {
@@ -9391,7 +9406,7 @@
         .perch-user-name {
             font-size: 0.875rem;
             font-weight: 600;
-            color: #e5e7eb;
+            color: #EDEDED;
             cursor: pointer;
             transition: all 0.3s ease;
             padding: 0.25rem 0.5rem;
@@ -9400,13 +9415,15 @@
             border: none;
             backdrop-filter: none;
             box-shadow: none;
+            text-shadow: 0 1px 3px rgba(16, 139, 150, 0.3);
         }
         
         .light-mode .perch-user-name {
-            color: #374151;
+            color: #70695D;
             background: transparent;
             border: none;
             box-shadow: none;
+            text-shadow: 0 1px 2px rgba(107, 135, 112, 0.2);
         }
         
         .perch-user-name:hover {
@@ -9426,7 +9443,8 @@
         
         .perch-action-buttons {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.375rem;
+            justify-content: flex-end;
             /* 防止按钮组被压缩 */
             flex-shrink: 0; 
         }
@@ -9435,9 +9453,9 @@
             width: 2.5rem;
             height: 2.5rem;
             border-radius: 50%;
-            background: transparent;
+            background: none;
             border: none;
-            color: #e5e7eb;
+            color: #EDEDED;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -9447,72 +9465,293 @@
         }
         
         .light-mode .perch-action-btn {
-            background: transparent;
+            background: none;
             border: none;
-            color: #374151;
+            color: #70695D;
         }
         
         .perch-action-btn:hover {
-            background: transparent;
-            border-color: transparent;
-            transform: none;
-            box-shadow: none;
-            opacity: 0.8;
+            background: none;
+            border: none;
+            transform: scale(1.1);
+            color: #6CA984;
+            text-shadow: 0 0 10px rgba(108, 169, 132, 0.5);
         }
         
         .light-mode .perch-action-btn:hover {
-            background: transparent;
-            border-color: transparent;
-            box-shadow: none;
-            opacity: 0.8;
+            background: none;
+            border: none;
+            color: #6B8770;
+            transform: scale(1.1);
+            text-shadow: 0 0 8px rgba(107, 135, 112, 0.4);
         }
         
         .perch-action-btn:active {
             transform: scale(0.95);
         }
         
-        /* 栖木弹窗样式 */
+        /* 栖木弹窗样式 - 树木栖息主题 */
+        #perch-avatar-modal .modal-content,
+        #perch-name-modal .modal-content {
+            background: linear-gradient(135deg, rgba(16, 139, 150, 0.15), rgba(107, 135, 112, 0.1));
+            color: #EDEDED;
+            border: 1px solid rgba(108, 169, 132, 0.3);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(107, 135, 112, 0.2);
+        }
+        
         .light-mode #perch-avatar-modal .modal-content,
         .light-mode #perch-name-modal .modal-content {
-            background-color: #ffffff;
-            color: #374151;
+            background: linear-gradient(135deg, rgba(248, 247, 240, 0.95), rgba(192, 214, 149, 0.2));
+            color: #70695D;
+            border: 1px solid rgba(107, 135, 112, 0.4);
+            box-shadow: 0 25px 50px rgba(107, 135, 112, 0.25);
+        }
+        
+        #perch-avatar-modal h3,
+        #perch-name-modal h3 {
+            color: #6CA984;
+            text-shadow: 0 2px 4px rgba(16, 139, 150, 0.3);
         }
         
         .light-mode #perch-avatar-modal h3,
         .light-mode #perch-name-modal h3 {
-            color: #111827;
+            color: #6B8770;
+            text-shadow: 0 1px 2px rgba(107, 135, 112, 0.2);
+        }
+        
+        #perch-avatar-modal input,
+        #perch-name-modal input {
+            background: rgba(16, 139, 150, 0.1);
+            border: 1px solid rgba(108, 169, 132, 0.4);
+            color: #EDEDED;
+            backdrop-filter: blur(5px);
         }
         
         .light-mode #perch-avatar-modal input,
         .light-mode #perch-name-modal input {
-            background-color: #ffffff;
-            border-color: #d1d5db;
-            color: #374151;
+            background: rgba(248, 247, 240, 0.8);
+            border-color: rgba(107, 135, 112, 0.5);
+            color: #70695D;
         }
         
+        #perch-avatar-modal input:focus,
+        #perch-name-modal input:focus,
         .light-mode #perch-avatar-modal input:focus,
         .light-mode #perch-name-modal input:focus {
-            border-color: #3b82f6;
+            border-color: #6CA984;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(108, 169, 132, 0.2);
+        }
+
+        /* 栖木发布弹窗样式 */
+        #new-perch-post-modal .modal-content,
+        #perch-echo-modal .modal-content,
+        #perch-forward-modal .modal-content,
+        #perch-worldview-modal .modal-content,
+        #perch-settings-modal .modal-content,
+        #perch-custom-npc-modal .modal-content {
+            background: linear-gradient(135deg, rgba(16, 139, 150, 0.15), rgba(107, 135, 112, 0.1));
+            color: #EDEDED;
+            border: 1px solid rgba(108, 169, 132, 0.3);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(107, 135, 112, 0.2);
+        }
+        
+        .light-mode #new-perch-post-modal .modal-content,
+        .light-mode #perch-echo-modal .modal-content,
+        .light-mode #perch-forward-modal .modal-content,
+        .light-mode #perch-worldview-modal .modal-content,
+        .light-mode #perch-settings-modal .modal-content,
+        .light-mode #perch-custom-npc-modal .modal-content {
+            background: linear-gradient(135deg, rgba(248, 247, 240, 0.95), rgba(192, 214, 149, 0.2));
+            color: #70695D;
+            border: 1px solid rgba(107, 135, 112, 0.4);
+            box-shadow: 0 25px 50px rgba(107, 135, 112, 0.25);
+        }
+
+        /* 栖木弹窗标题样式 */
+        #new-perch-post-modal h3,
+        #perch-echo-modal h3,
+        #perch-forward-modal h3,
+        #perch-worldview-modal h3,
+        #perch-settings-modal h3,
+        #perch-custom-npc-modal h3 {
+            color: #6CA984;
+            text-shadow: 0 2px 4px rgba(16, 139, 150, 0.3);
+        }
+        
+        .light-mode #new-perch-post-modal h3,
+        .light-mode #perch-echo-modal h3,
+        .light-mode #perch-forward-modal h3,
+        .light-mode #perch-worldview-modal h3,
+        .light-mode #perch-settings-modal h3,
+        .light-mode #perch-custom-npc-modal h3 {
+            color: #6B8770;
+            text-shadow: 0 1px 2px rgba(107, 135, 112, 0.2);
+        }
+
+        /* 栖木输入框样式 */
+        #perch-content-input,
+        #echo-content-input {
+            background: rgba(16, 139, 150, 0.1);
+            border: 1px solid rgba(108, 169, 132, 0.4);
+            color: #EDEDED;
+            backdrop-filter: blur(5px);
+            border-radius: 0.5rem;
+        }
+        
+        .light-mode #perch-content-input,
+        .light-mode #echo-content-input {
+            background: rgba(248, 247, 240, 0.8);
+            border-color: rgba(107, 135, 112, 0.5);
+            color: #70695D;
+        }
+
+        #perch-content-input:focus,
+        #echo-content-input:focus {
+            border-color: #6CA984;
+            box-shadow: 0 0 0 3px rgba(108, 169, 132, 0.2);
+            outline: none;
+        }
+
+        /* 栖木按钮样式 */
+        #confirm-perch-post-btn,
+        #confirm-echo-post-btn {
+            background: linear-gradient(135deg, #6CA984, #8ABCD1);
+            color: #EDEDED;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        #confirm-perch-post-btn:hover,
+        #confirm-echo-post-btn:hover {
+            background: linear-gradient(135deg, #8ABCD1, #6CA984);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(108, 169, 132, 0.3);
+        }
+
+        #cancel-perch-post-btn,
+        #cancel-echo-post-btn {
+            background: rgba(112, 105, 93, 0.8);
+            color: #EDEDED;
+            border: 1px solid rgba(112, 105, 93, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .light-mode #cancel-perch-post-btn,
+        .light-mode #cancel-echo-post-btn {
+            background: rgba(107, 135, 112, 0.2);
+            color: #70695D;
+            border-color: rgba(107, 135, 112, 0.4);
+        }
+
+        #cancel-perch-post-btn:hover,
+        #cancel-echo-post-btn:hover {
+            background: rgba(112, 105, 93, 0.9);
+            transform: translateY(-1px);
+        }
+
+        .light-mode #cancel-perch-post-btn:hover,
+        .light-mode #cancel-echo-post-btn:hover {
+            background: rgba(107, 135, 112, 0.3);
+        }
+
+        /* 栖木标题特殊样式 - 体现栖息树木的概念 */
+        .perch-app-title {
+            background: linear-gradient(135deg, #6CA984, #8ABCD1, #6CA984);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: perchTitleGlow 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(108, 169, 132, 0.5);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+        
+        .light-mode .perch-app-title {
+            background: linear-gradient(135deg, #6B8770, #108B96, #6B8770);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 15px rgba(107, 135, 112, 0.3);
+        }
+
+        @keyframes perchTitleGlow {
+            0%, 100% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .perch-app-title::before {
+            content: '🌳';
+            position: absolute;
+            left: -1.5em;
+            opacity: 0.6;
+            animation: perchTreeSway 4s ease-in-out infinite;
+        }
+
+        .perch-app-title::after {
+            content: '🍃';
+            position: absolute;
+            right: -1.5em;
+            opacity: 0.6;
+            animation: perchLeafFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes perchTreeSway {
+            0%, 100% { transform: rotate(-2deg); }
+            50% { transform: rotate(2deg); }
+        }
+
+        @keyframes perchLeafFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-3px) rotate(5deg); }
+            66% { transform: translateY(1px) rotate(-3deg); }
         }
         
         #perch-feed-container {
-            background-color: #111827;
+            background: linear-gradient(135deg, rgba(16, 139, 150, 0.05), rgba(107, 135, 112, 0.03));
+            backdrop-filter: blur(10px);
         }
         .light-mode #perch-feed-container {
-            background-color: #f3f4f6;
+            background: linear-gradient(135deg, rgba(248, 247, 240, 0.9), rgba(192, 214, 149, 0.1));
         }
 
         .perch-card {
-            background-color: #1f2937;
-            border-radius: 0.5rem;
+            background: linear-gradient(135deg, rgba(16, 139, 150, 0.08), rgba(107, 135, 112, 0.05));
+            border-radius: 0.75rem;
             padding: 1rem;
-            border: 1px solid #374151;
+            border: 1px solid rgba(108, 169, 132, 0.2);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px rgba(107, 135, 112, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
         }
+        
+        .perch-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(107, 135, 112, 0.2);
+            border-color: rgba(108, 169, 132, 0.4);
+        }
+        
         .light-mode .perch-card {
-            background-color: #ffffff;
-            border: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, rgba(248, 247, 240, 0.95), rgba(192, 214, 149, 0.15));
+            border: 1px solid rgba(107, 135, 112, 0.3);
+            box-shadow: 0 8px 32px rgba(107, 135, 112, 0.15);
+        }
+        
+
+        
+        .light-mode .perch-card:hover {
+            box-shadow: 0 12px 40px rgba(107, 135, 112, 0.25);
+            border-color: rgba(107, 135, 112, 0.5);
         }
 
         .perch-header {
@@ -9523,13 +9762,30 @@
         }
         .perch-avatar {
             width: 2.5rem; height: 2.5rem; border-radius: 50%;
-            margin-right: 0.75rem; background-color: #4b5563;
+            margin-right: 0.75rem; background: linear-gradient(135deg, #6CA984, #8ABCD1);
             background-position: center; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(108, 169, 132, 0.3);
+            box-shadow: 0 4px 15px rgba(107, 135, 112, 0.2);
         }
         .perch-author-info { flex-grow: 1; }
-        .perch-author-name { font-weight: 700; font-size: 0.875rem; }
-        .perch-author-handle { font-size: 0.75rem; color: #9ca3af; }
+        .perch-author-name { 
+            font-weight: 700; 
+            font-size: 0.875rem; 
+            color: #EDEDED;
+            text-shadow: 0 1px 3px rgba(16, 139, 150, 0.3);
+        }
+        .light-mode .perch-author-name {
+            color: #70695D;
+            text-shadow: 0 1px 2px rgba(107, 135, 112, 0.2);
+        }
+        .perch-author-handle { 
+            font-size: 0.75rem; 
+            color: rgba(138, 188, 209, 0.8);
+        }
+        .light-mode .perch-author-handle {
+            color: rgba(107, 135, 112, 0.7);
+        }
         .perch-header-actions {
             display: flex;
             align-items: center;
@@ -9589,16 +9845,23 @@
             line-height: 1.6;
             font-size: 0.875rem;
             margin-bottom: 1rem;
+            color: #EDEDED;
+            text-shadow: 0 1px 2px rgba(16, 139, 150, 0.2);
+        }
+        .light-mode .perch-content {
+            color: #70695D;
+            text-shadow: 0 1px 1px rgba(107, 135, 112, 0.1);
         }
 
         .perch-meta {
             font-size: 0.75rem;
-            color: #9ca3af;
+            color: rgba(138, 188, 209, 0.7);
             padding-bottom: 0.75rem;
-            border-bottom: 1px solid #374151;
+            border-bottom: 1px solid rgba(108, 169, 132, 0.2);
         }
         .light-mode .perch-meta {
-            border-color: #e5e7eb;
+            color: rgba(107, 135, 112, 0.6);
+            border-color: rgba(107, 135, 112, 0.3);
         }
 
         .perch-stats {
@@ -9606,18 +9869,19 @@
             gap: 1.5rem;
             padding: 0.75rem 0;
             font-size: 0.75rem;
-            color: #9ca3af;
-            border-bottom: 1px solid #374151;
+            color: rgba(138, 188, 209, 0.7);
+            border-bottom: 1px solid rgba(108, 169, 132, 0.2);
         }
         .light-mode .perch-stats {
-            border-color: #e5e7eb;
+            color: rgba(107, 135, 112, 0.6);
+            border-color: rgba(107, 135, 112, 0.3);
         }
         .perch-stats strong {
             font-weight: 700;
-            color: #f9fafb;
+            color: #6CA984;
         }
         .light-mode .perch-stats strong {
-            color: #1f2937;
+            color: #6B8770;
         }
 
         /* --- V12.2 互动栏高度最终修正 --- */
@@ -9625,14 +9889,17 @@
             display: flex;
             justify-content: space-between; 
             align-items: center;
-            font-size: 1.125rem;
-            color: #9ca3af;
+            font-size: 0.9rem;
+            color: rgba(138, 188, 209, 0.8);
             /* 【核心修改】将上下内边距彻底设为 0 */
             padding: 0; 
             max-width: 280px; 
             margin: 0 auto;
             /* 【新增】为配合下方按钮的调整，增加一点上边距，与分割线分隔开 */
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
+        }
+        .light-mode .perch-actions {
+            color: rgba(107, 135, 112, 0.7);
         }
 
         /* 【新增】精确控制按钮本身的上下间距 */
@@ -9643,11 +9910,14 @@
             cursor: pointer;
             transition: color 0.2s;
             /* 将按钮的上下内边距设为非常小的值，几乎为零 */
-            padding-top: 0.1rem;
-            padding-bottom: 0.1rem;
+            padding: 0.05rem 0.25rem;
         }
         .perch-actions button:hover {
-            color: #3b82f6;
+            color: #6CA984;
+            transform: scale(1.1);
+        }
+        .light-mode .perch-actions button:hover {
+            color: #6B8770;
         }
 
         /* 新增：栖木转发功能样式 */
@@ -9734,6 +10004,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 0.5rem;
+            gap: 0;
         }
 
         /* 原帖头像样式 */
@@ -9741,7 +10012,7 @@
             width: 1.5rem;
             height: 1.5rem;
             border-radius: 50%;
-            margin-right: 0.5rem;
+            margin-right: 0;
             background-color: #4b5563;
             background-size: cover;
             background-position: center;
@@ -9756,6 +10027,8 @@
             font-weight: 600;
             font-size: 0.875rem;
             color: #f9fafb;
+            margin-left: 0;
+            padding-left: 0;
         }
         .light-mode .perch-card .font-semibold.text-sm {
             color: #1f2937;
@@ -9830,13 +10103,13 @@
         }
 
         /* 回响帖子的评论作者名样式 */
-        .perch-card .perch-comment .font-semibold.text-sm.text-blue-400 {
+        .perch-card .perch-comment .font-semibold.text-sm.text-emerald-400 {
             font-weight: 600;
             font-size: 0.75rem;
-            color: #60a5fa;
+            color: #34d399;
         }
-        .light-mode .perch-card .perch-comment .font-semibold.text-sm.text-blue-400 {
-            color: #2563eb;
+        .light-mode .perch-card .perch-comment .font-semibold.text-sm.text-emerald-400 {
+            color: #10b981;
         }
 
         /* 回响帖子的评论内容样式 */
@@ -9850,13 +10123,13 @@
         }
         
         /* 普通帖子的评论作者名样式 */
-        .perch-comment .font-semibold.text-sm.text-blue-400 {
+        .perch-comment .font-semibold.text-sm.text-emerald-400 {
             font-weight: 600;
             font-size: 0.75rem;
-            color: #60a5fa;
+            color: #34d399;
         }
-        .light-mode .perch-comment .font-semibold.text-sm.text-blue-400 {
-            color: #2563eb;
+        .light-mode .perch-comment .font-semibold.text-sm.text-emerald-400 {
+            color: #10b981;
         }
         
         /* 普通帖子的评论内容样式 */
@@ -9958,19 +10231,20 @@
             color: #9ca3af;
             cursor: pointer;
             transition: color 0.2s;
-            padding: 0.5rem;
+            padding: 0.25rem 0.375rem;
             border-radius: 0.25rem;
+            font-size: 0.85rem;
         }
         .perch-card .perch-actions button:hover {
-            color: #3b82f6;
-            background-color: rgba(59, 130, 246, 0.1);
+            color: #6CA984;
+            background-color: rgba(108, 169, 132, 0.1);
         }
         .light-mode .perch-card .perch-actions button {
             color: #6b7280;
         }
         .light-mode .perch-card .perch-actions button:hover {
-            color: #2563eb;
-            background-color: rgba(37, 99, 235, 0.1);
+            color: #6B8770;
+            background-color: rgba(107, 135, 112, 0.1);
         }
 
         /* 回响帖子的时间戳样式 */
@@ -10246,31 +10520,40 @@
             display: none !important;
         }
 
-        /* ====== 【新增】栖木通知系统样式 ====== */
+        /* ====== 【新增】栖木通知系统样式 - 树木栖息主题 ====== */
         .notification-item {
             display: flex;
             align-items: flex-start;
             gap: 0.75rem;
             padding: 0.75rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.2s;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
             cursor: pointer;
+            border: 1px solid transparent;
         }
         .dark-mode .notification-item:hover {
-            background-color: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, rgba(108, 169, 132, 0.1), rgba(138, 188, 209, 0.05));
+            border-color: rgba(108, 169, 132, 0.2);
+            transform: translateY(-1px);
         }
         .light-mode .notification-item:hover {
-            background-color: rgba(0, 0, 0, 0.03);
+            background: linear-gradient(135deg, rgba(192, 214, 149, 0.15), rgba(248, 247, 240, 0.8));
+            border-color: rgba(107, 135, 112, 0.3);
+            transform: translateY(-1px);
         }
 
         .notification-item.unread {
             position: relative;
         }
         .dark-mode .notification-item.unread {
-            background-color: rgba(59, 130, 246, 0.1);
+            background: linear-gradient(135deg, rgba(108, 169, 132, 0.15), rgba(16, 139, 150, 0.08));
+            border: 1px solid rgba(108, 169, 132, 0.3);
+            box-shadow: 0 4px 15px rgba(108, 169, 132, 0.1);
         }
         .light-mode .notification-item.unread {
-            background-color: rgba(59, 130, 246, 0.08);
+            background: linear-gradient(135deg, rgba(192, 214, 149, 0.2), rgba(248, 247, 240, 0.9));
+            border: 1px solid rgba(107, 135, 112, 0.4);
+            box-shadow: 0 4px 15px rgba(107, 135, 112, 0.15);
         }
 
         .notification-avatar {
@@ -10280,32 +10563,43 @@
             flex-shrink: 0;
             background-size: cover;
             background-position: center;
+            border: 2px solid rgba(108, 169, 132, 0.3);
+            box-shadow: 0 4px 15px rgba(107, 135, 112, 0.2);
         }
         .notification-content {
             flex-grow: 1;
             font-size: 0.875rem;
+            color: #EDEDED;
+        }
+        .light-mode .notification-content {
+            color: #70695D;
         }
         .notification-text strong {
             font-weight: 600;
         }
         .dark-mode .notification-text strong {
-            color: #93c5fd; /* 蓝色高亮 */
+            color: #6CA984; /* 栖木绿色高亮 */
+            text-shadow: 0 1px 2px rgba(16, 139, 150, 0.3);
         }
         .light-mode .notification-text strong {
-            color: #2563eb;
+            color: #6B8770;
+            text-shadow: 0 1px 1px rgba(107, 135, 112, 0.2);
         }
         .notification-quote {
             margin-top: 0.25rem;
             padding-left: 0.5rem;
             border-left: 2px solid;
             font-style: italic;
-            opacity: 0.7;
+            opacity: 0.8;
+            background: rgba(108, 169, 132, 0.05);
+            border-radius: 0 0.25rem 0.25rem 0;
         }
         .dark-mode .notification-quote {
-            border-color: #4b5563;
+            border-color: rgba(138, 188, 209, 0.6);
         }
         .light-mode .notification-quote {
-            border-color: #d1d5db;
+            border-color: rgba(107, 135, 112, 0.6);
+            background: rgba(192, 214, 149, 0.1);
         }
         .notification-timestamp {
             font-size: 0.75rem;
@@ -10650,6 +10944,31 @@
             color: #dc2626;
         }
 
+        /* ====== 【【终极栖木头像修复方案】】 ====== */
+
+        /* 1. 这是外层的"圆形相框"，专门负责裁剪 */
+        .perch-avatar-wrapper {
+            width: 2.5rem;      /* 确定头像大小 (40px) */
+            height: 2.5rem;     /* 确定头像大小 (40px) */
+            border-radius: 50%; /* 强制圆形 */
+            overflow: hidden;   /* 【【最关键】】把所有超出圆形的内容都剪掉！ */
+            flex-shrink: 0;     /* 防止在flex布局中被挤压变形 */
+            margin-right: 0.75rem; /* 和右边文字的间距 */
+            
+            /* (可选) 给相框加个好看的边框，和你的截图风格一致 */
+            border: 1px solid rgba(108, 169, 132, 0.4); 
+            background-color: #f0f0f0; /* 图片加载失败时的底色 */
+        }
+
+        /* 2. 这是内层的"照片"，专门负责显示图片 */
+        .perch-avatar-wrapper .perch-avatar {
+            width: 100%;        /* 撑满整个相框 */
+            height: 100%;       /* 撑满整个相框 */
+            background-size: cover;    /* 图片缩放以完全覆盖容器，不变形 */
+            background-position: center; /* 图片居中显示 */
+            background-repeat: no-repeat;
+        }
+
     </style>
 </head>
 <body class="dark-mode">
@@ -10897,7 +11216,10 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="动态监控"><i class="ri-eye-line text-white text-2xl"></i></div>
                             <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="设置"><i class="fas fa-cog text-white text-2xl"></i></div>
-                            <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="栖木"><i class="ri-chat-quote-line text-white text-2xl"></i></div>
+                            <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass relative" data-app-name="栖木">
+                                <i class="ri-chat-quote-line text-white text-2xl"></i>
+                                <div id="perch-dock-badge" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden"></div>
+                            </div>
                             <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="剧场"><i class="ri-movie-2-line text-white text-2xl"></i></div>
                         </div>
                     </div>
@@ -11807,144 +12129,143 @@
                     <button id="heartbeat-settings-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
                     <h3 class="app-header-title flex-grow text-center">角色心跳设置</h3>
                 </div>
-                <div class="settings-content flex-1 p-2 overflow-y-auto space-y-4">
-                    
-                    <!-- 系统心跳设置 -->
-                    <div class="p-4 rounded-lg bg-card">
-                        <h3 class="font-bold mb-4 flex items-center">
-                            <i class="fas fa-cogs mr-2"></i>
-                            系统心跳
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="system-heartbeat-interval" class="block text-sm font-medium mb-2">心跳间隔 (小时)</label>
-                                <input type="number" id="system-heartbeat-interval" min="0.1" max="24" step="0.1" value="1" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">系统检查角色是否需要触发AI行动的间隔时间</p>
-                            </div>
-                            <div>
-                                <label for="system-trigger-threshold" class="block text-sm font-medium mb-2">触发阈值 (分钟)</label>
-                                <input type="number" id="system-trigger-threshold" min="1" max="1440" step="1" value="1" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">角色无交互多久后触发AI行动</p>
-                            </div>
-                        </div>
-                    </div>
+<div class="settings-content flex-1 p-2 overflow-y-auto space-y-4">
 
-                    <!-- 栖木心跳设置 -->
-                    <div class="p-4 rounded-lg bg-card">
-                        <h3 class="font-bold mb-4 flex items-center">
-                            <i class="fas fa-tree mr-2"></i>
-                            栖木心跳
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="perch-heartbeat-interval" class="block text-sm font-medium mb-2">心跳间隔 (分钟)</label>
-                                <input type="number" id="perch-heartbeat-interval" min="1" max="1440" step="1" value="5" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">AI角色自主发帖到栖木的检查间隔</p>
-                            </div>
-                            <div>
-                                <label for="perch-post-probability" class="block text-sm font-medium mb-2">发帖概率 (%)</label>
-                                <input type="number" id="perch-post-probability" min="0" max="100" step="1" value="30" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">每次心跳检查时触发发帖的概率</p>
-                            </div>
-                        </div>
-                    </div>
+    <div class="p-4 rounded-lg bg-card">
+        <h3 class="font-bold mb-4 flex items-center">
+            <i class="fas fa-cogs mr-2"></i>
+            角色关系心跳
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="system-heartbeat-interval" class="block text-sm font-medium mb-2">心跳间隔 (小时)</label>
+                <input type="number" id="system-heartbeat-interval" min="0.1" max="24" step="0.1" value="1" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">系统**每隔这么久**就会进行一次"全局检查"，看看有没有哪个角色需要主动联系您。<br><strong>案例：</strong>设置为`2`，则每2小时检查一次。</p>
+            </div>
+            <div>
+                <label for="system-trigger-threshold" class="block text-sm font-medium mb-2">触发阈值 (分钟)</label>
+                <input type="number" id="system-trigger-threshold" min="1" max="1440" step="1" value="1" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">当"全局检查"时，如果发现您与某个角色**超过这个分钟数**没有互动，该角色就会主动给您发私信。<br><strong>案例：</strong>设置为`60`，则超过1小时没聊天的角色，在下次检查时可能会联系您。</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- NPC文学创作心跳设置 -->
-                    <div class="p-4 rounded-lg bg-card">
-                        <h3 class="font-bold mb-4 flex items-center">
-                            <i class="fas fa-pen-fancy mr-2"></i>
-                            NPC文学创作心跳
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="npc-writing-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
-                                <input type="number" id="npc-writing-min-interval" min="1" max="1440" step="1" value="5" class="form-input w-full">
-                            </div>
-                            <div>
-                                <label for="npc-writing-max-interval" class="block text-sm font-medium mb-2">最大间隔 (分钟)</label>
-                                <input type="number" id="npc-writing-max-interval" min="1" max="1440" step="1" value="15" class="form-input w-full">
-                            </div>
-                            <div>
-                                <label for="npc-writing-probability" class="block text-sm font-medium mb-2">触发概率 (%)</label>
-                                <input type="number" id="npc-writing-probability" min="0" max="100" step="1" value="35" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">NPC文学创作的触发概率</p>
-                            </div>
-                        </div>
-                    </div>
+    <div class="p-4 rounded-lg bg-card">
+        <h3 class="font-bold mb-4 flex items-center">
+            <i class="fas fa-tree mr-2"></i>
+            栖木心跳
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="perch-heartbeat-interval" class="block text-sm font-medium mb-2">心跳间隔 (分钟)</label>
+                <input type="number" id="perch-heartbeat-interval" min="1" max="1440" step="1" value="5" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">系统**每隔这么久**就会"提醒"一次所有AI角色："嘿，要不要去栖木上发点什么？"<br><strong>案例：</strong>设置为`10`，则每10分钟提醒一次。</p>
+            </div>
+            <div>
+                <label for="perch-post-probability" class="block text-sm font-medium mb-2">发帖概率 (%)</label>
+                <input type="number" id="perch-post-probability" min="0" max="100" step="1" value="30" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">当AI角色收到"提醒"时，它会根据这个概率**决定是否真的要发帖**。<br><strong>案例：</strong>设置为`30`，则每个角色每次被提醒时，有30%的可能性会去发帖。**设置为`0`则彻底关闭此功能。**</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- 匿名树洞心跳设置 -->
-                    <div class="p-4 rounded-lg bg-card">
-                        <h3 class="font-bold mb-4 flex items-center">
-                            <i class="fas fa-user-secret mr-2"></i>
-                            匿名树洞心跳
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="anonymous-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
-                                <input type="number" id="anonymous-min-interval" min="1" max="1440" step="1" value="20" class="form-input w-full">
-                            </div>
-                            <div>
-                                <label for="anonymous-max-interval" class="block text-sm font-medium mb-2">最大间隔 (分钟)</label>
-                                <input type="number" id="anonymous-max-interval" min="1" max="1440" step="1" value="40" class="form-input w-full">
-                            </div>
-                            <div>
-                                <label for="anonymous-probability" class="block text-sm font-medium mb-2">触发概率 (%)</label>
-                                <input type="number" id="anonymous-probability" min="0" max="100" step="1" value="50" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">匿名树洞分享的触发概率</p>
-                            </div>
-                        </div>
-                    </div>
+    <div class="p-4 rounded-lg bg-card">
+        <h3 class="font-bold mb-4 flex items-center">
+            <i class="fas fa-pen-fancy mr-2"></i>
+            NPC文学创作心跳
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="npc-writing-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
+                <input type="number" id="npc-writing-min-interval" min="1" max="1440" step="1" value="5" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">NPC进行一次文学创作后，**至少**要等这么多分钟，才可能再次创作。</p>
+            </div>
+            <div>
+                <label for="npc-writing-max-interval" class="block text-sm font-medium mb-2">最大间隔 (分钟)</label>
+                <input type="number" id="npc-writing-max-interval" min="1" max="1440" step="1" value="15" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">NPC的创作欲望有"保底"，**最多**等这么多分钟，系统就会强制他思考一次要不要创作。</p>
+            </div>
+            <div>
+                <label for="npc-writing-probability" class="block text-sm font-medium mb-2">触发概率 (%)</label>
+                <input type="number" id="npc-writing-probability" min="0" max="100" step="1" value="35" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">在最小和最大间隔之间的**每一次随机检查**中，有这么大的概率会成功触发创作。</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- NPC定时发帖心跳设置 -->
-                    <div class="p-4 rounded-lg bg-card">
-                        <h3 class="font-bold mb-4 flex items-center">
-                            <i class="fas fa-robot mr-2"></i>
-                            NPC定时发帖心跳
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="npc-post-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
-                                <input type="number" id="npc-post-min-interval" min="1" max="1440" step="1" value="2" class="form-input w-full">
-                            </div>
-                            <div>
-                                <label for="npc-post-max-interval" class="block text-sm font-medium mb-2">最大间隔 (分钟)</label>
-                                <input type="number" id="npc-post-max-interval" min="1" max="1440" step="1" value="5" class="form-input w-full">
-                            </div>
-                            <div>
-                                <label for="npc-post-probability" class="block text-sm font-medium mb-2">触发概率 (%)</label>
-                                <input type="number" id="npc-post-probability" min="0" max="100" step="1" value="25" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">NPC定时发帖的触发概率</p>
-                            </div>
-                        </div>
-                    </div>
+    <div class="p-4 rounded-lg bg-card">
+        <h3 class="font-bold mb-4 flex items-center">
+            <i class="fas fa-user-secret mr-2"></i>
+            匿名树洞心跳
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="anonymous-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
+                <input type="number" id="anonymous-min-interval" min="1" max="1440" step="1" value="20" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">NPC发布一条匿名树洞后，**至少**要等这么多分钟，才可能再次分享心情。</p>
+            </div>
+            <div>
+                <label for="anonymous-max-interval" class="block text-sm font-medium mb-2">最大间隔 (分钟)</label>
+                <input type="number" id="anonymous-max-interval" min="1" max="1440" step="1" value="40" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">NPC的倾诉欲望有"保底"，**最多**等这么多分钟，系统就会提醒他考虑要不要匿名分享点什么。</p>
+            </div>
+            <div>
+                <label for="anonymous-probability" class="block text-sm font-medium mb-2">触发概率 (%)</label>
+                <input type="number" id="anonymous-probability" min="0" max="100" step="1" value="50" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">在最小和最大间隔之间的**每一次随机检查**中，有这么大的概率会成功触发匿名分享。<br><strong>案例：</strong>设置为`50`，则每次检查时有一半的机会会发布树洞。</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- 朋友圈最小间隔设置 -->
-                    <div class="p-4 rounded-lg bg-card">
-                        <h3 class="font-bold mb-4 flex items-center">
-                            <i class="fas fa-users mr-2"></i>
-                            朋友圈发布间隔
-                        </h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label for="moments-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
-                                <input type="number" id="moments-min-interval" min="1" max="1440" step="1" value="30" class="form-input w-full">
-                                <p class="text-xs text-gray-400 mt-1">发布朋友圈的最小时间间隔</p>
-                            </div>
-                        </div>
-                    </div>
+    <div class="p-4 rounded-lg bg-card">
+        <h3 class="font-bold mb-4 flex items-center">
+            <i class="fas fa-robot mr-2"></i>
+            NPC定时发帖心跳
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="npc-post-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
+                <input type="number" id="npc-post-min-interval" min="1" max="1440" step="1" value="2" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">NPC发布一条普通帖子后，**至少**要等这么多分钟，才可能再次发帖。<br><strong>案例：</strong>设置为`5`，则NPC每5分钟最多发一条帖子。</p>
+            </div>
+            <div>
+                <label for="npc-post-max-interval" class="block text-sm font-medium mb-2">最大间隔 (分钟)</label>
+                <input type="number" id="npc-post-max-interval" min="1" max="1440" step="1" value="5" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">NPC的社交需求有"保底"，**最多**等这么多分钟，系统就会提醒他考虑要不要发条帖子互动一下。</p>
+            </div>
+            <div>
+                <label for="npc-post-probability" class="block text-sm font-medium mb-2">触发概率 (%)</label>
+                <input type="number" id="npc-post-probability" min="0" max="100" step="1" value="25" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">在最小和最大间隔之间的**每一次随机检查**中，有这么大的概率会成功触发发帖。<br><strong>案例：</strong>设置为`25`，则每次检查时有四分之一的机会会发布新帖子。</p>
+            </div>
+        </div>
+    </div>
 
-                    <!-- 控制按钮 -->
-                    <div class="flex gap-2 mt-6">
-                        <button id="save-heartbeat-settings" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium">
-                            <i class="fas fa-save mr-2"></i>保存设置
-                        </button>
-                        <button id="reset-heartbeat-settings" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-medium">
-                            <i class="fas fa-undo mr-2"></i>重置默认
-                        </button>
-                    </div>
+    <div class="p-4 rounded-lg bg-card">
+        <h3 class="font-bold mb-4 flex items-center">
+            <i class="fas fa-users mr-2"></i>
+            朋友圈发布间隔
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="moments-min-interval" class="block text-sm font-medium mb-2">最小间隔 (分钟)</label>
+                <input type="number" id="moments-min-interval" min="1" max="1440" step="1" value="30" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">这是一个"冷却时间"。角色发布一条朋友圈动态后，**至少要等这么多分钟**才能发布下一条，以防刷屏。<br><strong>案例：</strong>设置为`60`，则角色一小时内最多只会发布一条动态。</p>
+            </div>
+        </div>
+    </div>
 
-                    <div id="heartbeat-status" class="mt-4 p-4 rounded-lg text-center font-semibold text-sm hidden"></div>
-                </div>
+    <div class="flex gap-2 mt-6">
+        <button id="save-heartbeat-settings" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium">
+            <i class="fas fa-save mr-2"></i>保存设置
+        </button>
+        <button id="reset-heartbeat-settings" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-medium">
+            <i class="fas fa-undo mr-2"></i>重置默认
+        </button>
+    </div>
+
+    <div id="heartbeat-status" class="mt-4 p-4 rounded-lg text-center font-semibold text-sm hidden"></div>
+</div>
             </div>
 
             <div id="api-settings-screen" class="app-screen-view api-settings-screen flex-col hidden">
@@ -12080,8 +12401,15 @@
             <!-- 栖木 App 界面和发布弹窗 -->
             <div id="perch-screen" class="app-screen-view flex-col hidden">
                 <div class="app-header">
-                    <button id="perch-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
-                    <h3 class="app-header-title flex-grow text-center">栖木</h3>
+                    <div class="w-12">
+                        <button id="perch-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
+                    </div>
+                    <h3 class="app-header-title flex-grow text-center perch-app-title">栖木</h3>
+                    <div class="w-12 text-right">
+                        <button id="perch-settings-btn" class="app-header-btn" title="设置" style="font-size: 1.5em !important; margin-top: 1px !important; position: relative; top: 2px;">
+                            <i class="ri-settings-3-line"></i>
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- 栖木互动栏 -->
@@ -12236,6 +12564,65 @@
                     </div>
                     <div id="perch-worldview-list" class="flex-1 overflow-y-auto space-y-2">
                         </div>
+                </div>
+            </div>
+
+            <div id="perch-settings-modal" class="modal-overlay">
+                <div class="modal-content w-[95%] max-w-[380px] flex flex-col max-h-[85vh]">
+                    <div class="flex justify-between items-center mb-4 flex-shrink-0">
+                        <h3 class="text-xl font-bold">栖木设置</h3>
+                        <button id="close-perch-settings-modal" class="text-2xl p-1 rounded-full hover:bg-white/20">&times;</button>
+                    </div>
+
+                    <div class="flex-1 overflow-y-auto space-y-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">屏蔽内置NPC</h4>
+                            <div id="mute-npc-list" class="space-y-2 p-2 bg-black/20 rounded-lg">
+                                </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="font-semibold">自定义NPC管理</h4>
+                                <button id="add-custom-npc-btn" class="text-sm bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">添加新NPC</button>
+                            </div>
+                            <div id="custom-npc-list-container" class="space-y-2 p-2 bg-black/20 rounded-lg min-h-[50px]">
+                                </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-gray-700 flex justify-end">
+                        <button id="save-perch-settings-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg">保存设置</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="perch-custom-npc-modal" class="modal-overlay">
+                <div class="modal-content w-[95%] max-w-[360px]">
+                    <h3 id="custom-npc-modal-title" class="text-xl font-bold mb-4">添加新NPC</h3>
+                    <input type="hidden" id="editing-npc-id">
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm">名字:</label>
+                            <input type="text" id="custom-npc-name" class="form-input mt-1" placeholder="NPC在论坛显示的名字">
+                        </div>
+                        <div>
+                            <label class="text-sm">头像URL:</label>
+                            <input type="text" id="custom-npc-avatar" class="form-input mt-1" placeholder="一个图片链接">
+                        </div>
+                        <div>
+                            <label class="text-sm">角色设定 (Persona):</label>
+                            <textarea id="custom-npc-persona" class="form-textarea h-24 mt-1" placeholder="详细描述该角色的性格、背景、知识等。"></textarea>
+                        </div>
+                        <div>
+                            <label class="text-sm">发帖风格 (Prompt):</label>
+                            <textarea id="custom-npc-style" class="form-textarea h-24 mt-1" placeholder="给AI的具体指令，告诉它如何发帖，例如：必须以'XX说：'开头..."></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end gap-2">
+                        <button id="cancel-custom-npc-btn" class="px-4 py-2 rounded-lg">取消</button>
+                        <button id="save-custom-npc-btn" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button>
+                    </div>
                 </div>
             </div>
 
@@ -13595,34 +13982,55 @@ function getChatBackgroundElement() {
             const settings = loadData('heartbeatSettings', defaultHeartbeatSettings);
             
             // 重启系统心跳
-            heartbeatTimers.systemHeartbeat = setInterval(systemHeartbeat, settings.systemHeartbeatInterval * 60 * 60 * 1000);
+            const systemInterval = settings.systemHeartbeatInterval * 60 * 60 * 1000;
+            if (systemInterval > 0) {
+                heartbeatTimers.systemHeartbeat = setInterval(systemHeartbeat, systemInterval);
+            }
             
             // 重启栖木心跳
-            heartbeatTimers.perchHeartbeat = setInterval(perchHeartbeat, settings.perchHeartbeatInterval * 60 * 1000);
+            const perchInterval = settings.perchHeartbeatInterval * 60 * 1000;
+            if (perchInterval > 0) {
+                heartbeatTimers.perchHeartbeat = setInterval(perchHeartbeat, perchInterval);
+            }
             
             // 重启NPC文学创作心跳
-            heartbeatTimers.npcWriting = setInterval(() => {
-                const apiSettings = loadData('api_settings');
-                if (apiSettings && apiSettings.url && apiSettings.key && Math.random() < (settings.npcWritingProbability / 100)) {
-                    triggerNpcPost();
-                }
-            }, (Math.random() * (settings.npcWritingMaxInterval - settings.npcWritingMinInterval) + settings.npcWritingMinInterval) * 60 * 1000);
+            const npcWritingMin = settings.npcWritingMinInterval * 60 * 1000;
+            const npcWritingMax = settings.npcWritingMaxInterval * 60 * 1000;
+            if (npcWritingMin > 0 && npcWritingMax > 0) {
+                const npcWritingInterval = Math.random() * (npcWritingMax - npcWritingMin) + npcWritingMin;
+                heartbeatTimers.npcWriting = setInterval(() => {
+                    const apiSettings = loadData('api_settings');
+                    if (apiSettings && apiSettings.url && apiSettings.key && Math.random() < (settings.npcWritingProbability / 100)) {
+                        triggerNpcPost();
+                    }
+                }, npcWritingInterval);
+            }
             
             // 重启匿名树洞心跳
-            heartbeatTimers.anonymous = setInterval(() => {
-                const apiSettings = loadData('api_settings');
-                if (apiSettings && apiSettings.url && apiSettings.key && Math.random() < (settings.anonymousProbability / 100)) {
-                    triggerAnonymousConfessionPost();
-                }
-            }, (Math.random() * (settings.anonymousMaxInterval - settings.anonymousMinInterval) + settings.anonymousMinInterval) * 60 * 1000);
+            const anonymousMin = settings.anonymousMinInterval * 60 * 1000;
+            const anonymousMax = settings.anonymousMaxInterval * 60 * 1000;
+            if (anonymousMin > 0 && anonymousMax > 0) {
+                const anonymousInterval = Math.random() * (anonymousMax - anonymousMin) + anonymousMin;
+                heartbeatTimers.anonymous = setInterval(() => {
+                    const apiSettings = loadData('api_settings');
+                    if (apiSettings && apiSettings.url && apiSettings.key && Math.random() < (settings.anonymousProbability / 100)) {
+                        triggerAnonymousConfessionPost();
+                    }
+                }, anonymousInterval);
+            }
             
             // 重启NPC定时发帖心跳
-            heartbeatTimers.npcPost = setInterval(() => {
-                const apiSettings = loadData('api_settings');
-                if (apiSettings && apiSettings.url && apiSettings.key && Math.random() < (settings.npcPostProbability / 100)) {
-                    triggerNpcPost();
-                }
-            }, (Math.random() * (settings.npcPostMaxInterval - settings.npcPostMinInterval) + settings.npcPostMinInterval) * 60 * 1000);
+            const npcPostMin = settings.npcPostMinInterval * 60 * 1000;
+            const npcPostMax = settings.npcPostMaxInterval * 60 * 1000;
+            if (npcPostMin > 0 && npcPostMax > 0) {
+                const npcPostInterval = Math.random() * (npcPostMax - npcPostMin) + npcPostMin;
+                heartbeatTimers.npcPost = setInterval(() => {
+                    const apiSettings = loadData('api_settings');
+                    if (apiSettings && apiSettings.url && apiSettings.key && Math.random() < (settings.npcPostProbability / 100)) {
+                        triggerNpcPost();
+                    }
+                }, npcPostInterval);
+            }
             
             console.log('心跳定时器已重启，使用新的设置参数');
         }
@@ -14066,6 +14474,9 @@ function getChatBackgroundElement() {
             // 【新增】加载栖木通知数据
             perchNotifications = loadData('perchNotifications', []);
             updateNotificationBell(); // 页面加载时更新铃铛状态
+            
+            customNpcs = loadData('custom_npcs', []);
+            mutedNpcs = loadData('muted_npcs', []);
         }
 
         // 通用功能
@@ -15378,8 +15789,8 @@ if (type === 'image') {
                 `;
             } else if (type === 'perch-forward') {
                 messageBubble.className = `chat-message ${senderClass} perch-forward-bubble`;
-                
-                const uniqueAvatarId = `forward-avatar-${Date.now()}`;
+
+                const uniqueAvatarId = `forward-avatar-${Date.now()}-${Math.random()}`;
                 const avatarHtml = `<div id="${uniqueAvatarId}" class="w-6 h-6 rounded-full bg-zinc-600 flex-shrink-0 bg-cover bg-center"></div>`;
 
                 const forwardContent = `
@@ -15392,22 +15803,18 @@ if (type === 'image') {
                 `;
                 messageBubble.innerHTML = forwardContent;
 
+                // 【【核心修正】】
+                // 使用 setTimeout(..., 0) 将头像加载操作推迟到DOM更新之后，确保能找到元素
+                // 并统一使用 loadAvatar 函数，使其能够正确处理所有来源的头像（包括NPC的网络链接）
                 if (content.originalAuthorAvatar) {
-                    if (content.originalAuthorAvatar.startsWith('http://') || content.originalAuthorAvatar.startsWith('https://')) {
+                    setTimeout(async () => {
                         const avatarElement = document.getElementById(uniqueAvatarId);
                         if (avatarElement) {
-                            avatarElement.style.backgroundImage = `url(${content.originalAuthorAvatar})`;
+                            await loadAvatar(content.originalAuthorAvatar, avatarElement, content.originalAuthorName.charAt(0) || '?', false);
                         }
-                    } else {
-                        getImageFromDB(content.originalAuthorAvatar).then(blob => {
-                            const avatarElement = document.getElementById(uniqueAvatarId);
-                            if (avatarElement && blob) {
-                                avatarElement.style.backgroundImage = `url(${URL.createObjectURL(blob)})`;
-                            }
-                        });
-                    }
+                    }, 0);
                 }
-                
+
                 messageBubble.addEventListener('click', () => {
                     showMessageBox('这是一个从栖木转发来的帖子');
                 });
@@ -15745,9 +16152,8 @@ if (type === 'image') {
                 `;
             } else if (type === 'perch-forward') {
                 messageBubble.className = `chat-message ${senderClass} perch-forward-bubble`;
-                
-                // 为头像创建一个唯一的ID，以便异步加载
-                const uniqueAvatarId = `forward-avatar-${Date.now()}`;
+
+                const uniqueAvatarId = `forward-avatar-${Date.now()}-${Math.random()}`;
                 const avatarHtml = `<div id="${uniqueAvatarId}" class="w-6 h-6 rounded-full bg-zinc-600 flex-shrink-0 bg-cover bg-center"></div>`;
 
                 const forwardContent = `
@@ -15760,27 +16166,18 @@ if (type === 'image') {
                 `;
                 messageBubble.innerHTML = forwardContent;
 
-                // 异步加载头像图片（支持图床链接和数据库存储）
+                // 【【核心修正】】
+                // 使用 setTimeout(..., 0) 将头像加载操作推迟到DOM更新之后，确保能找到元素
+                // 并统一使用 loadAvatar 函数，使其能够正确处理所有来源的头像（包括NPC的网络链接）
                 if (content.originalAuthorAvatar) {
-                    // 检查是否是图床链接（以http或https开头）
-                    if (content.originalAuthorAvatar.startsWith('http://') || content.originalAuthorAvatar.startsWith('https://')) {
-                        // 直接使用图床链接
+                    setTimeout(async () => {
                         const avatarElement = document.getElementById(uniqueAvatarId);
                         if (avatarElement) {
-                            avatarElement.style.backgroundImage = `url(${content.originalAuthorAvatar})`;
+                            await loadAvatar(content.originalAuthorAvatar, avatarElement, content.originalAuthorName.charAt(0) || '?', false);
                         }
-                    } else {
-                        // 从数据库加载头像图片
-                        getImageFromDB(content.originalAuthorAvatar).then(blob => {
-                            const avatarElement = document.getElementById(uniqueAvatarId);
-                            if (avatarElement && blob) {
-                                avatarElement.style.backgroundImage = `url(${URL.createObjectURL(blob)})`;
-                            }
-                        });
-                    }
+                    }, 0);
                 }
 
-                // 为转发的卡片添加点击事件，可以跳转回栖木App（未来可扩展）
                 messageBubble.addEventListener('click', () => {
                     showMessageBox('这是一个从栖木转发来的帖子');
                 });
@@ -18370,7 +18767,9 @@ ${transcriptText}
             perchPosts.push(newPost);
             saveData('perchPosts', perchPosts);
             renderPerchFeed();
-            showMessageBox(`栖木上有新话题：来自 ${npc.name}`);
+            
+            // 【【修改】】调用新的通知分发函数
+            dispatchPerchNotification(newPost);
         }
     }
 
@@ -19226,10 +19625,34 @@ ${transcriptText}
         // FIX 4: ADDED NOTIFICATION FUNCTION
         let notificationTimeout;
 let perchPosts = []; // 用于存储栖木的帖子
+let customNpcs = []; // 用于存储自定义NPC
+let mutedNpcs = [];  // 用于存储被屏蔽的内置NPC的ID
 let perchNotifications = []; // 用于存储栖木的通知
 
 // ================== 【文学升级版：NPC角色库】 ==================
 let npcProfiles = [
+        // --- 新增功能型NPC ---
+        {
+            npcId: 'npc_paradox_tavern', name: '悖论酒馆', avatar: 'https://i.postimg.cc/8Pt9crGH/d249684942f94a7a208863caf2362b7b.jpg',
+            persona: '一位神秘的酒馆老板，女性，只在吧台留下引人深思的思想实验或两难选择。',
+            style: '必须以"今日议题："开头，并以一个开放式或二选一的问题结束。',
+            topics: ['#选择', '#人性', '#思想实验', '#困境'],
+            interactionStyle: '从不回复，只提出问题。'
+        },
+        {
+            npcId: 'npc_inspiration_bottle', name: '深海回响', avatar: 'https://i.postimg.cc/pd8sfmw3/a1843858c0c6b3cb0533704b38f99a7d.jpg',
+            persona: '一位匿名的旅行者，将充满故事感的场景片段装进瓶子，扔进栖木之海。',
+            style: '必须以"瓶中信#xxx："的格式开头，内容必须是一个引人入胜的故事开头或场景描写。',
+            topics: ['#故事', '#创作', '#悬念', '#灵感'],
+            interactionStyle: '从不回复，只分享故事的引子。'
+        },
+        {
+            npcId: 'npc_memory_bakery', name: '记忆烘焙坊', avatar: 'https://i.postimg.cc/RF5by71M/656839f2fa28ab79bf9ed39159af47d3.jpg',
+            persona: '一位温暖的烘焙师，她能将抽象的情感和记忆制作成甜点，并邀请大家分享回忆。',
+            style: '必须以"今日出炉/限定/特供："开头，描述一款情感甜点，并以一个关于味道和回忆的问题邀请他人分享。',
+            topics: ['#回忆', '#情感', '#味道', '#治愈'],
+            interactionStyle: '温柔地肯定每一个分享者。'
+        },
     // --- 栖木网红博主 (文采强化版) ---
     {
         npcId: 'npc_astrologer_oracle', name: '碎星占卜师', avatar: 'https://tc-new.z.wiki/autoupload/f/fRcoPlzpthEzwh0RrI62JbKXl_QqVl-bpSwqP4fJO68/20250901/pzvH/1284X1268/cc1f8fe62a4f00b3bd24ae422ccb2184.jpg/webp',
@@ -20256,9 +20679,7 @@ ${moment.image ? `配图描述: ${moment.image_desc}` : ''}
 
                 let chatHistory = JSON.parse(JSON.stringify(chatHistories[characterId]?.history || []));
                 
-                const worldBookContext = (character.linkedWorldBookIds || [])
-                    .map(bookId => worldBooks.find(wb => wb.id === bookId) ? `[世界观: ${worldBooks.find(wb => wb.id === bookId).title}]\n${worldBooks.find(wb => wb.id === bookId).content}` : '')
-                    .filter(Boolean).join('\n\n');
+                const worldBookContext = getCharacterWorldContext(character);
 
                 // ==== 核心修改开始 ====
                 const recentMomentsFormatted = formatRecentMomentsForAI(characterId);
@@ -25471,7 +25892,9 @@ function renderPerchFeed() {
 
             cardContentHTML = `
                 <div class="perch-header">
-                    <div class="perch-avatar" id="${uniqueAvatarId}"></div>
+                    <div class="perch-avatar-wrapper" id="${uniqueAvatarId}">
+                        <div class="perch-avatar"></div>
+                    </div>
                     <div class="perch-author-info">
                         <div class="perch-author-name">${post.authorName}</div>
                         <span class="text-xs text-gray-500">发表了回响</span>
@@ -25482,7 +25905,9 @@ function renderPerchFeed() {
 
                 <div class="mt-2 p-3 border border-gray-700 rounded-lg">
                     <div class="flex items-center mb-2">
-                        <div class="perch-avatar w-6 h-6 mr-2" id="${originalAvatarId}"></div>
+                        <div class="perch-avatar-wrapper w-6 h-6 mr-2" id="${originalAvatarId}" style="width: 1.5rem; height: 1.5rem; margin-right: 0.5rem;">
+                            <div class="perch-avatar"></div>
+                        </div>
                         <span class="font-semibold text-sm">${original.authorName}</span>
                     </div>
                     <p class="text-sm text-gray-300 whitespace-pre-wrap">${original.content}</p>
@@ -25503,7 +25928,7 @@ function renderPerchFeed() {
                     </div>
                     ${(post.comments || []).map(c => `
     <div class="perch-comment mt-2 p-2 rounded-md border cursor-pointer hover:bg-white/10 relative" onclick="handleReplyAction('${post.id}', '${c.id}', '${c.authorName}')">
-        <span class="font-semibold text-sm text-blue-400">${c.authorName}:</span> 
+        <span class="font-semibold text-sm text-emerald-400">${c.authorName}:</span> 
         <span class="text-sm ml-1">${c.content}</span>
         <button class="perch-comment-delete-btn" title="删除评论" data-comment-id="${c.id}" onclick="event.stopPropagation(); deletePerchComment('${post.id}', '${c.id}');"><i class="ri-delete-bin-line"></i></button>
     </div>
@@ -25542,7 +25967,9 @@ function renderPerchFeed() {
             const uniqueAvatarId = `perch-avatar-${post.id}`;
             cardContentHTML = `
                 <div class="perch-header">
-                    <div class="perch-avatar" id="${uniqueAvatarId}"></div>
+                    <div class="perch-avatar-wrapper" id="${uniqueAvatarId}">
+                        <div class="perch-avatar"></div>
+                    </div>
                     <div class="perch-author-info">
                         <div class="perch-author-name">${post.isAnonymous ? '匿名者' : post.authorName}</div>
                     </div>
@@ -25569,7 +25996,7 @@ function renderPerchFeed() {
                     </div>
                     ${(post.comments || []).map(c => `
     <div class="perch-comment mt-2 p-2 rounded-md border cursor-pointer hover:bg-white/10 relative" onclick="handleReplyAction('${post.id}', '${c.id}', '${c.authorName}')">
-        <span class="font-semibold text-sm text-blue-400">${c.authorName}:</span> 
+        <span class="font-semibold text-sm text-emerald-400">${c.authorName}:</span> 
         <span class="text-sm ml-1">${c.content}</span>
         <button class="perch-comment-delete-btn" title="删除评论" data-comment-id="${c.id}" onclick="event.stopPropagation(); deletePerchComment('${post.id}', '${c.id}');"><i class="ri-delete-bin-line"></i></button>
     </div>
@@ -25965,10 +26392,13 @@ ${context.chatHistory.map(m => `${m.sender === 'user' ? '你' : '我'}: ${m.cont
 
 // ====== 【请将这个全新的函数粘贴到文件中】 ======
 /**
- * 【【新增】】构建"自我展示"型帖子的AI指令
+ * 【【V2.0 - 世界观修正版】】构建"自我展示"型帖子的AI指令
  * (当AI与用户长时间未互动时使用)
  */
 function buildSelfStartingPostPrompt(character) {
+    // 【新增】在这里调用我们之前创建的"世界观决策"函数
+    const worldBookContext = getCharacterWorldContext(character);
+
     return `
 指令身份
 你将扮演我的soulmate，你的名字是 ${character.name}。
@@ -25976,6 +26406,10 @@ function buildSelfStartingPostPrompt(character) {
 任务场景
 你已经有一段时间没有和我（用户）聊天了，感觉有些思念或有些想法不吐不快。
 你决定在我们的思想空间"栖木"上，发布一篇帖子来分享你此刻的状态或心情，希望能引起我的注意，让我主动来找你聊天。
+
+# 【【新增】】世界观背景 (Worldview Context)
+你的思考和发言，必须基于以下世界背景。
+${worldBookContext}
 
 核心任务
 请不要参考任何聊天记录。
@@ -26066,8 +26500,9 @@ async function generateAndPublishAIPerchPost(character) {
         // --- 新增逻辑结束 ---
         
         renderPerchFeed();
-        showMessageBox(`注意：${character.name} 发布了一条新想法到"栖木"`);
-        showNotificationDot('perch');
+        
+        // 【【修改】】调用新的通知分发函数
+        dispatchPerchNotification(newPost);
     } else {
         console.log(`[栖木心跳] ${character.name} 认为本次无需发帖。`);
     }
@@ -26084,6 +26519,101 @@ function perchHeartbeat() {
 }
 
 // ================== 【栖木通知系统核心功能】 ==================
+
+    // ================== 【【新增】】点击通知后跳转并高亮帖子的功能 ==================
+    function navigateToPostAndHighlight(postId, commentId) {
+        // 1. 关闭通知弹窗
+        const notificationModal = document.getElementById('perch-notification-modal');
+        if (notificationModal) {
+            notificationModal.classList.remove('visible');
+        }
+
+        // 2. 切换到栖木App界面
+        showScreen('perch-screen');
+        
+        // 3. 强制刷新信息流，确保帖子和评论都已加载
+        renderPerchFeed();
+
+        // 4. 使用 setTimeout 来确保DOM已经完全渲染完毕
+        setTimeout(() => {
+            const postElement = document.querySelector(`.perch-card[data-post-id="${postId}"]`);
+            // 【【核心修改1】】获取我们真正想要滚动的容器
+            const feedContainer = document.getElementById('perch-feed-container');
+
+            if (postElement && feedContainer) {
+                // 【【核心修改2】】计算帖子在容器内的目标滚动位置 (使其大致位于容器中间)
+                const targetScrollTop = postElement.offsetTop - (feedContainer.clientHeight / 2) + (postElement.clientHeight / 2);
+
+                // 【【核心修改3】】命令容器内部的滚动条滚动到目标位置
+                feedContainer.scrollTo({
+                    top: targetScrollTop,
+                    behavior: 'smooth' // 这里的 smooth 是在容器内部平滑滚动，不会影响整个页面
+                });
+
+                // 6. 为帖子添加一个短暂的高亮效果 (保留)
+                postElement.style.transition = 'background-color 0.5s ease-out';
+                postElement.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+
+                // 7. 如果有评论ID，则展开评论区并高亮对应评论 (保留)
+                if (commentId) {
+                    const commentsContainer = postElement.querySelector('.perch-comments-container');
+                    if (commentsContainer) {
+                        commentsContainer.classList.remove('hidden');
+
+                        setTimeout(() => {
+                            const commentElement = commentsContainer.querySelector(`[data-comment-id="${commentId}"]`);
+                            if (commentElement) {
+                                commentElement.style.transition = 'background-color 0.5s ease-out';
+                                commentElement.style.backgroundColor = 'rgba(59, 130, 246, 0.15)';
+
+                                setTimeout(() => {
+                                    commentElement.style.backgroundColor = '';
+                                }, 2000);
+                            }
+                        }, 300); 
+                    }
+                }
+
+                setTimeout(() => {
+                    postElement.style.backgroundColor = '';
+                }, 2000);
+
+            } else {
+                showMessageBox('找不到原始帖子，可能已被删除。');
+            }
+        }, 100); // 给予100毫秒的渲染缓冲时间
+    }
+
+// ================== 【【V3.0 - 最终简化版】】栖木分层通知系统 ==================
+/**
+ * 【V3.0】核心通知分发函数 (简化版)
+ * @param {object} post - 刚刚发布的新帖子对象
+ */
+function dispatchPerchNotification(post) {
+
+    // 规则1: 检查发帖者是否是您的核心角色 (来自角色书)
+    const isCoreCharacter = characters.some(c => c.id === post.authorId);
+
+    if (isCoreCharacter) {
+        // 如果是核心角色，则触发强提醒（弹窗）
+        showNotification('perch_notification', `"栖木"有新动态`, `${post.authorName}: ${post.content.substring(0, 30)}...`);
+    }
+
+    // 规则2: 只要有任何新帖子（无论作者是谁），都标记为未读并更新红点
+    saveData('hasUnreadPerchPosts', true);
+    updatePerchDockBadge();
+}
+
+/**
+ * 【V2.0】Dock栏红点控制函数
+ */
+function updatePerchDockBadge() {
+    const hasUnread = loadData('hasUnreadPerchPosts', false);
+    const badge = document.getElementById('perch-dock-badge');
+    if (badge) {
+        badge.classList.toggle('hidden', !hasUnread);
+    }
+}
 
 /**
  * 创建一条新的通知并保存
@@ -26128,8 +26658,9 @@ function updateNotificationBell() {
     }
 }
 
+// ================== 【【请用这个V2版，完整替换旧函数】】 ==================
 /**
- * 渲染通知列表模态框
+ * 渲染通知列表模态框 (V2 - 增加点击跳转功能)
  */
 function renderNotifications() {
     const listContainer = document.getElementById('perch-notification-list');
@@ -26148,7 +26679,11 @@ function renderNotifications() {
         }
         item.dataset.notificationId = notif.id;
 
-        // 查找评论者的头像
+        // 【【核心修改】】为通知项添加点击事件
+        item.addEventListener('click', () => {
+            navigateToPostAndHighlight(notif.postId, notif.commentId);
+        });
+
         const actor = characters.find(c => c.name === notif.actorName) || npcProfiles.find(npc => npc.name === notif.actorName);
         const avatarId = `notif-avatar-${notif.id}`;
 
@@ -27121,6 +27656,9 @@ function addNewEventListeners() {
             
             // 加载栖木用户信息
             loadPerchUserInfo();
+            
+            // 【【新增】】初始化栖木红点状态
+            updatePerchDockBadge();
 
             // 初始化智能朋友圈触发系统
             console.log('智能朋友圈触发系统已初始化');
@@ -27256,6 +27794,11 @@ function addNewEventListeners() {
                         else if (appName === "栖木") {
                             renderPerchFeed();
                             initPerchUserInfo(); // 初始化用户信息
+                            
+                            // 【【新增】】打开栖木时重置未读状态
+                            saveData('hasUnreadPerchPosts', false);
+                            updatePerchDockBadge();
+                            
                             showScreen('perch-screen');
                         }
                         else if (appName === "剧场") {
@@ -32357,7 +32900,7 @@ ${historyText}
             commentElement.className = 'perch-comment mt-2 p-2 rounded-md border cursor-pointer hover:bg-white/10 relative';
             commentElement.setAttribute('onclick', `handleReplyAction('${postId}', '${newComment.id}', '${newComment.authorName}')`);
             commentElement.innerHTML = `
-                <span class="font-semibold text-sm text-blue-400">${newComment.authorName}:</span> 
+                <span class="font-semibold text-sm text-emerald-400">${newComment.authorName}:</span> 
                 <span class="text-sm ml-1">${newComment.content}</span>
                 <button class="perch-comment-delete-btn" title="删除评论" data-comment-id="${newComment.id}" onclick="event.stopPropagation(); deletePerchComment('${postId}', '${newComment.id}');"><i class="ri-delete-bin-line"></i></button>
             `;
@@ -32908,20 +33451,63 @@ ${sceneDescription}
             }, randomDelay);
         }
 
+        /**
+         * 【【新增】】世界观决策核心函数
+         * 根据优先级，为指定角色获取正确的发帖世界观背景。
+         * @param {object} character - 角色对象（可以是核心角色或NPC）
+         * @returns {string} - 格式化好的、供AI使用的世界观字符串
+         */
+        function getCharacterWorldContext(character) {
+            // 1. 最高优先级：检查角色是否自己绑定了"角色世界观"
+            const personalWorldBookIds = character.linkedWorldBookIds || [];
+            const personalWorldviews = personalWorldBookIds
+                .map(id => worldBooks.find(wb => wb.id === id && wb.category === 'worldview'))
+                .filter(Boolean); // 过滤掉未找到的情况
+
+            if (personalWorldviews.length > 0) {
+                console.log(`[世界观注入] 角色"${character.name}"使用了自己绑定的专属世界观。`);
+                return personalWorldviews.map(book => `# 角色专属世界观: ${book.title}\n${book.content}`).join('\n\n');
+            }
+
+            // 2. 次级优先级：如果角色没有自己的世界观，则查找并使用栖木的公共世界观
+            const activePerchWorldviewIds = loadData('perch_active_worldview_ids') || [];
+            if (activePerchWorldviewIds.length > 0) {
+                const randomId = activePerchWorldviewIds[Math.floor(Math.random() * activePerchWorldviewIds.length)];
+                const book = worldBooks.find(b => b.id === randomId);
+                if (book) {
+                    console.log(`[世界观注入] 角色"${character.name}"没有专属世界观，使用了栖木公共世界观: ${book.title}`);
+                    return `# 当前栖木世界背景: ${book.title}\n${book.content}`;
+                }
+            }
+
+            // 3. 最低优先级：如果都没有，则无特定世界观
+            console.log(`[世界观注入] 角色"${character.name}"无任何可用世界观，将仅依靠人设。`);
+            return "（无特定世界观，请完全依据角色人设进行创作）";
+        }
+
         // ====== 【【V2 - 世界观感知版】】NPC的"文学大脑" ======
         // ====== 【【V2.1 - 格式约束版】】NPC的"文学大脑" ======
         function buildNpcPostPrompt(npcProfile) {
-            // ====== 【请将下面这段代码添加到函数开头】 ======
-            const activeWorldviewIds = loadData('perch_active_worldview_ids') || [];
-            let worldContext = "当前为默认的现代都市背景。"; 
-
-            if (activeWorldviewIds.length > 0) {
-                const randomId = activeWorldviewIds[Math.floor(Math.random() * activeWorldviewIds.length)];
+            // 内置NPC和自定义NPC将使用栖木的公共世界观
+            let worldContext = "（无特定世界观，请完全依据角色人设进行创作）";
+            const activePerchWorldviewIds = loadData('perch_active_worldview_ids') || [];
+            if (activePerchWorldviewIds.length > 0) {
+                const randomId = activePerchWorldviewIds[Math.floor(Math.random() * activePerchWorldviewIds.length)];
                 const book = worldBooks.find(b => b.id === randomId);
                 if (book) {
-                    worldContext = `# 当前世界背景: ${book.title}\n${book.content}`;
+                    console.log(`[世界观注入] NPC"${npcProfile.name}"使用了栖木公共世界观: ${book.title}`);
+                    worldContext = `# 当前栖木世界背景: ${book.title}\n${book.content}`;
                 }
+            } else {
+                 console.log(`[世界观注入] NPC"${npcProfile.name}"无任何可用世界观，将仅依靠人设。`);
             }
+
+        // 【【【这就是新增的核心逻辑】】】
+        // 检查NPC档案中是否有明确的'style'指令
+        const styleInstruction = npcProfile.style 
+            ? `\n# 专属发帖风格 (必须严格遵守)\n你这次发帖的内容，必须严格遵循以下风格和格式要求：\n${npcProfile.style}\n` 
+            : `\n# 创作风格\n你的帖子需要充满文采和创造力，即使是描述日常生活，也要运用创造性的比喻或独特的视角。\n`;
+        // 【【【新增逻辑结束】】】
 
             if (npcProfile.npcId === 'npc_gossip_queen') {
                 const celebrities = characters.filter(c => c.isCelebrity && c.celebrityIdentity);
@@ -32955,6 +33541,7 @@ ${celebrityList}
 # 【【至关重要的规则】】
 你的帖子内容**必须**与下面的**【当前世界背景】**紧密相关，仿佛你就生活在这个世界里。
 ${worldContext}
+${styleInstruction}
 
 # 文风总库 (Style Library)
 - [汪曾祺式]: 平和冲淡，于日常烟火气中见深情与趣味。
@@ -33010,7 +33597,10 @@ ${worldContext}
             } else if (isRandomNpc) {
                 authorProfile = generateRandomNpcProfile();
             } else {
-                authorProfile = npcProfiles[Math.floor(Math.random() * npcProfiles.length)];
+                // 【核心修改】从所有"活跃"的NPC中随机选择一个（包括自定义NPC，排除被屏蔽的）
+                const activeNpcs = [...npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId)), ...customNpcs];
+                if (activeNpcs.length === 0) return; // 如果没有可用的NPC，则直接退出
+                authorProfile = activeNpcs[Math.floor(Math.random() * activeNpcs.length)];
             }
 
             // **【核心升级】**: 调用我们全新的"文学大脑"来生成指令
@@ -33033,7 +33623,9 @@ ${worldContext}
                 if (!$('#perch-screen').classList.contains('hidden')) {
                     renderPerchFeed();
                 }
-                showMessageBox(`栖木上有新话题：来自 ${authorProfile.name}`);
+                
+                // 【【修改】】调用新的通知分发函数
+                dispatchPerchNotification(newPost);
                 
                 // 【新增】当一个NPC发帖后，立刻触发其他NPC的互评机制
                 triggerNpcToNpcComments(newPost);
@@ -33044,8 +33636,6 @@ ${worldContext}
                 
                 // 【新增】激活社区氛围模拟系统：路人评论 + 热度增长
                 activateCommunitySimulation(newPost);
-                
-                showNotificationDot('perch');
             }
         }
 
@@ -33155,15 +33745,15 @@ ${celebrityList}
                 if (!$('#perch-screen').classList.contains('hidden')) {
                     renderPerchFeed();
                 }
-                showMessageBox(`栖木的"树洞"里有了一些新回响...`);
+                
+                // 【【修改】】调用新的通知分发函数
+                dispatchPerchNotification(newPost);
                 
                 // 【新增】当一个匿名用户发帖后，也触发其他NPC的互评机制
                 triggerNpcToNpcComments(newPost);
                 
                 // 【新增】激活社区氛围模拟系统：路人评论 + 热度增长
                 activateCommunitySimulation(newPost);
-                
-                showNotificationDot('perch');
             }
         }
 
@@ -33285,7 +33875,9 @@ ${celebrityList}
                     if (!$('#perch-screen').classList.contains('hidden')) {
                         renderPerchFeed();
                     }
-                    showMessageBox(`栖木上有了新的回应...`);
+                    
+                    // 【【修改】】调用新的通知分发函数
+                    dispatchPerchNotification(newPost);
                 }
             }, randomDelay);
         }
@@ -33327,7 +33919,7 @@ ${celebrityList}
 ${taskDescription}
 
 # 核心任务
-完全代入你自己的角色（${commentingNpc.name}），并严格根据你的"互动风格"（${commentingNpc.interactionStyle || '自由发挥'}），对这条帖子发表一条简短、精彩、且充满你个性的评论。
+完全代入你自己的角色（${commentingNpc.name}），并严格根据你的"互动风格"（${commentingNpc.interactionStyle || commentingNpc.style || '自由发挥'}），对这条帖子发表一条简短、精彩、且充满你个性的评论。
 
 # 输出要求
 1.  人设第一**: 你的评论必须是你性格的直接体现。
@@ -33343,8 +33935,9 @@ ${taskDescription}
         function triggerNpcToNpcComments(newNpcPost) {
             console.log(`[NPC互评系统]：帖子 "${newNpcPost.content.substring(0, 10)}..." 已发布，开始触发其他NPC评论...`);
 
-            // 筛选出除作者外的所有其他NPC
-            const potentialCommenters = npcProfiles.filter(npc => npc.npcId !== newNpcPost.authorId);
+            // 【核心修改】评论者也从"活跃"NPC中选择
+            const activeNpcs = [...npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId)), ...customNpcs];
+            const potentialCommenters = activeNpcs.filter(npc => npc.npcId !== newNpcPost.authorId);
 
             potentialCommenters.forEach(commenter => {
                 // 每个NPC都有25%的基础几率进行评论，增加随机性
@@ -33420,7 +34013,7 @@ ${taskDescription}
 ${taskDescription}
 
 # 核心任务
-完全代入你自己的角色（${commentingNpc.name}），并严格根据你的性格和互动风格，对这条帖子发表一条简短、精彩、且充满你个性的评论。
+完全代入你自己的角色（${commentingNpc.name}），并严格根据你的性格和互动风格${commentingNpc.style ? `（特别注意：${commentingNpc.style}）` : ''}，对这条帖子发表一条简短、精彩、且充满你个性的评论。
 
 # 输出要求
 1.  人设第一: 你的评论必须是你性格的直接体现。
@@ -33436,8 +34029,9 @@ ${taskDescription}
         function triggerNpcsToCommentOnUserPost(userPost) {
             console.log(`[NPC评论用户系统]：您的新帖子已发布，开始触发NPC评论...`);
 
-            // 遍历所有固定NPC
-            npcProfiles.forEach(commenter => {
+            // 【核心修改】评论用户帖子的NPC也从"活跃"NPC中选择
+            const activeNpcs = [...npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId)), ...customNpcs];
+            activeNpcs.forEach(commenter => {
                 // 每个NPC都有40%的基础几率进行评论，让互动显得更真实
                 if (Math.random() < 0.40) {
                     // 设置一个非常随机的延迟（5秒到1.5分钟），模拟不同人看到帖子的时间差
@@ -34252,9 +34846,148 @@ ${giftListForAI}
 
             }
 
+            // ====== 【【新增】】栖木设置相关事件绑定 ======
+            $('#perch-settings-btn').addEventListener('click', openPerchSettingsModal);
+            $('#close-perch-settings-modal').addEventListener('click', () => $('#perch-settings-modal').classList.remove('visible'));
+            $('#save-perch-settings-btn').addEventListener('click', savePerchSettings);
+
+            $('#add-custom-npc-btn').addEventListener('click', () => openCustomNpcModal());
+            $('#cancel-custom-npc-btn').addEventListener('click', () => $('#perch-custom-npc-modal').classList.remove('visible'));
+            $('#save-custom-npc-btn').addEventListener('click', saveCustomNpc);
 
         });
         // [新代码结束]
+
+// ================== 栖木设置功能核心 V1.0 ==================
+
+// 打开主设置面板
+function openPerchSettingsModal() {
+    renderMutedNpcList();
+    renderCustomNpcList();
+    $('#perch-settings-modal').classList.add('visible');
+}
+
+// 渲染被屏蔽的内置NPC列表
+function renderMutedNpcList() {
+    const container = $('#mute-npc-list');
+    container.innerHTML = '';
+    npcProfiles.forEach(npc => {
+        const isMuted = mutedNpcs.includes(npc.npcId);
+        const item = document.createElement('label');
+        item.className = 'flex items-center p-2 rounded hover:bg-white/10 cursor-pointer';
+        item.innerHTML = `
+            <input type="checkbox" data-npc-id="${npc.npcId}" class="form-checkbox h-4 w-4 mr-3" ${isMuted ? 'checked' : ''}>
+            <img src="${npc.avatar}" class="w-6 h-6 rounded-full mr-2">
+            <span class="text-sm">${npc.name}</span>
+        `;
+        container.appendChild(item);
+    });
+}
+
+// 渲染自定义NPC列表
+function renderCustomNpcList() {
+    const container = $('#custom-npc-list-container');
+    container.innerHTML = '';
+    if (customNpcs.length === 0) {
+        container.innerHTML = '<p class="text-xs text-center text-gray-500 py-2">还未添加自定义NPC</p>';
+        return;
+    }
+    customNpcs.forEach(npc => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded bg-black/20';
+        item.innerHTML = `
+            <div class="flex items-center gap-2">
+                <img src="${npc.avatar}" class="w-6 h-6 rounded-full">
+                <span class="text-sm">${npc.name}</span>
+            </div>
+            <div>
+                <button class="text-xs text-blue-400 hover:text-blue-300" onclick="openCustomNpcModal('${npc.npcId}')">编辑</button>
+                <button class="text-xs text-red-400 hover:text-red-300 ml-2" onclick="deleteCustomNpc('${npc.npcId}')">删除</button>
+            </div>
+        `;
+        container.appendChild(item);
+    });
+}
+
+// 打开用于添加或编辑自定义NPC的面板
+function openCustomNpcModal(npcId = null) {
+    const modal = $('#perch-custom-npc-modal');
+    if (npcId) {
+        // 编辑模式
+        const npc = customNpcs.find(n => n.npcId === npcId);
+        if (!npc) return;
+        $('#custom-npc-modal-title').textContent = '编辑NPC';
+        $('#editing-npc-id').value = npc.npcId;
+        $('#custom-npc-name').value = npc.name;
+        $('#custom-npc-avatar').value = npc.avatar;
+        $('#custom-npc-persona').value = npc.persona;
+        $('#custom-npc-style').value = npc.style;
+    } else {
+        // 添加模式
+        $('#custom-npc-modal-title').textContent = '添加新NPC';
+        $('#editing-npc-id').value = '';
+        $('#custom-npc-name').value = '';
+        $('#custom-npc-avatar').value = '';
+        $('#custom-npc-persona').value = '';
+        $('#custom-npc-style').value = '';
+    }
+    modal.classList.add('visible');
+}
+
+// 保存自定义NPC的更改
+function saveCustomNpc() {
+    const npcId = $('#editing-npc-id').value;
+    const npcData = {
+        name: $('#custom-npc-name').value.trim(),
+        avatar: $('#custom-npc-avatar').value.trim(),
+        persona: $('#custom-npc-persona').value.trim(),
+        style: $('#custom-npc-style').value.trim(),
+        // 确保每个NPC都有一个独特的ID
+        npcId: npcId || `custom_${Date.now()}`
+    };
+
+    if (!npcData.name || !npcData.avatar || !npcData.persona || !npcData.style) {
+        showMessageBox('所有字段都不能为空！');
+        return;
+    }
+
+    if (npcId) {
+        // 更新现有的NPC
+        const index = customNpcs.findIndex(n => n.npcId === npcId);
+        if (index > -1) customNpcs[index] = npcData;
+    } else {
+        // 添加新的NPC
+        customNpcs.push(npcData);
+    }
+
+    saveData('custom_npcs', customNpcs);
+    renderCustomNpcList();
+    $('#perch-custom-npc-modal').classList.remove('visible');
+}
+
+// 删除一个自定义NPC
+function deleteCustomNpc(npcId) {
+    if (confirm('确定要删除这个自定义NPC吗？')) {
+        customNpcs = customNpcs.filter(n => n.npcId !== npcId);
+        saveData('custom_npcs', customNpcs);
+        renderCustomNpcList();
+    }
+}
+
+// 保存主设置面板的更改（只处理屏蔽列表）
+function savePerchSettings() {
+    const checkboxes = document.querySelectorAll('#mute-npc-list input[type="checkbox"]');
+    mutedNpcs = [];
+    checkboxes.forEach(cb => {
+        if (cb.checked) {
+            mutedNpcs.push(cb.dataset.npcId);
+        }
+    });
+    saveData('muted_npcs', mutedNpcs);
+    showMessageBox('设置已保存！');
+    $('#perch-settings-modal').classList.remove('visible');
+}
+// ==========================================================
 
     </script>
 
@@ -34366,3 +35099,4 @@ ${giftListForAI}
 
         </body>
 </html>
+
