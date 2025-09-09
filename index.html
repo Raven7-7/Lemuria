@@ -10969,6 +10969,21 @@
             background-repeat: no-repeat;
         }
 
+        /* ====== 【【栖木标题栏位置调整】】 ====== */
+        /* 让栖木的标题栏（返回键、标题、设置键）统一下移一点 */
+        #perch-screen .app-header {
+            padding-top: 1rem !important;    /* 增加顶部内边距，让整个标题栏下移 */
+            padding-bottom: 0.5rem !important;
+            height: 5rem !important;          /* 相应增加标题栏总高度 */
+            min-height: 5rem !important;
+        }
+
+        /* 确保栖木标题栏中的按钮和标题都受到影响 */
+        #perch-screen .app-header-btn,
+        #perch-screen .app-header-title {
+            margin-top: 0.25rem !important;  /* 额外的微调下移 */
+        }
+
     </style>
 </head>
 <body class="dark-mode">
