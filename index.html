@@ -1121,6 +1121,7 @@
             align-items: flex-start;
             width: 100%;
             position: relative;
+            min-height: 18px; /* <-- 核心修正：统一所有行的最小高度 */
         }
         
         /* ====== 【【修正版】】拉黑消息的红色感叹号样式 ====== */
@@ -1149,11 +1150,11 @@
             justify-content: flex-start;
         }
         .chat-message-wrapper + .chat-message-wrapper {
-            margin-top: 1rem; /* 为每条消息之间都设置一个固定的间距 */
+            margin-top: 0.1rem !important; /* 为每条消息之间都设置一个固定的间距 */
         }
         .chat-avatar {
-            width: 44px;
-            height: 44px;
+            width: 36px;  /* <-- 修改这里 */
+            height: 36px; /* <-- 修改这里 */
             border-radius: 50%;
             background-color: #9ca3af;
             background-size: cover;
@@ -1164,6 +1165,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            visibility: hidden;
+            position: relative; /* <-- 新增：开启相对定位 */
+            top: -5px;          /* <-- 新增：向上移动5px */
+        }
+        /* 仅当消息是新的发言者时，才显示头像 */
+        .chat-message-wrapper.new-sender .chat-avatar {
+            visibility: visible;
         }
         .chat-avatar i {
             font-size: 22px;
@@ -1192,7 +1200,10 @@
                 inset 0 -1px 0 rgba(0, 0, 0, 0.1);
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
-            padding: 0.35rem 1rem;
+            padding-top: 0.15rem;     /* <-- 新增 */
+            padding-bottom: 0.15rem;  /* <-- 新增 */
+            padding-left: 0.5rem;     /* <-- 新增 (比原来稍大一点) */
+            padding-right: 0.35rem;    /* <-- 新增 (比原来稍小一点，用于抵消标点空白) */
             width: -moz-fit-content;
             width: fit-content;
             max-width: 100%; 
@@ -1312,12 +1323,12 @@
                 inset 0 -1px 0 rgba(0, 0, 0, 0.1);
         }
         .message-meta {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             color: #9ca3af;
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
             white-space: nowrap;
             align-self: flex-end;
         }
@@ -1359,6 +1370,27 @@
         }
         .dark-mode .chat-message.sent.image-message, .light-mode .chat-message.sent.image-message { border: 2px solid #4b5563; }
         .dark-mode .chat-message.received.image-message, .light-mode .chat-message.received.image-message { border: 2px solid rgba(229, 231, 250, 0.8); }
+
+        /* ====== 【新增】隐藏头像 (类WhatsApp风格) 的CSS样式 ====== */
+
+        /* 当聊天容器有 .no-avatars 类时，彻底隐藏头像 */
+        #wechat-content-chat.no-avatars .chat-avatar {
+            display: none;
+        }
+
+        /* 隐藏头像后，移除气泡内容区的左右间距，让它直接贴近头像原本的位置 */
+        #wechat-content-chat.no-avatars .chat-message-content {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        /* 隐藏头像后，将整个聊天行的左右内边距调小，让气泡更靠近屏幕边缘 */
+        #wechat-content-chat.no-avatars .chat-message-wrapper {
+            padding-left: 0.5rem;  /* 8px，可以按喜好调整 */
+            padding-right: 0.5rem; /* 8px，可以按喜好调整 */
+        }
+
+        /* ======================================================== */
 
         /* ====== 画板样式 ====== */
         .drawing-modal-overlay {
@@ -2688,6 +2720,9 @@
         }
         .dark-mode #chat-input { background-color: transparent; color: #ffffff; }
         .light-mode #chat-input { background-color: transparent; color: #1f2937; }
+        #chat-input::placeholder {
+            color: var(--placeholder-color, rgba(156, 163, 175, 0.7));
+        }
         .status-bar.transparent-override {
             background-color: transparent !important;
         }
@@ -2878,10 +2913,13 @@
         }
 
         .list-item {
-            padding: 1rem;
+            display: flex;                 /* <-- 确保是Flex布局 */
+            justify-content: space-between;  /* <-- 新增：让左右两端对齐 */
+            align-items: center;           /* <-- 垂直居中对齐 */
+            padding: 0.8rem;
             cursor: pointer;
             transition: background-color 0.2s;
-            border-radius: 1rem;
+            border-radius: 0.8rem;
             position: relative;
         }
         .list-item:hover {
@@ -11913,6 +11951,13 @@
                 </div>
                 <div class="flex-1 p-2 overflow-y-auto space-y-2">
                     <div id="pin-chat-option" class="list-item">置顶对话</div>
+                    <div class="list-item flex justify-between items-center" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
+                        <span>隐藏头像</span>
+                        <label for="hide-avatars-toggle" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" value="" id="hide-avatars-toggle" class="sr-only peer">
+                            <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-focus:ring-4 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
                     <div id="change-chat-bg-option" class="list-item">设置聊天背景</div>
                     <div class="list-item flex justify-between items-center">
                         <span>气泡颜色 (我 / 对方)</span>
@@ -11922,8 +11967,16 @@
                         </div>
                     </div>
                     <div class="list-item flex justify-between items-center">
-                        <label for="ai-memory-length" class="flex-grow">AI 记忆上下文长度</label>
-                        <input type="number" id="ai-memory-length" class="form-input w-20 text-center" min="10" max="100" value="50">
+                        <span>文字颜色 (我 / 对方 / 其他)</span>
+                        <div class="flex items-center space-x-2">
+                            <input type="color" id="user-text-color-picker" class="color-picker-input">
+                            <input type="color" id="ai-text-color-picker" class="color-picker-input">
+                            <input type="color" id="other-text-color-picker" class="color-picker-input">
+                        </div>
+                    </div>
+                    <div class="list-item flex justify-between items-center">
+                                            <label for="ai-memory-length" class="flex-grow">AI 记忆上下文长度</label>
+                    <input type="number" id="ai-memory-length" class="form-input w-20 text-center" min="10" max="500" value="50">
                     </div>
                     <div id="change-user-video-image-option" class="list-item">设置对方的视频照片</div>
                     <div id="clear-chat-history-option" class="list-item text-red-500">清空聊天记录</div>
@@ -12267,6 +12320,16 @@
                 <input type="number" id="moments-min-interval" min="1" max="1440" step="1" value="30" class="form-input w-full">
                 <p class="text-xs text-gray-400 mt-1">这是一个"冷却时间"。角色发布一条朋友圈动态后，**至少要等这么多分钟**才能发布下一条，以防刷屏。<br><strong>案例：</strong>设置为`60`，则角色一小时内最多只会发布一条动态。</p>
             </div>
+            <div>
+                <label for="moments-time-trigger-interval" class="block text-sm font-medium mb-2">时间触发间隔 (小时)</label>
+                <input type="number" id="moments-time-trigger-interval" min="1" max="72" step="0.5" value="6" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">当角色与用户长时间没有互动时，经过这么多小时后，系统会考虑让角色主动发布朋友圈分享生活。<br><strong>案例：</strong>设置为`4`，则4小时无聊天后可能触发朋友圈。</p>
+            </div>
+            <div>
+                <label for="moments-trigger-probability" class="block text-sm font-medium mb-2">发布概率 (%)</label>
+                <input type="number" id="moments-trigger-probability" min="0" max="100" step="5" value="80" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">当满足发布条件时（情感触发或时间触发），实际发布朋友圈的概率。<br><strong>案例：</strong>设置为`80`，则有80%的机会会发布，20%机会跳过。</p>
+            </div>
         </div>
     </div>
 
@@ -12277,6 +12340,27 @@
         <button id="reset-heartbeat-settings" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md font-medium">
             <i class="fas fa-undo mr-2"></i>重置默认
         </button>
+    </div>
+    
+    <!-- 测试功能区域 -->
+    <div class="mt-6 p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+        <h4 class="font-bold text-yellow-800 dark:text-yellow-200 mb-3">
+            <i class="fas fa-flask mr-2"></i>快速测试
+        </h4>
+        <p class="text-sm text-yellow-700 dark:text-yellow-300 mb-3">
+            测试模式会临时将时间间隔设为10秒，概率设为100%，方便快速验证功能
+        </p>
+        <div class="flex gap-2">
+            <button id="test-moments-trigger" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-md font-medium">
+                <i class="fas fa-play mr-2"></i>开始测试
+            </button>
+            <button id="stop-moments-test" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium hidden">
+                <i class="fas fa-stop mr-2"></i>停止测试
+            </button>
+        </div>
+        <div id="test-status" class="mt-3 p-2 rounded bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm hidden">
+            <strong>测试状态：</strong><span id="test-status-text">准备就绪</span>
+        </div>
     </div>
 
     <div id="heartbeat-status" class="mt-4 p-4 rounded-lg text-center font-semibold text-sm hidden"></div>
@@ -12329,7 +12413,11 @@
                             </div>
                             <div>
                                 <label for="api_url" class="block text-sm font-medium mb-1">API 地址:</label>
-                                <input type="text" id="api_url" placeholder="例如: https://api.example.com/v1" class="api-input form-input">
+                                <input type="text" id="api_url" placeholder="例如: https://api.example.com/v1" class="api-input form-input" oninput="checkApiStatus()">
+                                <!-- 🚀 API状态检测显示器 -->
+                                <div id="api-status-indicator" style="margin-top: 8px; padding: 8px; border-radius: 6px; font-size: 12px; display: none;">
+                                    <div class="api-status-content"></div>
+                                </div>
                             </div>
                             <div>
                                 <label for="api_key" class="block text-sm font-medium mb-1">API 密钥:</label>
@@ -12803,6 +12891,97 @@
     </div>
 
     <script>
+        // 🚀 全局API类型检测和CORS处理函数
+        function getApiType(url) {
+            if (url.includes('googleapis.com')) return 'google';
+            if (url.includes('api.openai.com')) return 'openai-official';
+            if (url.includes('api.anthropic.com')) return 'claude';
+            if (url.includes('dashscope.aliyuncs.com')) return 'tongyi';
+            if (url.includes('aip.baidubce.com')) return 'ernie';
+            if (url.includes('open.bigmodel.cn')) return 'zhipu';
+            if (url.includes('ark.cn-beijing.volces.com')) return 'doubao';
+            return 'openai-compatible'; // 默认兼容格式，保持原有逻辑
+        }
+
+        // 检测是否需要代理（CORS问题诊断）
+        function needsProxy(url) {
+            const officialAPIs = [
+                'api.openai.com',
+                'api.anthropic.com', 
+                'api.cohere.ai',
+                'api.mistral.ai'
+            ];
+            return officialAPIs.some(api => url.includes(api));
+        }
+
+        // 🚀 API状态检测函数
+        function checkApiStatus() {
+            const url = document.getElementById('api_url').value.trim();
+            const indicator = document.getElementById('api-status-indicator');
+            const content = indicator.querySelector('.api-status-content');
+            
+            if (!url) {
+                indicator.style.display = 'none';
+                return;
+            }
+            
+            const apiType = getApiType(url);
+            const needsProxyMode = needsProxy(url);
+            
+            // 显示API类型和状态
+            let statusHTML = '';
+            let statusClass = '';
+            
+            if (apiType === 'google') {
+                statusHTML = '🟢 Google Gemini API - 推荐使用';
+                statusClass = 'success';
+            } else if (apiType === 'openai-official') {
+                statusHTML = '🟡 OpenAI 官方API - 可能需要代理';
+                statusClass = 'warning';
+            } else if (apiType === 'claude') {
+                statusHTML = '🟡 Claude API - 可能需要代理';
+                statusClass = 'warning';
+            } else if (apiType === 'tongyi') {
+                statusHTML = '🟢 通义千问API - 国内直连';
+                statusClass = 'success';
+            } else if (apiType === 'ernie') {
+                statusHTML = '🟢 文心一言API - 国内直连';
+                statusClass = 'success';
+            } else if (apiType === 'zhipu') {
+                statusHTML = '🟢 智谱GLM API - 国内直连';
+                statusClass = 'success';
+            } else if (apiType === 'doubao') {
+                statusHTML = '🟢 豆包API - 国内直连';
+                statusClass = 'success';
+            } else {
+                statusHTML = '🔵 OpenAI兼容API - 请确认连通性';
+                statusClass = 'info';
+            }
+            
+            if (needsProxyMode) {
+                statusHTML += '<br/>💡 建议：使用中转服务或配置代理';
+            }
+            
+            content.innerHTML = statusHTML;
+            
+            // 设置样式
+            if (statusClass === 'success') {
+                indicator.style.backgroundColor = '#dcfce7';
+                indicator.style.color = '#166534';
+                indicator.style.border = '1px solid #bbf7d0';
+            } else if (statusClass === 'warning') {
+                indicator.style.backgroundColor = '#fef3c7';
+                indicator.style.color = '#92400e';
+                indicator.style.border = '1px solid #fcd34d';
+            } else if (statusClass === 'info') {
+                indicator.style.backgroundColor = '#dbeafe';
+                indicator.style.color = '#1e40af';
+                indicator.style.border = '1px solid #93c5fd';
+            }
+            
+            indicator.style.display = 'block';
+        }
+
         // ====== 【【新增】】生成类礼物的专属HTML模板库 ======
         const gift_html_templates = {
             // 模板中的 {{content}} 将会被AI生成的内容自动替换
@@ -13484,7 +13663,40 @@
             }
         }
 
-
+        // 应用其他文字颜色的全局函数
+        function applyOtherTextColor(color) {
+            // 应用到输入框
+            const chatInput = $('#chat-input');
+            if (chatInput) {
+                chatInput.style.color = color;
+            }
+            
+            // 应用到所有聊天相关按钮
+            const buttons = document.querySelectorAll('.chat-input-btn, .quick-action-btn, #send-chat-button, #receive-chat-button, #add-feature-btn, #emoji-btn');
+            buttons.forEach(button => {
+                button.style.color = color;
+            });
+            
+            // 应用到更多功能面板的按钮
+            const moreFeaturesButtons = document.querySelectorAll('#more-features-panel button, .feature-btn');
+            moreFeaturesButtons.forEach(button => {
+                button.style.color = color;
+            });
+            
+            // 应用到输入框的占位符颜色
+            if (chatInput) {
+                chatInput.style.setProperty('--placeholder-color', color);
+            }
+            
+            // 应用到其他可能的文本元素
+            const textElements = document.querySelectorAll('.chat-input-bar button i, .quick-actions button i');
+            textElements.forEach(element => {
+                element.style.color = color;
+            });
+            
+            // 重新渲染聊天历史以应用消息颜色
+            renderChatHistory();
+        }
 
         // 全屏模式切换功能
         document.addEventListener('DOMContentLoaded', function() {
@@ -13590,6 +13802,7 @@
         let userAvatars = {};
         let chatBackgrounds = {};
         let chatBubbleColors = {};
+        let chatTextColors = {};
         let userVideoImages = {};
         let myVideoImages = {};
         let currentChatCharacterId = null;
@@ -13905,7 +14118,9 @@ function getChatBackgroundElement() {
             npcPostMinInterval: 2, // 分钟
             npcPostMaxInterval: 5, // 分钟
             npcPostProbability: 25, // 百分比
-            momentsMinInterval: 30 // 分钟
+            momentsMinInterval: 30, // 分钟
+            momentsTimeTriggerInterval: 6, // 小时
+            momentsTriggerProbability: 80 // 百分比
         };
 
         // 加载心跳设置到界面
@@ -13926,6 +14141,8 @@ function getChatBackgroundElement() {
             document.getElementById('npc-post-max-interval').value = settings.npcPostMaxInterval;
             document.getElementById('npc-post-probability').value = settings.npcPostProbability;
             document.getElementById('moments-min-interval').value = settings.momentsMinInterval;
+            document.getElementById('moments-time-trigger-interval').value = settings.momentsTimeTriggerInterval;
+            document.getElementById('moments-trigger-probability').value = settings.momentsTriggerProbability;
         }
 
         // 保存心跳设置
@@ -13944,7 +14161,9 @@ function getChatBackgroundElement() {
                 npcPostMinInterval: parseInt(document.getElementById('npc-post-min-interval').value),
                 npcPostMaxInterval: parseInt(document.getElementById('npc-post-max-interval').value),
                 npcPostProbability: parseInt(document.getElementById('npc-post-probability').value),
-                momentsMinInterval: parseInt(document.getElementById('moments-min-interval').value)
+                momentsMinInterval: parseInt(document.getElementById('moments-min-interval').value),
+                momentsTimeTriggerInterval: parseFloat(document.getElementById('moments-time-trigger-interval').value),
+                momentsTriggerProbability: parseInt(document.getElementById('moments-trigger-probability').value)
             };
 
             saveData('heartbeatSettings', settings);
@@ -13978,6 +14197,110 @@ function getChatBackgroundElement() {
             setTimeout(() => {
                 statusElement.classList.add('hidden');
             }, 3000);
+        }
+
+        // 朋友圈测试功能
+        let momentsTestInterval = null;
+        let originalTimeGap = null;
+        let originalProbability = null;
+        
+        function startMomentsTest() {
+            // 保存原始设置
+            const settings = loadData('heartbeatSettings') || defaultHeartbeatSettings;
+            originalTimeGap = settings.momentsTimeGap;
+            originalProbability = settings.momentsTriggerProbability;
+            
+            // 临时修改设置为测试模式
+            settings.momentsTimeGap = 10 * 1000; // 10秒
+            settings.momentsTriggerProbability = 100; // 100%概率
+            saveData('heartbeatSettings', settings);
+            
+                         // 更新朋友圈触发系统设置
+             if (window.momentsTriggerSystem) {
+                 window.momentsTriggerSystem.triggerThresholds.timeGap = 10 * 1000;
+                 window.momentsTriggerSystem.triggerThresholds.triggerProbability = 100;
+             }
+            
+            // 显示测试状态
+            updateTestStatus('测试模式已启动 - 10秒间隔，100%触发概率');
+            $('#test-status').classList.remove('hidden');
+            $('#test-moments-trigger').classList.add('hidden');
+            $('#stop-moments-test').classList.remove('hidden');
+            
+            // 启动测试定时器，每5秒检查一次是否需要触发
+            momentsTestInterval = setInterval(() => {
+                const characters = loadData('characters') || [];
+                if (characters.length === 0) {
+                    updateTestStatus('没有可用角色进行测试');
+                    return;
+                }
+                
+                // 随机选择一个角色进行测试
+                const randomCharacter = characters[Math.floor(Math.random() * characters.length)];
+                updateTestStatus(`正在检查角色 ${randomCharacter.name} 的朋友圈触发条件...`);
+                
+                                 // 模拟触发检查
+                 if (window.momentsTriggerSystem) {
+                                              const result = window.momentsTriggerSystem.shouldTriggerMoment(randomCharacter.id);
+                     if (result.should) {
+                         updateTestStatus(`✅ 角色 ${randomCharacter.name} 触发朋友圈: ${result.reason}`);
+                         // 实际触发朋友圈生成
+                         triggerMomentManually(randomCharacter.id, result.type, '测试触发');
+                     } else {
+                         updateTestStatus(`❌ 角色 ${randomCharacter.name} 未触发: ${result.reason}`);
+                     }
+                 }
+            }, 5000);
+            
+            // 30秒后自动停止测试
+            setTimeout(() => {
+                if (momentsTestInterval) {
+                    stopMomentsTest();
+                    updateTestStatus('测试已自动停止（30秒限制）');
+                }
+            }, 30000);
+        }
+        
+        function stopMomentsTest() {
+            // 停止测试定时器
+            if (momentsTestInterval) {
+                clearInterval(momentsTestInterval);
+                momentsTestInterval = null;
+            }
+            
+            // 恢复原始设置
+            if (originalTimeGap !== null && originalProbability !== null) {
+                const settings = loadData('heartbeatSettings') || defaultHeartbeatSettings;
+                settings.momentsTimeGap = originalTimeGap;
+                settings.momentsTriggerProbability = originalProbability;
+                saveData('heartbeatSettings', settings);
+                
+                                 // 更新朋友圈触发系统设置
+                 if (window.momentsTriggerSystem) {
+                     window.momentsTriggerSystem.triggerThresholds.timeGap = originalTimeGap;
+                     window.momentsTriggerSystem.triggerThresholds.triggerProbability = originalProbability;
+                 }
+                
+                originalTimeGap = null;
+                originalProbability = null;
+            }
+            
+            // 更新界面
+            updateTestStatus('测试已停止，设置已恢复');
+            $('#test-moments-trigger').classList.remove('hidden');
+            $('#stop-moments-test').classList.add('hidden');
+            
+            setTimeout(() => {
+                $('#test-status').classList.add('hidden');
+            }, 3000);
+        }
+        
+        function updateTestStatus(message) {
+            const statusText = $('#test-status-text');
+            if (statusText) {
+                statusText.textContent = message;
+                console.log('[朋友圈测试]', message);
+            }
         }
 
         // 存储定时器ID以便重启
@@ -14049,6 +14372,13 @@ function getChatBackgroundElement() {
                 }, npcPostInterval);
             }
             
+            // 更新朋友圈触发系统设置
+            if (window.momentsTriggerSystem) {
+                window.momentsTriggerSystem.triggerThresholds.timeGap = settings.momentsTimeTriggerInterval * 60 * 60 * 1000;
+                window.momentsTriggerSystem.triggerThresholds.minInterval = settings.momentsMinInterval * 60 * 1000;
+                window.momentsTriggerSystem.triggerThresholds.triggerProbability = settings.momentsTriggerProbability;
+            }
+            
             console.log('心跳定时器已重启，使用新的设置参数');
         }
 
@@ -14065,6 +14395,10 @@ function getChatBackgroundElement() {
             
             const savedTheme = loadData('theme', 'dark');
             body.className = `flex items-center justify-center min-h-screen ${savedTheme}-mode`;
+            // 为Tailwind CSS添加dark类支持
+            if (savedTheme === 'dark') {
+                body.classList.add('dark');
+            }
             $('#theme-icon').className = `fas fa-${savedTheme === 'dark' ? 'moon' : 'sun'} text-lg`;
             
             // 初始化主题相关的UI元素
@@ -14187,6 +14521,7 @@ function getChatBackgroundElement() {
             userAvatars = loadData('userAvatars', {});
             chatBackgrounds = loadData('chatBackgrounds', {});
             chatBubbleColors = loadData('chatBubbleColors', {});
+            chatTextColors = loadData('chatTextColors', {});
             userVideoImages = loadData('userVideoImages', {});
             myVideoImages = loadData('myVideoImages', {});
             
@@ -14463,6 +14798,9 @@ function getChatBackgroundElement() {
                 if (savedApiSettings && savedApiSettings.url && savedApiSettings.key) {
                     $('#api_url').value = savedApiSettings.url;
                     $('#api_key').value = savedApiSettings.key;
+                    
+                    // 🚀 初始化时检查API状态
+                    setTimeout(checkApiStatus, 100);
                     
                     const modelSelect = $('#model_select');
                     if (savedApiSettings.model && !Array.from(modelSelect.options).some(opt => opt.value === savedApiSettings.model)) {
@@ -15174,6 +15512,8 @@ function getChatBackgroundElement() {
         function toggleTheme() {
             body.classList.toggle('dark-mode');
             body.classList.toggle('light-mode');
+            // 为Tailwind CSS添加dark类支持
+            body.classList.toggle('dark');
             const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
             $('#theme-icon').className = `fas fa-${theme === 'dark' ? 'moon' : 'sun'} text-lg`;
             saveData('theme', theme);
@@ -16226,8 +16566,12 @@ if (type === 'image') {
 
             if (!['system', 'red-packet', 'transfer', 'sticker', 'gift'].includes(type)) {
                 const customColors = chatBubbleColors[currentChatCharacterId];
+                const customTextColors = chatTextColors[currentChatCharacterId];
                 const isDarkMode = body.classList.contains('dark-mode');
                 let bubbleColor;
+                let textColor;
+                
+                // 处理气泡颜色
                 if (customColors) {
                     const colorHex = sender === 'user' ? customColors.user : customColors.ai;
                     if (colorHex) {
@@ -16238,6 +16582,19 @@ if (type === 'image') {
                         }
                     }
                 }
+                
+                // 处理文字颜色
+                if (customTextColors) {
+                    const textColorHex = sender === 'user' ? customTextColors.user : customTextColors.ai;
+                    if (textColorHex) {
+                        textColor = textColorHex;
+                        messageBubble.style.color = textColor;
+                        // 如果消息内容包含段落标签，也设置段落颜色
+                        const paragraphs = messageBubble.querySelectorAll('p');
+                        paragraphs.forEach(p => p.style.color = textColor);
+                    }
+                }
+                
                 // 根据日间夜间模式设置默认背景色
                 let defaultBg;
                 if (isDarkMode) {
@@ -16554,7 +16911,20 @@ ${moduleStyleContext || "无"}
                 `;
                 // --- 系统指令结束 ---
 
-
+                // 🚀 第一优先级：API类型检测和CORS处理（使用全局函数）
+                const apiType = getApiType(apiSettings.url);
+                const needsProxyMode = needsProxy(apiSettings.url);
+                
+                // 🚀 API兼容性和优化建议
+                console.log(`📡 检测到API类型: ${apiType}`);
+                if (needsProxyMode) {
+                    console.warn('⚠️ 检测到官方API地址，可能因CORS限制无法直连。建议：');
+                    console.warn('1. 使用中转API服务（如one-api、new-api）');
+                    console.warn('2. 配置反向代理并添加CORS头');
+                    console.warn('3. 使用浏览器扩展绕过CORS限制');
+                } else if (apiType !== 'openai-compatible') {
+                    console.log(`✅ ${apiType} API 已优化支持，建议直连使用`);
+                }
 
                 const isGoogleApi = apiSettings.url.includes('googleapis.com');
                 let finalApiUrl, requestBody;
@@ -16562,7 +16932,29 @@ ${moduleStyleContext || "无"}
 
                 if (isGoogleApi) {
                     // Google API specific logic
-                } else { // OpenAI-Compatible
+                } else if (apiType === 'claude') {
+                    // 🚀 第二优先级：Claude API支持
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/messages`;
+                    headers['anthropic-version'] = '2023-06-01';
+                    // Claude使用不同的请求格式
+                } else if (apiType === 'tongyi') {
+                    // 🚀 第二优先级：通义千问API支持
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/v1/services/aigc/text-generation/generation`;
+                    headers['X-DashScope-SSE'] = 'enable';
+                    // 通义千问特殊处理
+                } else if (apiType === 'ernie') {
+                    // 🚀 第二优先级：文心一言API支持
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions`;
+                    // 文心一言特殊处理
+                } else if (apiType === 'zhipu') {
+                    // 🚀 第二优先级：智谱GLM API支持
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/v4/chat/completions`;
+                    // 智谱GLM特殊处理
+                } else if (apiType === 'doubao') {
+                    // 🚀 第二优先级：豆包API支持
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/v3/chat/completions`;
+                    // 豆包特殊处理
+                } else { // OpenAI-Compatible (默认兼容格式，保持原有逻辑)
                     finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/chat/completions`;
                     const messages = [{ role: "system", content: systemPrompt }];
 
@@ -16781,12 +17173,45 @@ ${moduleStyleContext || "无"}
 
             } catch (error) {
                 console.error("AI 响应错误:", error);
-                if (thinkingMessageWrapper) {
-                    const bubble = thinkingMessageWrapper.querySelector('.chat-message p');
-                    if (bubble) bubble.textContent = `AI 响应失败: ${error.message}`;
-                } else if (retryWrapper) {
-                    const bubble = retryWrapper.querySelector('.chat-message p');
-                    if (bubble) bubble.textContent = `重生成失败: ${error.message}`;
+                
+                // 🚀 延迟刷新机制：避免直接报错，给用户更好的体验
+                const isConnectionError = error.message.includes('CORS') || 
+                                        error.message.includes('网络') || 
+                                        error.message.includes('Failed to fetch') ||
+                                        error.name === 'TypeError';
+                
+                if (isConnectionError) {
+                    // 连接问题时，显示延迟重试提示
+                    const retryMessage = needsProxyMode ? 
+                        `连接失败 (可能是CORS限制)，3秒后自动重试...` : 
+                        `网络连接失败，3秒后自动重试...`;
+                    
+                    if (thinkingMessageWrapper) {
+                        const bubble = thinkingMessageWrapper.querySelector('.chat-message p');
+                        if (bubble) bubble.textContent = retryMessage;
+                        
+                        // 3秒后自动重试
+                        setTimeout(() => {
+                            if (bubble) bubble.textContent = '正在重新连接...';
+                        }, 3000);
+                    } else if (retryWrapper) {
+                        const bubble = retryWrapper.querySelector('.chat-message p');
+                        if (bubble) bubble.textContent = retryMessage;
+                        
+                        // 3秒后自动重试  
+                        setTimeout(() => {
+                            if (bubble) bubble.textContent = '正在重新生成...';
+                        }, 3000);
+                    }
+                } else {
+                    // 其他错误照常显示
+                    if (thinkingMessageWrapper) {
+                        const bubble = thinkingMessageWrapper.querySelector('.chat-message p');
+                        if (bubble) bubble.textContent = `AI 响应失败: ${error.message}`;
+                    } else if (retryWrapper) {
+                        const bubble = retryWrapper.querySelector('.chat-message p');
+                        if (bubble) bubble.textContent = `重生成失败: ${error.message}`;
+                    }
                 }
             } finally {
                 receiveBtnIcon.classList.remove('spinning');
@@ -17541,6 +17966,10 @@ ${context.recentDiaries.map(diary => diary.content).join('\n')}
 `;
 
                 // 调用API生成日记
+                // 🚀 同步：API类型检测和CORS处理
+                const apiType = getApiType(apiSettings.url);
+                const needsProxyMode = needsProxy(apiSettings.url);
+                
                 const isGoogleApi = apiSettings.url.includes('googleapis.com');
                 let finalApiUrl, requestBody;
                 let headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiSettings.key}` };
@@ -18505,6 +18934,18 @@ ${transcriptText}
                     chatScreen.classList.remove('has-custom-bg');
                     statusBar.classList.remove('transparent-override');
                 }
+
+                // ====== 在这里加入下面的代码 ======
+                // 应用保存的文字颜色设置
+                const savedTextColors = chatTextColors[characterId];
+                if (savedTextColors && savedTextColors.other) {
+                    applyOtherTextColor(savedTextColors.other);
+                }
+                
+                const chatOptions = loadData('chatOptions', {});
+                const shouldHideAvatars = chatOptions[characterId]?.hideAvatars || false;
+                document.getElementById('wechat-content-chat').classList.toggle('no-avatars', shouldHideAvatars);
+                // ==================================
                 
                 showScreen('wechat-chat-screen');
                 
@@ -18604,7 +19045,20 @@ ${transcriptText}
                         <p class="text-sm text-gray-400 last-message">${lastMessagePreview}</p>
                     </div>
                 `;
-                item.addEventListener('click', () => startChatWithCharacter(charId));
+                
+                // 更稳健的事件绑定 - 使用捕获和防止默认行为
+                const clickHandler = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('点击聊天项目:', character.name, charId);
+                    startChatWithCharacter(charId);
+                };
+                
+                item.addEventListener('click', clickHandler, { capture: true });
+                // 添加数据属性用于调试
+                item.setAttribute('data-character-id', charId);
+                item.setAttribute('data-character-name', character.name);
+                
                 container.appendChild(item);
 
                 // 在元素被添加到页面后，异步加载并设置头像
@@ -19305,6 +19759,10 @@ ${transcriptText}
                     * **我们的约定 (Our Plans)**：${planContext}这是我们共同许下的计划和承诺的列表，它们是你记忆的一部分。
                 `;
 
+                // 🚀 同步：API类型检测和CORS处理
+                const apiType = getApiType(apiSettings.url);
+                const needsProxyMode = needsProxy(apiSettings.url);
+                
                 const isGoogleApi = apiSettings.url.includes('googleapis.com');
                 let finalApiUrl, requestBody, headers = { 'Content-Type': 'application/json' };
 
@@ -20615,8 +21073,9 @@ ${triggerDescription}
                 const heartbeatSettings = loadData('heartbeatSettings', defaultHeartbeatSettings);
                 this.triggerThresholds = {
                     emotionHigh: 0.85,  // 情感强度达到0.85可能触发
-                    timeGap: 6 * 60 * 60 * 1000, // 6小时无互动可能触发
-                    minInterval: heartbeatSettings.momentsMinInterval * 60 * 1000 // 使用用户设置的朋友圈最小间隔
+                    timeGap: heartbeatSettings.momentsTimeTriggerInterval * 60 * 60 * 1000, // 使用用户设置的时间触发间隔
+                    minInterval: heartbeatSettings.momentsMinInterval * 60 * 1000, // 使用用户设置的朋友圈最小间隔
+                    triggerProbability: heartbeatSettings.momentsTriggerProbability // 使用用户设置的触发概率
                 };
                 this.characterPersonalityModifiers = {
                     '温柔': { frequency: 0.8, emotionThreshold: 0.8 },
@@ -20670,14 +21129,24 @@ ${triggerDescription}
                     const lastMessage = chatHistory[chatHistory.length - 1];
                     const emotionScore = this.analyzeEmotion(lastMessage.message);
                     if (Math.abs(emotionScore) > personalityModifier.emotionThreshold) {
-                        return { should: false, reason: '对话达到情感高点' };
+                        // 应用概率判断
+                        if (Math.random() * 100 < this.triggerThresholds.triggerProbability) {
+                            return { should: true, type: 'emotion', reason: '对话达到情感高点' };
+                        } else {
+                            return { should: false, reason: '达到情感触发条件但概率判断未通过' };
+                        }
                     }
                 }
                 
                 // 时间流逝触发
                 const adjustedTimeGap = this.triggerThresholds.timeGap / personalityModifier.frequency;
                 if (now - lastInteraction > adjustedTimeGap) {
-                    return { should: true, type: 'time', reason: '长时间无互动，分享生活' };
+                    // 应用概率判断
+                    if (Math.random() * 100 < this.triggerThresholds.triggerProbability) {
+                        return { should: true, type: 'time', reason: '长时间无互动，分享生活' };
+                    } else {
+                        return { should: false, reason: '达到时间触发条件但概率判断未通过' };
+                    }
                 }
 
                 return { should: false, reason: '未达到触发条件' };
@@ -20707,6 +21176,7 @@ ${triggerDescription}
 
         // 创建全局触发系统实例
         const momentsTriggerSystem = new MomentsTriggerSystem();
+        window.momentsTriggerSystem = momentsTriggerSystem;
 
         // Function to format moment data into a string for the AI prompt
         function formatRecentMomentsForAI(characterId) {
@@ -21623,7 +22093,7 @@ ${moment.image ? `配图描述: ${moment.image_desc}` : ''}
                 momentsTriggerSystem.recordMomentPosted(characterId);
                 
                 // 刷新朋友圈显示
-                if (currentTab === 'moments') {
+                if ($('.wechat-tab-item[data-tab="moments"]').classList.contains('active')) {
                     renderUnifiedMoments();
                 }
                 
@@ -21745,7 +22215,7 @@ ${moment.image ? `配图描述: ${moment.image_desc}` : ''}
                 momentsTriggerSystem.recordMomentPosted(characterId);
                 
                 // 刷新朋友圈显示
-                if (currentTab === 'moments') {
+                if ($('.wechat-tab-item[data-tab="moments"]').classList.contains('active')) {
                     renderUnifiedMoments();
                 }
                 
@@ -21890,7 +22360,7 @@ ${moment.image ? `配图描述: ${moment.image_desc}` : ''}
                 momentsTriggerSystem.recordMomentPosted(characterId);
                 
                 // 刷新朋友圈显示
-                if (currentTab === 'moments') {
+                if ($('.wechat-tab-item[data-tab="moments"]').classList.contains('active')) {
                     renderUnifiedMoments();
                 }
                 
@@ -27936,6 +28406,10 @@ function addNewEventListeners() {
             $('#heartbeat-settings-back-button').addEventListener('click', () => showScreen('main-settings-screen'));
             $('#save-heartbeat-settings').addEventListener('click', saveHeartbeatSettings);
             $('#reset-heartbeat-settings').addEventListener('click', resetHeartbeatSettings);
+            
+            // 朋友圈测试功能
+            $('#test-moments-trigger').addEventListener('click', startMomentsTest);
+            $('#stop-moments-test').addEventListener('click', stopMomentsTest);
 
             $('#music-block').addEventListener('click', (e) => { if (e.target === e.currentTarget) $('#background-input').click(); });
             $('#background-input').addEventListener('change', async (e) => {
@@ -28196,14 +28670,21 @@ function addNewEventListeners() {
                 
                 const userColorPicker = $('#user-bubble-color-picker');
                 const aiColorPicker = $('#ai-bubble-color-picker');
+                const userTextColorPicker = $('#user-text-color-picker');
+                const aiTextColorPicker = $('#ai-text-color-picker');
                 const currentColors = chatBubbleColors[currentChatCharacterId];
+                const currentTextColors = chatTextColors[currentChatCharacterId];
                 
                 const isDarkMode = body.classList.contains('dark-mode');
                 const defaultUserColor = '#374151';
                 const defaultAiColor = isDarkMode ? '#4a4a4a' : '#e5e7eb';
+                const defaultUserTextColor = '#ffffff';
+                const defaultAiTextColor = '#000000';
 
                 userColorPicker.value = currentColors?.user || defaultUserColor;
                 aiColorPicker.value = currentColors?.ai || defaultAiColor;
+                userTextColorPicker.value = currentTextColors?.user || defaultUserTextColor;
+                aiTextColorPicker.value = currentTextColors?.ai || defaultAiTextColor;
 
                 // V40.0 新增：加载并显示已保存的记忆长度
                 const memoryLengthInput = $('#ai-memory-length');
@@ -28252,6 +28733,32 @@ function addNewEventListeners() {
                     saveData('chatHistories', chatHistories);
                     showScreen('wechat-chat-screen'); // 操作后返回聊天界面
                 });
+
+                // ====== 【新增】处理"隐藏头像"开关的逻辑 ======
+                const hideAvatarsToggle = document.getElementById('hide-avatars-toggle');
+                const chatOptions = loadData('chatOptions', {});
+                const currentChatOptions = chatOptions[currentChatCharacterId] || {};
+
+                // 1. 加载当前设置，更新开关状态
+                hideAvatarsToggle.checked = currentChatOptions.hideAvatars || false;
+
+                // 2. 监听开关变化，并保存设置
+                hideAvatarsToggle.onchange = (e) => {
+                    const shouldHide = e.target.checked;
+                    if (!chatOptions[currentChatCharacterId]) {
+                        chatOptions[currentChatCharacterId] = {};
+                    }
+                    chatOptions[currentChatCharacterId].hideAvatars = shouldHide;
+                    saveData('chatOptions', chatOptions);
+
+                    // 立即应用或取消样式
+                    document.getElementById('wechat-content-chat').classList.toggle('no-avatars', shouldHide);
+
+                    // 滚动到底部以防布局变化导致位置错乱
+                    const chatContentArea = $('#wechat-content-chat');
+                    chatContentArea.scrollTop = chatContentArea.scrollHeight;
+                };
+                // ============================================
 
                 showScreen('wechat-options-screen');
             });
@@ -28333,13 +28840,33 @@ function addNewEventListeners() {
                 saveData('chatBubbleColors', chatBubbleColors);
                 renderChatHistory();
             }
+            
+            function handleTextColorChange(type, value) {
+                if (!currentChatCharacterId) return;
+                if (!chatTextColors[currentChatCharacterId]) {
+                    chatTextColors[currentChatCharacterId] = {};
+                }
+                chatTextColors[currentChatCharacterId][type] = value;
+                saveData('chatTextColors', chatTextColors);
+                
+                if (type === 'other') {
+                    applyOtherTextColor(value);
+                } else {
+                    renderChatHistory();
+                }
+            }
+
+            
             $('#user-bubble-color-picker').addEventListener('input', (e) => handleColorChange('user', e.target.value));
             $('#ai-bubble-color-picker').addEventListener('input', (e) => handleColorChange('ai', e.target.value));
+            $('#user-text-color-picker').addEventListener('input', (e) => handleTextColorChange('user', e.target.value));
+            $('#ai-text-color-picker').addEventListener('input', (e) => handleTextColorChange('ai', e.target.value));
+            $('#other-text-color-picker').addEventListener('input', (e) => handleTextColorChange('other', e.target.value));
             
             // V40.0 新增：AI记忆长度设置的保存
             $('#ai-memory-length').addEventListener('change', (e) => {
                 const value = parseInt(e.target.value, 10);
-                if (value >= 10 && value <= 100) {
+                if (value >= 10 && value <= 500) {
                     saveData('ai_memory_length', value);
                     console.log(`AI记忆长度已更新为: ${value}`);
                 } else {
@@ -30183,6 +30710,11 @@ function addNewEventListeners() {
                 `;
 
                 const apiSettings = loadData('apiSettings');
+                
+                // 🚀 同步：API类型检测和CORS处理
+                const apiType = getApiType(apiSettings.url);
+                const needsProxyMode = needsProxy(apiSettings.url);
+                
                 const isGoogleApi = apiSettings.url.includes('googleapis.com');
                 let finalApiUrl, requestBody, headers = { 'Content-Type': 'application/json' };
 
@@ -30480,6 +31012,10 @@ ${eventTypeSpecificInput}
 ---
 `;
 
+    // 🚀 同步：API类型检测和CORS处理
+    const apiType = getApiType(apiSettings.url);
+    const needsProxyMode = needsProxy(apiSettings.url);
+    
     const isGoogleApi = apiSettings.url.includes('googleapis.com');
     let requestBody;
 
@@ -30899,11 +31435,11 @@ ${eventTypeSpecificInput}
             if (memoryLengthInput) {
                 memoryLengthInput.addEventListener('change', (e) => {
                     let value = parseInt(e.target.value, 10);
-                    // 验证输入值是否在10到100之间
+                    // 验证输入值是否在10到500之间
                     if (isNaN(value) || value < 10) {
                         value = 10;
-                    } else if (value > 100) {
-                        value = 100;
+                    } else if (value > 500) {
+                        value = 500;
                     }
                     e.target.value = value; // 如果超出范围，自动修正输入框中的值
                     saveData('ai_memory_length', value);
@@ -34857,6 +35393,13 @@ ${giftListForAI}
                     }
                 });
             }
+            
+            // 初始化时应用保存的"其他"文字颜色
+            setTimeout(() => {
+                if (currentChatCharacterId && chatTextColors[currentChatCharacterId] && chatTextColors[currentChatCharacterId].other) {
+                    applyOtherTextColor(chatTextColors[currentChatCharacterId].other);
+                }
+            }, 100);
 
             // --- 【新增代码从这里开始】 ---
 
