@@ -16594,27 +16594,52 @@ ${moduleStyleContext || "无"}
                         
                         // 如果是用户发送的图片或表情包消息
                         if (msg.sender === 'user' && (msg.type === 'image' || msg.type === 'sticker')) {
+                            console.log('🖼️ 检测到图片消息:', msg);
                             let base64Image = null;
                             let promptText = '[用户发送了一张图片，请你对此进行回应]';
 
                             // 智能判断是画板的DataURL还是上传的图片ID
                             if (typeof msg.content === 'string' && msg.content.startsWith('data:image')) {
                                 // 这是画板的画
+                                console.log('📝 画板图片，直接使用DataURL');
                                 base64Image = msg.content;
                                 promptText = '这是一张用户在画板上画的画，请你识别画中的内容并进行描述和回应。';
                             } else {
                                 // 这是上传的图片
+                                console.log('📁 上传图片，从数据库获取，ID:', msg.content);
                                 const imageBlob = await getImageFromDB(msg.content);
                                 if (imageBlob) {
+                                    console.log('✅ 成功从数据库获取图片blob');
                                     base64Image = await blobToBase64(imageBlob);
+                                    console.log('✅ 成功转换为base64，长度:', base64Image ? base64Image.length : 0);
+                                } else {
+                                    console.warn('❌ 从数据库获取图片失败');
                                 }
                             }
 
                             if (base64Image) {
-                                // 【【修复】】：改为纯文本格式，避免API格式错误
-                                return { role: 'user', content: promptText };
+                                console.log('🚀 构造Vision API格式的消息');
+                                // 这是支持OpenAI GPT-4 Vision等模型的正确格式
+                                const visionMessage = {
+                                    role: 'user',
+                                    content: [
+                                        {
+                                            type: 'text',
+                                            text: promptText // 例如 "[用户发送了一张图片，请你对此进行回应]"
+                                        },
+                                        {
+                                            type: 'image_url',
+                                            image_url: {
+                                                url: base64Image
+                                            }
+                                        }
+                                    ]
+                                };
+                                console.log('📤 返回Vision消息格式:', visionMessage);
+                                return visionMessage;
                             } else {
-                                // 如果图片加载失败
+                                console.warn('❌ base64Image为空，返回失败消息');
+                                // 图片加载失败的情况
                                 return { role: 'user', content: '[用户发送了一张图片，但图片已丢失]' };
                             }
                         }
@@ -16637,14 +16662,32 @@ ${moduleStyleContext || "无"}
 
                     messages.push(...processedHistory);
                     
-                    // 【【终极安全检查】】：确保所有消息的content都是字符串
+                    // 【【终极安全检查】】：确保所有消息的content格式正确
                     messages.forEach((msg, index) => {
+                        // 对于图片消息，content应该是数组格式，不需要转换为字符串
+                        if (Array.isArray(msg.content)) {
+                            console.log(`📋 消息${index}是图片消息，保持数组格式:`, msg.content);
+                            // 这是图片消息的正确格式，保持不变
+                            return;
+                        }
+                        // 对于其他消息，确保content是字符串
                         if (typeof msg.content !== 'string') {
                             console.warn(`消息${index}的content不是字符串，强制转换:`, msg.content);
                             msg.content = typeof msg.content === 'object' ? JSON.stringify(msg.content) : String(msg.content);
                         }
                     });
 
+                    // 调试：打印最终要发送的消息
+                    console.log('📨 最终发送给API的消息列表:', messages);
+
+                    // 检查是否有图片消息，如果有，确保使用支持Vision的模型
+                    const hasImageMessages = messages.some(msg => Array.isArray(msg.content));
+                    if (hasImageMessages) {
+                        console.log('🔍 检测到图片消息，当前模型:', apiSettings.model);
+                        if (!apiSettings.model.includes('vision') && !apiSettings.model.includes('gpt-4')) {
+                            console.warn('⚠️ 当前模型可能不支持图片识别，建议使用 gpt-4-vision-preview 或 gpt-4o');
+                        }
+                    }
                     
                     // --- 【【添加OpenAI安全参数】】 ---
                     requestBody = JSON.stringify({ 
@@ -16657,6 +16700,7 @@ ${moduleStyleContext || "无"}
                     });
                 }
 
+                console.log('📡 发送API请求到:', finalApiUrl);
                 const response = await fetch(finalApiUrl, { method: 'POST', headers: headers, body: requestBody });
 
                 if (!characters.find(c => c.id === characterIdForThisRequest)) {
@@ -16666,11 +16710,14 @@ ${moduleStyleContext || "无"}
 
                 if (!response.ok) {
                     const errorText = await response.text();
+                    console.error('❌ API响应错误:', response.status, errorText);
                     throw new Error(JSON.parse(errorText || "{}").error?.message || `HTTP 错误 ${response.status}`);
                 }
 
                 const result = await response.json();
+                console.log('✅ API响应成功:', result);
                 const aiMessage = isGoogleApi ? result.candidates[0].content.parts[0].text : result.choices[0].message.content;
+                console.log('💬 提取的AI消息:', aiMessage);
 
                 // --- 【【动作指令解释器】】 ---
                 // 动作指令解释器
@@ -23034,7 +23081,7 @@ function replyToComment(momentId, commentId, originalAuthor) {
         }
 
         // [AI, 请用这个版本完整替换现有的 openDiaryBook 函数]
-        function openDiaryBook(ownerId) {
+        async function openDiaryBook(ownerId) {
             // V33.0 新增：打开日记本时，移除更新提示
             let updatedDiaries = loadData('updatedDiaries', []);
             if (updatedDiaries.includes(ownerId)) {
@@ -23077,27 +23124,37 @@ function replyToComment(momentId, commentId, originalAuthor) {
             }
             $('#diary-cover-author').textContent = `by ${authorName}`;
 
-            // 优先加载独立的顶部横幅图片
-            const savedBanner = loadData(`diary_banner_${ownerId}`);
-            // 如果找不到横幅，则使用原来的书本封面作为备用
-            const savedCover = loadData(`diary_cover_${ownerId}`);
-
-            const finalImage = savedBanner || savedCover; // 优先使用横幅图
+            const savedBannerId = loadData(`diary_banner_${ownerId}`);
+            const savedCoverId = loadData(`diary_cover_${ownerId}`);
+            const finalImageId = savedBannerId || savedCoverId;
 
             const coverElement = document.getElementById('diary-book-cover');
-            if (finalImage) {
-                // 完全覆盖CSS样式，确保图片显示
-                coverElement.style.cssText = `
-                    background: url(${finalImage}) center center / cover no-repeat !important;
-                    background-image: url(${finalImage}) !important;
-                    background-size: cover !important;
-                    background-repeat: no-repeat !important;
-                    background-position: center !important;
-                `;
+            
+            // --- 核心修复逻辑 ---
+            if (finalImageId) {
+                try {
+                    // 使用ID从数据库异步获取图片数据
+                    const imageBlob = await getImageFromDB(finalImageId);
+                    if (imageBlob) {
+                        // 如果成功获取，创建临时URL并设置背景
+                        const objectURL = URL.createObjectURL(imageBlob);
+                        coverElement.style.cssText = `
+                            background: url(${objectURL}) center center / cover no-repeat !important;
+                        `;
+                    } else {
+                        // 如果数据库里没有这个ID的图片，恢复默认样式
+                        coverElement.style.cssText = '';
+                    }
+                } catch (error) {
+                    // 如果在获取过程中出错，也恢复默认样式
+                    console.error("加载日记横幅失败:", error);
+                    coverElement.style.cssText = '';
+                }
             } else {
-                // 恢复默认渐变背景
+                // 如果连ID都没有，直接恢复默认样式
                 coverElement.style.cssText = '';
             }
+            // --- 修复结束 ---
 
             // [关键] 强制隐藏旧的翻页按钮
             prevPageBtn.style.display = 'none';
@@ -27228,32 +27285,41 @@ function addNewEventListeners() {
                 input.type = 'file';
                 input.accept = 'image/*';
 
+                // 【AI 修正版】
                 input.onchange = async (e) => {
                     const file = e.target.files[0];
                     if (file && currentOpenBook.ownerId) {
-                        // 显示图片裁剪界面
-                        showImageCropper(file, async (croppedDataUrl) => {
-                            try {
-                                // 使用新的命名规则保存独立的横幅图片
-                                const ownerId = currentOpenBook.ownerId;
-                                saveData(`diary_banner_${ownerId}`, croppedDataUrl);
+                        // 注意：这里的 aspectRatio: 1000 / 300 是一个更适合横幅的比例
+                        showImageCropper(file, async (croppedBlob) => {
+                            if (croppedBlob) {
+                                try {
+                                    const ownerId = currentOpenBook.ownerId;
+                                    // 1. (修正) 为图片创建一个唯一的ID
+                                    const imageId = `diary_banner_${ownerId}_${Date.now()}`;
 
-                                // 立刻更新当前页面的显示
-                                const coverElement = document.getElementById('diary-book-cover');
-                                // 完全覆盖CSS样式，确保图片显示
-                                coverElement.style.cssText = `
-                                    background: url(${croppedDataUrl}) center center / cover no-repeat !important;
-                                    background-image: url(${croppedDataUrl}) !important;
-                                    background-size: cover !important;
-                                    background-repeat: no-repeat !important;
-                                    background-position: center !important;
-                                `;
+                                    // 2. (修正) 将裁切后的图片数据(Blob)存入数据库
+                                    await saveImageToDB(imageId, croppedBlob);
 
-                                showMessageBox('顶部横幅图片已更新');
-                            } catch (error) {
-                                showMessageBox('横幅图片处理失败');
+                                    // 3. (修正) 将图片的ID存入localStorage，这才是正确的做法
+                                    saveData(`diary_banner_${ownerId}`, imageId);
+
+                                    // 4. (实时更新UI) 更新当前打开的日记本横幅
+                                    const coverElement = document.getElementById('diary-book-cover');
+                                    const objectURL = URL.createObjectURL(croppedBlob);
+                                    coverElement.style.cssText = `
+                                        background: url(${objectURL}) center center / cover no-repeat !important;
+                                    `;
+
+                                    // 5. (实时更新UI) 刷新书架，让封面也立刻更新
+                                    showDiaryBookshelf();
+
+                                    showMessageBox('顶部横幅图片已更新');
+                                } catch (error) {
+                                    console.error("处理和保存横幅失败:", error);
+                                    showMessageBox('横幅图片处理失败');
+                                }
                             }
-                        });
+                        }, 1000 / 500); // 使用 2:1 的横幅裁切比例 (更合理的横幅比例)
                     }
                 };
                 input.click();
@@ -35116,3 +35182,5 @@ function savePerchSettings() {
 
         </body>
 </html>
+
+
