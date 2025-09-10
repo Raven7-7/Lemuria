@@ -609,12 +609,12 @@
         }
 
         .modal-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.5);
             z-index: 9000;
             display: none;
             justify-content: center;
@@ -1023,6 +1023,17 @@
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+        
+        /* 深色主题下的剧本内容毛玻璃效果 */
+        .dark-mode #scenario-content-container {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                0 4px 16px rgba(0, 0, 0, 0.3) !important;
+        }
         .dark-mode .app-screen-view:not(#home-screen):not(#wechat-chat-screen) { background-color: #1a1a1a; }
         .dark-mode #wechat-chat-screen { background-color: #1a1a1a; }
         .dark-mode .app-header { 
@@ -1151,6 +1162,11 @@
         }
         .chat-message-wrapper + .chat-message-wrapper {
             margin-top: 0.1rem !important; /* 为每条消息之间都设置一个固定的间距 */
+        }
+        
+        /* 针对多行气泡后的消息增加额外间距（仅在显示头像模式下） */
+        #wechat-content-chat:not(.no-avatars) .chat-message-wrapper.has-multiline + .chat-message-wrapper {
+            margin-top: 0.8rem !important; /* 多行气泡后需要更大间距 */
         }
         .chat-avatar {
             width: 36px;  /* <-- 修改这里 */
@@ -1289,6 +1305,7 @@
         .chat-message p, .chat-message i {
             font-size: inherit;
             line-height: 1.5;
+            margin: 0; /* 消除p标签的默认margin，确保气泡间距统一 */
         }
 
         .chat-message.image-message::before, .chat-message.voice-message::before, .chat-message.sticker-message::before, .chat-message.red-packet-message::before, .chat-message.transfer-message::before {
@@ -2839,6 +2856,27 @@
             border-radius: 50%;
         }
 
+        /* 重置外观设置按钮样式 */
+        #reset-colors-btn {
+            font-size: 14px;
+            min-width: 160px;
+        }
+        
+        #reset-colors-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dark-mode #reset-colors-btn {
+            background-color: #3b82f6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dark-mode #reset-colors-btn:hover {
+            background-color: #2563eb;
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25);
+        }
+
         .app-header { 
             display: flex; 
             align-items: center; /* 垂直居中所有子元素 */
@@ -2850,6 +2888,12 @@
             z-index: 20;
             border-bottom: 1px solid rgba(128, 128, 128, 0.2); /* 中性边框颜色 */
             background: transparent;
+        }
+
+        /* 剧场界面头部标题栏下移 */
+        #theater-screen .app-header {
+            padding-top: 2rem;
+            padding-bottom: 0.5rem;
             /* 确保标题栏在手机模式下始终可见 */
             min-height: 4.5rem;
             overflow: visible;
@@ -3095,6 +3139,83 @@
             background-position: right 0.5rem center;
             background-size: 1.5em 1.5em;
             padding-right: 2.5rem;
+        }
+
+        /* 剧场主题设置模态框样式 */
+        #scenario-theme-modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: rgba(0, 0, 0, 0.7) !important;
+            display: none !important;
+            justify-content: center !important;
+            align-items: center !important;
+            padding: 20px !important;
+            box-sizing: border-box !important;
+        }
+        
+        #scenario-theme-modal.visible {
+            display: flex !important;
+        }
+        
+        #scenario-theme-modal .modal-content {
+            max-width: 450px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: 0;
+            position: relative;
+            transform: scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        #scenario-theme-modal.visible .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        #scenario-theme-modal .color-picker-input {
+            border: 2px solid rgba(128, 128, 128, 0.3);
+            transition: border-color 0.2s ease;
+        }
+
+        #scenario-theme-modal .color-picker-input:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+        }
+
+        /* 日夜间模式下的主题设置对话框 */
+        .dark-mode #scenario-theme-modal .modal-content {
+            background: rgba(31, 41, 55, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .light-mode #scenario-theme-modal .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: #1f2937;
+        }
+
+        .dark-mode #scenario-theme-modal .modal-content h3,
+        .dark-mode #scenario-theme-modal .modal-content label {
+            color: #ffffff;
+        }
+
+        .light-mode #scenario-theme-modal .modal-content h3,
+        .light-mode #scenario-theme-modal .modal-content label {
+            color: #1f2937;
+        }
+
+        .dark-mode #scenario-theme-modal .text-gray-600 {
+            color: #d1d5db !important;
+        }
+
+        .light-mode #scenario-theme-modal .text-gray-600 {
+            color: #6b7280 !important;
         }
         .wb-checkbox-label { display: flex; align-items: center; padding: 0.5rem; border-radius: 0.5rem; cursor: pointer; }
         .wb-checkbox-label:hover { background-color: rgba(255, 255, 255, 0.1); }
@@ -8857,6 +8978,61 @@
         }
 
         /* ====== 【【新增】】剧场 App 样式 ====== */
+        
+        /* 剧场主题自定义CSS变量 */
+        :root {
+            --scenario-bg-color: #4d3a2a;
+            --scenario-header-color: #4d3a2a;
+            --scenario-title-color: #f5f2ed;
+            --scenario-content-color: #3e2723;
+            --scenario-content-bg-color: #f5f2ed;
+            --scenario-input-border-color: #8b6559;
+            --scenario-refresh-btn-color: #8b6559;
+            --scenario-send-btn-color: #6d4c41;
+            --scenario-send-btn-border-color: #5d4037;
+            --scenario-bg-image: none;
+            --scenario-bg-opacity: 0.7;
+            --scenario-bg-blur: 2px;
+        }
+
+        /* 剧场主题背景图片样式 */
+        #theater-screen {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #theater-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: var(--scenario-bg-image);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: local;
+            opacity: var(--scenario-bg-opacity);
+            filter: blur(var(--scenario-bg-blur));
+            z-index: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        #theater-screen > * {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 确保剧场内容在背景图片之上 */
+        #theater-screen .scenario-header,
+        #theater-screen .scenario-content,
+        #theater-screen .scenario-input-area {
+            position: relative;
+            z-index: 20;
+        }
+
         .script-card {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -8938,48 +9114,66 @@
 
         /* 剧场界面 - 质感阅读体验 (V2.0 皮质效果) */
         #scenario-interaction-view {
-            /* 创建皮革质感的多层背景 */
-            background: 
-                /* 顶层：模拟皮革纹理的噪点 */
-                radial-gradient(circle at 25% 25%, rgba(180, 140, 120, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(160, 120, 100, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 50% 80%, rgba(140, 100, 80, 0.15) 0%, transparent 50%),
-                /* 中层：皮革的自然斑纹 */
-                linear-gradient(45deg, rgba(120, 80, 60, 0.1) 25%, transparent 25%),
-                linear-gradient(-45deg, rgba(100, 70, 50, 0.1) 25%, transparent 25%),
-                /* 底层：皮革的基础颜色 */
-                linear-gradient(135deg, #4d3a2a 0%, #3e2723 50%, #2c2118 100%);
-            background-size: 120px 120px, 80px 80px, 150px 150px, 20px 20px, 20px 20px, 100% 100%;
+            /* 使用CSS变量创建可自定义的背景 */
+            background: var(--scenario-bg-color);
             position: relative;
+            z-index: 1;
             /* 添加内阴影增加深度感 */
             box-shadow: 
                 inset 0 0 80px rgba(0,0,0,0.4),
-                inset 0 0 40px rgba(139, 101, 89, 0.1);
+                inset 0 0 40px rgba(0,0,0,0.2);
         }
 
-        /* 剧本界面标题栏美化 - 皮革质感风格 */
+        /* 当有背景图片时，让scenario-interaction-view透明 */
+        .has-bg-image #scenario-interaction-view {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* 当有背景图片时，隐藏背景纹理层 */
+        .has-bg-image #scenario-interaction-view::before {
+            display: none !important;
+        }
+
+        /* 背景纹理层 */
+        #scenario-interaction-view::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+                linear-gradient(45deg, rgba(255, 255, 255, 0.01) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255, 255, 255, 0.01) 25%, transparent 25%);
+            background-size: 120px 120px, 80px 80px, 150px 150px, 20px 20px, 20px 20px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* 剧本界面标题栏美化 - 可自定义风格 */
         #scenario-interaction-view .app-header {
             padding-top: 1.2rem;
             padding-bottom: 0.4rem;
-            /* 皮革质感渐变背景 */
-            background: linear-gradient(135deg, 
-                rgba(77, 58, 42, 0.95) 0%, 
-                rgba(62, 39, 35, 0.9) 50%, 
-                rgba(44, 33, 24, 0.95) 100%);
-            /* 添加细微的纹理效果 */
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(139, 101, 89, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(139, 101, 89, 0.08) 0%, transparent 50%);
-            background-size: 60px 60px, 80px 80px;
+            /* 使用CSS变量的背景 */
+            background: var(--scenario-header-color);
             /* 边框和阴影效果 */
-            border-bottom: 1px solid rgba(139, 101, 89, 0.3);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.3);
             box-shadow: 
                 0 2px 8px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(139, 101, 89, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
                 inset 0 -1px 0 rgba(0, 0, 0, 0.2);
             /* 增加质感 */
             position: relative;
             overflow: hidden;
+            z-index: 2;
+            /* 修改布局以确保标题居中，按钮靠右 */
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
         }
 
         /* 标题栏顶部光泽效果 */
@@ -8998,59 +9192,116 @@
         }
 
         #scenario-interaction-view .app-header-title {
-            transform: translateY(6px);
-            color: #f5f2ed !important; /* 温暖的米白色 */
+            transform: translateY(8px); /* 调整标题下移，与按钮对齐 */
+            color: var(--scenario-title-color) !important; /* 使用CSS变量 */
             text-shadow: 
                 0 1px 2px rgba(0, 0, 0, 0.5),
-                0 0 8px rgba(139, 101, 89, 0.3);
+                0 0 8px rgba(0, 0, 0, 0.3);
             position: relative;
-            z-index: 2;
+            z-index: 3;
             font-weight: 600;
             letter-spacing: 0.5px;
+            /* 让标题在容器中居中，不被边距影响 */
+            margin: 0 auto;
+            text-align: center;
         }
 
         #scenario-interaction-view .app-header .text-xs {
-            color: rgba(245, 242, 237, 0.8) !important; /* 稍微透明的米白色 */
+            color: var(--scenario-title-color) !important; /* 使用CSS变量 */
+            opacity: 0.8;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
             position: relative;
-            z-index: 2;
+            z-index: 3;
             transform: translateY(6px);
         }
 
         #scenario-interaction-view .app-header-btn {
-            transform: translateY(6px);
-            color: #f5f2ed !important;
+            color: var(--scenario-title-color) !important;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
             position: relative;
-            z-index: 2;
+            z-index: 3;
             transition: all 0.3s ease;
             border-radius: 6px;
-            padding: 6px;
-            background: rgba(139, 101, 89, 0.2);
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
             backdrop-filter: blur(2px);
+            min-width: 36px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #scenario-interaction-view .app-header-btn:hover {
-            background: rgba(139, 101, 89, 0.35);
-            color: #ffffff !important;
-            text-shadow: 0 0 8px rgba(139, 101, 89, 0.6);
-            transform: translateY(5px);
+            background: rgba(0, 0, 0, 0.35);
+            color: var(--scenario-title-color) !important;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+            opacity: 0.9;
+        }
+
+        /* hover状态的特殊处理 */
+        #scenario-interaction-view #scenario-theme-btn:hover,
+        #scenario-interaction-view #scenario-settings-btn:hover {
+            transform: translateY(-18%); /* hover时在原位置基础上稍微向上移动 */
+        }
+        
+        /* 返回按钮的hover状态 - 无背景 */
+        #scenario-interaction-view #scenario-back-btn:hover {
+            transform: translateY(-18%); /* hover时在原位置基础上稍微向上移动 */
+            background: transparent !important; /* hover时也保持透明 */
+            opacity: 0.8; /* 通过透明度变化提供hover反馈 */
+        }
+
+        /* 右侧按钮组样式 */
+        #scenario-interaction-view .app-header-btn.ml-1 {
+            margin-left: 0.25rem; /* 减少按钮间距 */
+        }
+
+        /* 确保按钮组位于右侧 */
+        #scenario-interaction-view #scenario-theme-btn {
+            position: absolute;
+            right: 4rem; /* 美化按钮位置 */
+            top: 50%;
+            transform: translateY(-16%); /* 垂直居中对齐 */
+        }
+
+        #scenario-interaction-view #scenario-settings-btn {
+            position: absolute;
+            right: 1rem; /* 设置按钮位置 */
+            top: 50%;
+            transform: translateY(-16%); /* 垂直居中对齐 */
+        }
+
+        /* 确保返回按钮保持在左侧 */
+        #scenario-interaction-view #scenario-back-btn {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-16%); /* 垂直居中对齐 */
+            min-width: 44px !important; /* 增大点击区域 */
+            min-height: 44px !important; /* 增大点击区域 */
+            padding: 12px !important; /* 增加内边距 */
+            z-index: 10 !important; /* 确保在最上层 */
+            pointer-events: auto !important; /* 确保可以点击 */
+            background: transparent !important; /* 透明背景 */
+            backdrop-filter: none !important; /* 移除模糊效果 */
         }
 
         #scenario-content-container {
             font-family: 'Noto Serif SC', serif;
-            background: linear-gradient(145deg, #f8f5f0 0%, #f5f2ed 30%, #f3efea 70%, #f0ebe6 100%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 20px;
             margin: 15px;
             padding: 15px 20px;
             box-shadow: 
-                0 12px 32px rgba(139, 101, 89, 0.15),
-                0 4px 12px rgba(139, 101, 89, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                inset 0 -1px 0 rgba(139, 101, 89, 0.05);
+                0 8px 32px rgba(31, 38, 135, 0.2),
+                0 4px 16px rgba(139, 101, 89, 0.1);
             position: relative;
             z-index: 2;
-            border: 1px solid rgba(139, 101, 89, 0.08);
+            transition: all 0.3s ease;
         }
 
         #scenario-content-container::before {
@@ -9161,93 +9412,91 @@
         }
 
         .ai-turn {
-            background-color: transparent;
-            color: #3e2723;
+            background-color: var(--scenario-content-bg-color);
+            color: var(--scenario-content-color);
             font-size: 0.85rem;
             font-weight: 400;
             position: relative;
             padding-left: 2rem;
             padding-right: 2rem;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            margin: 0.5rem 0;
         }
 
-        .ai-turn::before {
-            content: '"';
-            position: absolute;
-            left: 0;
-            top: -0.2rem;
-            font-size: 2.2rem;
-            color: #8b6559;
-            font-family: 'Times New Roman', serif;
-            line-height: 1;
-            opacity: 0.6;
-        }
 
-        .ai-turn::after {
-            content: '"';
-            position: absolute;
-            right: 0;
-            bottom: -0.8rem;
-            font-size: 2.2rem;
-            color: #8b6559;
-            font-family: 'Times New Roman', serif;
-            line-height: 1;
-            opacity: 0.6;
-        }
 
         .user-turn {
-            background: linear-gradient(135deg, rgba(139, 101, 89, 0.1) 0%, rgba(121, 85, 72, 0.05) 100%);
-            color: #5d4037;
+            background: linear-gradient(135deg, var(--scenario-content-bg-color) 0%, rgba(255, 255, 255, 0.8) 100%);
+            color: var(--scenario-content-color);
             font-size: 0.8rem;
             line-height: 1.5;
             font-style: italic;
-            border-left: 3px solid #8b6559;
+            border-left: 3px solid var(--scenario-input-border-color);
             padding-left: 1.2rem;
             border-radius: 0 8px 8px 0;
-            box-shadow: inset 0 1px 3px rgba(139, 101, 89, 0.1);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .light-mode .user-turn {
-            background: linear-gradient(135deg, rgba(139, 101, 89, 0.1) 0%, rgba(121, 85, 72, 0.05) 100%);
-            color: #5d4037;
-            border-left-color: #8b6559;
+            background: linear-gradient(135deg, var(--scenario-content-bg-color) 0%, rgba(255, 255, 255, 0.9) 100%);
+            color: var(--scenario-content-color);
+            border-left-color: var(--scenario-input-border-color);
         }
         /* 剧场界面输入栏美化 */
         #scenario-input-bar {
-            background: linear-gradient(135deg, #3e2723 0%, #4e342e 100%);
-            border-top: 2px solid #8b6559;
+            background: var(--scenario-header-color);
+            border-top: 2px solid var(--scenario-input-border-color);
             position: relative;
             z-index: 3;
         }
 
         #scenario-input {
             max-height: 120px;
-            background: linear-gradient(145deg, #faf7f0 0%, #f5f1e8 100%);
-            border: 2px solid #8b6559;
+            background: linear-gradient(145deg, var(--scenario-content-bg-color) 0%, rgba(255, 255, 255, 0.95) 100%);
+            border: 2px solid var(--scenario-input-border-color);
             border-radius: 8px;
-            color: #3e2723;
+            color: var(--scenario-content-color);
             font-family: 'Noto Serif SC', serif;
-            box-shadow: inset 0 2px 4px rgba(139, 101, 89, 0.1);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         #scenario-input:focus {
             outline: none;
-            border-color: #6d4c41;
+            border-color: var(--scenario-input-border-color);
             box-shadow: 
-                inset 0 2px 4px rgba(139, 101, 89, 0.1),
-                0 0 0 3px rgba(139, 101, 89, 0.2);
+                inset 0 2px 4px rgba(0, 0, 0, 0.1),
+                0 0 0 3px rgba(0, 0, 0, 0.2);
         }
 
-        /* 复古精致按钮样式 */
-        #retry-scenario-turn-btn, #send-scenario-turn-btn {
-            background: linear-gradient(145deg, #8b6559 0%, #6d4c41 50%, #5d4037 100%);
-            border: 2px solid #a1887f;
+        /* 自定义按钮样式 */
+        #retry-scenario-turn-btn {
+            background: var(--scenario-refresh-btn-color);
+            border: 2px solid var(--scenario-refresh-btn-color);
             border-radius: 8px;
-            color: #faf7f0;
+            color: #ffffff;
             font-family: 'Noto Serif SC', serif;
             font-weight: 600;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             box-shadow: 
-                0 4px 8px rgba(62, 39, 35, 0.3),
+                0 4px 8px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #send-scenario-turn-btn {
+            background: var(--scenario-send-btn-color);
+            border: 2px solid var(--scenario-send-btn-border-color);
+            border-radius: 8px;
+            color: #ffffff;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1),
                 inset 0 -1px 0 rgba(0, 0, 0, 0.1);
             transition: all 0.2s ease;
@@ -9269,7 +9518,7 @@
         #retry-scenario-turn-btn:hover, #send-scenario-turn-btn:hover {
             transform: translateY(-2px);
             box-shadow: 
-                0 6px 12px rgba(62, 39, 35, 0.4),
+                0 6px 12px rgba(0, 0, 0, 0.4),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2),
                 inset 0 -1px 0 rgba(0, 0, 0, 0.1);
             border-color: #bcaaa4;
@@ -9287,7 +9536,7 @@
         }
 
         #send-scenario-turn-btn {
-            background: linear-gradient(145deg, #8b6559 0%, #795548 50%, #6d4c41 100%);
+            background: var(--scenario-send-btn-color);
         }
 
         /* ====== 栖木 App 样式 (文字卡片) - 栖木主题美化 ====== */
@@ -11115,6 +11364,128 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 剧场主题设置对话框 -->
+            <div id="scenario-theme-modal" class="modal-overlay">
+                <div class="modal-content max-w-md">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold">剧场主题美化</h3>
+                        <button id="close-theme-modal" class="text-gray-500 hover:text-gray-700 text-xl font-bold">&times;</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- 背景颜色设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">背景颜色</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="bg-color-picker" class="color-picker-input" value="#4d3a2a">
+                                <span class="text-sm text-gray-600">主背景色</span>
+                            </div>
+                        </div>
+
+                        <!-- 标题栏颜色设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">标题栏颜色</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="header-color-picker" class="color-picker-input" value="#4d3a2a">
+                                <span class="text-sm text-gray-600">标题栏背景色</span>
+                            </div>
+                        </div>
+
+                        <!-- 标题文字颜色设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">标题文字颜色</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="title-text-color-picker" class="color-picker-input" value="#f5f2ed">
+                                <span class="text-sm text-gray-600">标题文字色</span>
+                            </div>
+                        </div>
+
+                        <!-- 文本内容颜色设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">文本内容颜色</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="content-text-color-picker" class="color-picker-input" value="#3e2723">
+                                <span class="text-sm text-gray-600">正文文字色</span>
+                            </div>
+                        </div>
+
+                        <!-- 文本背景颜色设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">文本背景颜色</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="content-bg-color-picker" class="color-picker-input" value="#f5f2ed">
+                                <span class="text-sm text-gray-600">正文背景色</span>
+                            </div>
+                        </div>
+
+                        <!-- 输入框边框颜色设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">输入框边框颜色</label>
+                            <div class="flex items-center gap-2">
+                                <input type="color" id="input-border-color-picker" class="color-picker-input" value="#8b6559">
+                                <span class="text-sm text-gray-600">输入框边框色</span>
+                            </div>
+                        </div>
+
+                        <!-- 按钮颜色设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">按钮颜色</label>
+                            <div class="space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="refresh-btn-color-picker" class="color-picker-input" value="#8b6559">
+                                    <span class="text-sm text-gray-600">刷新按钮色</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="send-btn-color-picker" class="color-picker-input" value="#6d4c41">
+                                    <span class="text-sm text-gray-600">发送按钮背景色</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="color" id="send-btn-border-color-picker" class="color-picker-input" value="#5d4037">
+                                    <span class="text-sm text-gray-600">发送按钮边框色</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 背景图片设置 -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2">背景图片</label>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2">
+                                    <input type="file" id="bg-image-input" accept="image/*" class="hidden">
+                                    <button id="bg-image-btn" class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm">
+                                        <i class="fas fa-upload mr-1"></i>选择图片
+                                    </button>
+                                    <span id="bg-image-name" class="text-sm text-gray-600">未选择图片</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-sm text-gray-600">透明度:</label>
+                                    <input type="range" id="bg-opacity-slider" min="0" max="100" value="70" class="flex-1">
+                                    <span id="bg-opacity-value" class="text-sm text-gray-600 w-8">70%</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-sm text-gray-600">模糊程度:</label>
+                                    <input type="range" id="bg-blur-slider" min="0" max="20" value="2" class="flex-1">
+                                    <span id="bg-blur-value" class="text-sm text-gray-600 w-12">2px</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button id="remove-bg-btn" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
+                                        <i class="fas fa-trash mr-1"></i>移除背景
+                                    </button>
+                                    <button id="preview-bg-btn" class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-sm">
+                                        <i class="fas fa-eye mr-1"></i>预览效果
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-6">
+                        <button id="reset-theme-btn" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">重置默认</button>
+                        <button id="apply-theme-btn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">应用设置</button>
+                    </div>
+                </div>
+            </div>
             <div id="voice-input-modal" class="modal-overlay">
                 <div class="modal-content">
                     <h3 class="text-lg font-bold mb-4 text-center">发送语音消息</h3>
@@ -11691,8 +12062,9 @@
                 <div id="scenario-interaction-view" class="flex flex-col h-full hidden">
                     <div class="app-header">
                         <button id="scenario-back-btn" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
-                        <h3 id="scenario-title" class="app-header-title truncate px-4">剧本标题</h3>
-                        <button id="scenario-settings-btn" class="app-header-btn"><i class="fas fa-cog"></i></button>
+                        <h3 id="scenario-title" class="app-header-title flex-1 text-center">剧本标题</h3>
+                        <button id="scenario-theme-btn" class="app-header-btn ml-1" title="主题美化"><i class="fas fa-palette"></i></button>
+                        <button id="scenario-settings-btn" class="app-header-btn ml-1"><i class="fas fa-cog"></i></button>
                     </div>
                     <div id="scenario-content-container" class="flex-1 overflow-y-auto p-4 space-y-4">
                         </div>
@@ -11974,6 +12346,12 @@
                             <input type="color" id="other-text-color-picker" class="color-picker-input">
                         </div>
                     </div>
+                    <div class="list-item flex justify-center">
+                        <button id="reset-colors-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors duration-200 flex items-center space-x-2">
+                            <i class="fas fa-undo"></i>
+                            <span>重置外观设置</span>
+                        </button>
+                    </div>
                     <div class="list-item flex justify-between items-center">
                                             <label for="ai-memory-length" class="flex-grow">AI 记忆上下文长度</label>
                     <input type="number" id="ai-memory-length" class="form-input w-20 text-center" min="10" max="500" value="50">
@@ -12157,6 +12535,23 @@
                     <input type="file" id="wallpaper-input" accept="image/*">
                     <div id="change-app-icons-link" class="list-item flex justify-between items-center">
                         <h4 class="font-semibold">更换App图标</h4>
+                    </div>
+                    <div class="list-item">
+                        <h4 class="font-semibold mb-2">角色朋友圈配图URL</h4>
+                        <input type="url" id="custom-image-url" class="form-input w-full" placeholder="请输入图片链接，如：https://example.com/image.jpg">
+                        <p class="text-xs text-gray-400 mt-1">角色自动发布朋友圈时将使用此图片作为配图</p>
+                        <button id="save-image-url" class="mt-2 px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">保存设置</button>
+                    </div>
+
+                    <div class="list-item">
+                        <h4 class="font-semibold mb-2">清除主界面内容</h4>
+                        <p class="text-xs text-gray-400 mb-3">清除播放器背景、照片墙图片和应用图标，恢复默认效果</p>
+                        <div class="flex gap-1.5">
+                            <button id="clear-player-bg" class="flex-1 px-2 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs">清除播放器背景</button>
+                            <button id="clear-photo-wall" class="flex-1 px-2 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs">清除照片墙</button>
+                            <button id="clear-app-icons" class="flex-1 px-2 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs">清除应用图标</button>
+                        </div>
+                        <button id="clear-all-main-content" class="w-full mt-2 px-2 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs">一键清除所有主界面内容</button>
                     </div>
                 </div>
             </div>
@@ -12509,7 +12904,7 @@
                     </div>
                     <h3 class="app-header-title flex-grow text-center perch-app-title">栖木</h3>
                     <div class="w-12 text-right">
-                        <button id="perch-settings-btn" class="app-header-btn" title="设置" style="font-size: 1.5em !important; margin-top: 1px !important; position: relative; top: 2px;">
+                        <button id="perch-settings-btn" class="app-header-btn" title="设置" style="font-size: 1.5em !important; margin-top: 1px !important; position: relative; top: 2px;" onclick="openPerchSettingsModal()">
                             <i class="ri-settings-3-line"></i>
                         </button>
                     </div>
@@ -13663,8 +14058,45 @@
             }
         }
 
+        // 🛡️ 安全的响应处理工具函数
+        async function safeParseApiResponse(response) {
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`❌ API响应错误 ${response.status}:`, errorText);
+                
+                // 安全的JSON解析，避免HTML内容导致的解析错误
+                let errorMessage = `HTTP 错误 ${response.status}`;
+                try {
+                    // 检查是否是HTML内容
+                    if (errorText.trim().startsWith('<')) {
+                        errorMessage = `服务器返回了HTML页面而不是JSON数据 (${response.status})`;
+                    } else {
+                        const errorJson = JSON.parse(errorText || "{}");
+                        errorMessage = errorJson.error?.message || errorMessage;
+                    }
+                } catch (parseError) {
+                    // 如果解析失败，使用默认错误信息
+                    console.warn('⚠️ 响应内容不是有效的JSON格式:', errorText.substring(0, 200) + '...');
+                }
+                
+                throw new Error(errorMessage);
+            }
+            
+            // 安全解析JSON响应
+            try {
+                return await response.json();
+            } catch (jsonError) {
+                const responseText = await response.text();
+                console.error('❌ JSON解析失败:', jsonError);
+                console.error('📄 响应内容:', responseText.substring(0, 500) + '...');
+                throw new Error(`API返回了无效的JSON格式。可能原因：\n1. API地址错误\n2. CORS跨域问题\n3. 服务器返回了HTML错误页面`);
+            }
+        }
+
         // 应用其他文字颜色的全局函数
         function applyOtherTextColor(color) {
+            console.log('应用其他文字颜色:', color);
+            
             // 应用到输入框
             const chatInput = $('#chat-input');
             if (chatInput) {
@@ -13683,13 +14115,19 @@
                 button.style.color = color;
             });
             
+            // 应用到聊天设置区域的文字
+            const settingsElements = document.querySelectorAll('#chat-settings-screen .setting-label, #chat-settings-screen .color-label, #chat-settings-screen button:not(#reset-colors-btn)');
+            settingsElements.forEach(element => {
+                element.style.color = color;
+            });
+            
             // 应用到输入框的占位符颜色
             if (chatInput) {
                 chatInput.style.setProperty('--placeholder-color', color);
             }
             
             // 应用到其他可能的文本元素
-            const textElements = document.querySelectorAll('.chat-input-bar button i, .quick-actions button i');
+            const textElements = document.querySelectorAll('.chat-input-bar button i, .quick-actions button i, .wechat-screen .icon, .wechat-screen span:not(.message-text)');
             textElements.forEach(element => {
                 element.style.color = color;
             });
@@ -14197,6 +14635,34 @@ function getChatBackgroundElement() {
             setTimeout(() => {
                 statusElement.classList.add('hidden');
             }, 3000);
+        }
+
+        // 保存自定义图片URL
+        function saveCustomImageUrl() {
+            const urlInput = document.getElementById('custom-image-url');
+            const url = urlInput.value.trim();
+            
+            if (url && !url.match(/^https?:\/\/.+/)) {
+                showMessageBox('请输入有效的HTTP/HTTPS图片链接');
+                return;
+            }
+            
+            if (url) {
+                localStorage.setItem('customImageUrl', url);
+                showMessageBox('自定义图片URL已保存！角色朋友圈将使用此配图。');
+            } else {
+                localStorage.removeItem('customImageUrl');
+                showMessageBox('已清除自定义图片URL，将使用默认配图。');
+            }
+        }
+
+        // 加载自定义图片URL
+        function loadCustomImageUrl() {
+            const urlInput = document.getElementById('custom-image-url');
+            const savedUrl = localStorage.getItem('customImageUrl');
+            if (urlInput && savedUrl) {
+                urlInput.value = savedUrl;
+            }
         }
 
         // 朋友圈测试功能
@@ -15526,6 +15992,28 @@ function getChatBackgroundElement() {
             
             // 主题切换后更新栖木评论的背景色
             updatePerchCommentColors();
+            
+            // 主题切换后更新其他文字颜色（如果当前角色没有自定义设置）
+            updateOtherTextColorForTheme();
+        }
+        
+        // 主题切换时更新其他文字颜色
+        function updateOtherTextColorForTheme() {
+            if (!currentChatCharacterId) return;
+            
+            const savedTextColors = chatTextColors[currentChatCharacterId];
+            // 只有当前角色没有自定义的其他文字颜色时，才应用主题默认颜色
+            if (!savedTextColors || !savedTextColors.other) {
+                const isDarkMode = body.classList.contains('dark-mode');
+                const defaultOtherTextColor = isDarkMode ? '#ffffff' : '#000000';
+                applyOtherTextColor(defaultOtherTextColor);
+                
+                // 同时更新颜色选择器的显示值
+                const otherColorPicker = $('#other-text-color-picker');
+                if (otherColorPicker) {
+                    otherColorPicker.value = defaultOtherTextColor;
+                }
+            }
         }
         
         // 更新聊天消息背景色以匹配当前主题
@@ -15692,7 +16180,7 @@ function getChatBackgroundElement() {
         
         function compressImage(file, options = {}) {
             return new Promise((resolve, reject) => {
-                const { maxWidth = 800, maxHeight = 800, quality = 0.7, forceAspectRatio } = options;
+                const { maxWidth = 800, maxHeight = 800, quality = 0.7, forceAspectRatio, outputFormat = 'image/jpeg' } = options;
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = event => {
@@ -15735,16 +16223,26 @@ function getChatBackgroundElement() {
                         canvas.width = width;
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
+                        
+                        // 为图标类图片启用抗锯齿
+                        if (maxWidth <= 256 && maxHeight <= 256) {
+                            ctx.imageSmoothingEnabled = true;
+                            ctx.imageSmoothingQuality = 'high';
+                        }
+                        
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // 关键修改：从返回DataURL改为返回Blob
+                        // 对于小尺寸图标使用PNG格式保持清晰度
+                        const format = (maxWidth <= 256 && maxHeight <= 256) ? 'image/png' : outputFormat;
+                        const finalQuality = format === 'image/png' ? 1.0 : quality; // PNG不需要质量参数
+                        
                         canvas.toBlob(blob => {
                             if (blob) {
                                 resolve(blob);
                             } else {
                                 reject(new Error('Canvas to Blob conversion failed'));
                             }
-                        }, 'image/jpeg', quality);
+                        }, format, finalQuality);
                     };
                     img.onerror = error => reject(error);
                 };
@@ -16220,6 +16718,21 @@ if (type === 'image') {
                 messageWrapper.appendChild(avatar);
             }
             
+            // 检测多行内容并添加特殊CSS类
+            setTimeout(() => {
+                const bubble = messageWrapper.querySelector('.chat-message');
+                if (bubble && type === 'text') {
+                    // 获取气泡的实际渲染高度
+                    const bubbleHeight = bubble.offsetHeight;
+                    const lineHeight = parseFloat(window.getComputedStyle(bubble).lineHeight) || 24;
+                    
+                    // 如果高度超过1.5倍行高，认为是多行内容
+                    if (bubbleHeight > lineHeight * 1.5) {
+                        messageWrapper.classList.add('has-multiline');
+                    }
+                }
+            }, 0);
+            
             return messageWrapper;
         }
         
@@ -16653,6 +17166,25 @@ if (type === 'image') {
 
             chatContentArea.appendChild(messageWrapper);
             chatContentArea.scrollTop = chatContentArea.scrollHeight;
+
+            // 检测多行内容并添加class
+            if (!['system', 'red-packet', 'transfer', 'sticker', 'gift', 'call-log', 'image'].includes(type)) {
+                setTimeout(() => {
+                    const bubble = messageWrapper.querySelector('.chat-message');
+                    if (bubble && !bubble.classList.contains('image-message') && !bubble.classList.contains('sticker-message')) {
+                        const bubbleHeight = bubble.offsetHeight;
+                        const lineHeight = parseFloat(window.getComputedStyle(bubble).lineHeight) || 24;
+                        
+                        console.log(`消息高度: ${bubbleHeight}px, 行高: ${lineHeight}px, 阈值: ${lineHeight * 1.5}px`);
+                        
+                        // 如果高度超过1.5倍行高，认为是多行内容
+                        if (bubbleHeight > lineHeight * 1.5) {
+                            messageWrapper.classList.add('has-multiline');
+                            console.log('添加了 has-multiline class');
+                        }
+                    }
+                }, 50);
+            }
 
             // 【【修改点4：移除数据保存逻辑，现在由调用方负责】】
             // 数据保存现在在 handleSendMessage 等调用方中处理
@@ -17103,7 +17635,18 @@ ${moduleStyleContext || "无"}
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('❌ API响应错误:', response.status, errorText);
-                    throw new Error(JSON.parse(errorText || "{}").error?.message || `HTTP 错误 ${response.status}`);
+                    
+                    // 安全的JSON解析，避免HTML内容导致的解析错误
+                    let errorMessage = `HTTP 错误 ${response.status}`;
+                    try {
+                        const errorJson = JSON.parse(errorText || "{}");
+                        errorMessage = errorJson.error?.message || errorMessage;
+                    } catch (parseError) {
+                        // 如果errorText是HTML或其他非JSON格式，使用默认错误信息
+                        console.warn('响应内容不是有效的JSON格式:', errorText.substring(0, 100) + '...');
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
 
                 const result = await response.json();
@@ -18940,6 +19483,11 @@ ${transcriptText}
                 const savedTextColors = chatTextColors[characterId];
                 if (savedTextColors && savedTextColors.other) {
                     applyOtherTextColor(savedTextColors.other);
+                } else {
+                    // 如果没有保存的设置，根据当前主题应用默认颜色
+                    const isDarkMode = document.body.classList.contains('dark-mode');
+                    const defaultOtherTextColor = isDarkMode ? '#ffffff' : '#000000';
+                    applyOtherTextColor(defaultOtherTextColor);
                 }
                 
                 const chatOptions = loadData('chatOptions', {});
@@ -19814,7 +20362,18 @@ ${transcriptText}
                 const response = await fetch(finalApiUrl, { method: 'POST', headers, body: requestBody });
                 if (!response.ok) {
                     const errorText = await response.text();
-                    throw new Error(JSON.parse(errorText || "{}").error?.message || `HTTP ${response.status}`);
+                    
+                    // 安全的JSON解析，避免HTML内容导致的解析错误
+                    let errorMessage = `HTTP ${response.status}`;
+                    try {
+                        const errorJson = JSON.parse(errorText || "{}");
+                        errorMessage = errorJson.error?.message || errorMessage;
+                    } catch (parseError) {
+                        // 如果errorText是HTML或其他非JSON格式，使用默认错误信息
+                        console.warn('响应内容不是有效的JSON格式:', errorText.substring(0, 100) + '...');
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
                 const result = await response.json();
                 
@@ -20946,13 +21505,15 @@ ${triggerDescription}
             return "现代都市生活，充满科技与人文气息的世界";
         }
 
-        // [最终版] 智能图片URL生成器 - 使用固定的在线图片链接
+        // [最终版] 智能图片URL生成器 - 使用自定义或默认的在线图片链接
         function generateSmartImageUrl(imageDesc, fallbackText = 'AI动态配图') {
-            // !! 用户请注意 !!
-            // 请在这里的引号里，粘贴你准备好的在线图片链接
-            const imageUrl = 'https://tc.z.wiki/autoupload/f/fRcoPlzpthEzwh0RrI62JbKXl_QqVl-bpSwqP4fJO68/20250823/OQIS/1284X1279/f6a2fcb519602c2a736291940f764b2a.jpg'; 
+            // 从localStorage读取用户自定义的图片URL
+            const customImageUrl = localStorage.getItem('customImageUrl');
             
-            console.log(`[图片URL生成] 使用固定的在线图片: "${imageUrl}"`);
+            // 如果用户设置了自定义URL，使用自定义URL，否则使用默认URL
+            const imageUrl = customImageUrl || 'https://tc.z.wiki/autoupload/f/fRcoPlzpthEzwh0RrI62JbKXl_QqVl-bpSwqP4fJO68/20250823/OQIS/1284X1279/f6a2fcb519602c2a736291940f764b2a.jpg'; 
+            
+            console.log(`[图片URL生成] 使用${customImageUrl ? '自定义' : '默认'}的在线图片: "${imageUrl}"`);
             
             return imageUrl;
         }
@@ -28672,6 +29233,7 @@ function addNewEventListeners() {
                 const aiColorPicker = $('#ai-bubble-color-picker');
                 const userTextColorPicker = $('#user-text-color-picker');
                 const aiTextColorPicker = $('#ai-text-color-picker');
+                const otherTextColorPicker = $('#other-text-color-picker');
                 const currentColors = chatBubbleColors[currentChatCharacterId];
                 const currentTextColors = chatTextColors[currentChatCharacterId];
                 
@@ -28680,11 +29242,13 @@ function addNewEventListeners() {
                 const defaultAiColor = isDarkMode ? '#4a4a4a' : '#e5e7eb';
                 const defaultUserTextColor = '#ffffff';
                 const defaultAiTextColor = '#000000';
+                const defaultOtherTextColor = '#000000';
 
                 userColorPicker.value = currentColors?.user || defaultUserColor;
                 aiColorPicker.value = currentColors?.ai || defaultAiColor;
                 userTextColorPicker.value = currentTextColors?.user || defaultUserTextColor;
                 aiTextColorPicker.value = currentTextColors?.ai || defaultAiTextColor;
+                otherTextColorPicker.value = currentTextColors?.other || defaultOtherTextColor;
 
                 // V40.0 新增：加载并显示已保存的记忆长度
                 const memoryLengthInput = $('#ai-memory-length');
@@ -28856,12 +29420,109 @@ function addNewEventListeners() {
                 }
             }
 
+            // 重置颜色和背景设置功能
+            function resetColorsToDefault() {
+                if (!currentChatCharacterId) return;
+                
+                const isDarkMode = body.classList.contains('dark-mode');
+                
+                // 定义默认颜色值
+                const defaultColors = {
+                    user: '#374151',
+                    ai: isDarkMode ? '#4a4a4a' : '#e5e7eb'
+                };
+                
+                const defaultTextColors = {
+                    user: '#ffffff',
+                    ai: '#000000',
+                    other: isDarkMode ? '#ffffff' : '#000000'
+                };
+                
+                // 重置气泡颜色
+                if (chatBubbleColors[currentChatCharacterId]) {
+                    delete chatBubbleColors[currentChatCharacterId];
+                } else {
+                    chatBubbleColors[currentChatCharacterId] = {};
+                }
+                
+                // 重置文字颜色
+                if (chatTextColors[currentChatCharacterId]) {
+                    delete chatTextColors[currentChatCharacterId];
+                } else {
+                    chatTextColors[currentChatCharacterId] = {};
+                }
+                
+                // 重置聊天背景
+                try {
+                    const bgElement = getChatBackgroundElement();
+                    if (bgElement) {
+                        bgElement.style.backgroundImage = 'none';
+                        bgElement.style.backgroundColor = ''; // 清除背景色
+                    }
+                    
+                    // 重置聊天屏幕背景
+                    const chatScreen = $('#wechat-chat-screen');
+                    if (chatScreen) {
+                        chatScreen.style.backgroundColor = '';
+                        chatScreen.style.backgroundImage = 'none';
+                    }
+                    
+                    // 清除保存的背景数据
+                    const chatBackgrounds = loadData('chatBackgrounds', {});
+                    if (chatBackgrounds[currentChatCharacterId]) {
+                        delete chatBackgrounds[currentChatCharacterId];
+                        saveData('chatBackgrounds', chatBackgrounds);
+                    }
+                } catch (error) {
+                    console.warn('重置背景时出现错误:', error);
+                }
+                
+                // 保存到本地存储
+                saveData('chatBubbleColors', chatBubbleColors);
+                saveData('chatTextColors', chatTextColors);
+                
+                // 更新颜色选择器的显示值
+                $('#user-bubble-color-picker').value = defaultColors.user;
+                $('#ai-bubble-color-picker').value = defaultColors.ai;
+                $('#user-text-color-picker').value = defaultTextColors.user;
+                $('#ai-text-color-picker').value = defaultTextColors.ai;
+                $('#other-text-color-picker').value = defaultTextColors.other;
+                
+                // 重新渲染聊天历史以应用默认颜色
+                renderChatHistory();
+                
+                // 应用"其他"文字颜色
+                applyOtherTextColor(defaultTextColors.other);
+                
+                // 强制重新应用默认颜色到界面元素，确保完全重置
+                setTimeout(() => {
+                    console.log('强制重置其他文字颜色为:', defaultTextColors.other);
+                    applyOtherTextColor(defaultTextColors.other);
+                    
+                    // 额外确保颜色选择器显示正确的值
+                    const otherColorPicker = $('#other-text-color-picker');
+                    if (otherColorPicker) {
+                        otherColorPicker.value = defaultTextColors.other;
+                    }
+                }, 100);
+                
+                // 显示成功提示
+                showMessageBox('颜色和背景设置已重置为默认值！', 'success');
+            }
+
             
             $('#user-bubble-color-picker').addEventListener('input', (e) => handleColorChange('user', e.target.value));
             $('#ai-bubble-color-picker').addEventListener('input', (e) => handleColorChange('ai', e.target.value));
             $('#user-text-color-picker').addEventListener('input', (e) => handleTextColorChange('user', e.target.value));
             $('#ai-text-color-picker').addEventListener('input', (e) => handleTextColorChange('ai', e.target.value));
             $('#other-text-color-picker').addEventListener('input', (e) => handleTextColorChange('other', e.target.value));
+            
+            // 重置外观设置按钮事件监听器
+            $('#reset-colors-btn').addEventListener('click', () => {
+                if (confirm('确定要重置所有外观设置为默认值吗？\n这将恢复以下设置到初始状态：\n• 气泡颜色\n• 文字颜色\n• 聊天背景图片')) {
+                    resetColorsToDefault();
+                }
+            });
             
             // V40.0 新增：AI记忆长度设置的保存
             $('#ai-memory-length').addEventListener('change', (e) => {
@@ -28883,7 +29544,7 @@ function addNewEventListeners() {
             $('#user-avatar-input').addEventListener('change', async (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    const imageId = await handleImageUpload(e.target, null, null, { compression: { maxWidth: 128, maxHeight: 128 } });
+                    const imageId = await handleImageUpload(e.target, null, null, { compression: { maxWidth: 256, maxHeight: 256, quality: 0.95, outputFormat: 'image/png' } });
                     if (imageId) {
                         // 更新当前聊天角色的头像
                         if (currentChatCharacterId) {
@@ -28937,6 +29598,175 @@ function addNewEventListeners() {
                             homeWallpaper.style.backgroundRepeat = 'no-repeat';
                         }
                     });
+                }
+            });
+
+            // 自定义图片URL设置功能
+            $('#save-image-url').addEventListener('click', () => {
+                const urlInput = $('#custom-image-url');
+                const url = urlInput.value.trim();
+                
+                if (url) {
+                    // 简单的URL验证
+                    try {
+                        new URL(url);
+                        localStorage.setItem('customImageUrl', url);
+                        showNotification('自定义图片URL已保存！', 'success');
+                    } catch (e) {
+                        showNotification('请输入有效的图片链接！', 'error');
+                    }
+                } else {
+                    localStorage.removeItem('customImageUrl');
+                    showNotification('已清除自定义图片URL设置！', 'success');
+                }
+            });
+
+            // 加载已保存的自定义图片URL
+            function loadCustomImageUrl() {
+                const savedUrl = localStorage.getItem('customImageUrl');
+                if (savedUrl) {
+                    $('#custom-image-url').value = savedUrl;
+                }
+            }
+
+            // 页面加载时执行
+            loadCustomImageUrl();
+
+            // 清除主界面内容功能
+            $('#clear-player-bg').addEventListener('click', () => {
+                // 清除播放器背景
+                const musicBlock = $('#music-block');
+                musicBlock.style.backgroundImage = '';
+                
+                // 清除localStorage中的数据
+                localStorage.removeItem('saved_music_background');
+                
+                // 从IndexedDB中删除图片数据
+                const savedBgId = loadData('saved_music_background');
+                if (savedBgId) {
+                    deleteImageFromDB(savedBgId);
+                    saveData('saved_music_background', null);
+                }
+                
+                showNotification('播放器背景已清除，恢复毛玻璃效果！', 'success');
+            });
+
+            $('#clear-photo-wall').addEventListener('click', () => {
+                // 清除照片墙背景
+                const photoWidget = $('#photo-widget');
+                photoWidget.style.backgroundImage = '';
+                
+                // 清除localStorage中的数据
+                localStorage.removeItem('saved_photo_widget');
+                
+                // 从IndexedDB中删除图片数据
+                const savedPhotoId = loadData('saved_photo_widget');
+                if (savedPhotoId) {
+                    deleteImageFromDB(savedPhotoId);
+                    saveData('saved_photo_widget', null);
+                }
+                
+                showNotification('照片墙背景已清除，恢复毛玻璃效果！', 'success');
+            });
+
+            $('#clear-all-main-content').addEventListener('click', async () => {
+                try {
+                    let totalCleared = 0;
+                    
+                    // 清除播放器背景
+                    const musicBlock = $('#music-block');
+                    musicBlock.style.backgroundImage = '';
+                    
+                    // 清除照片墙背景
+                    const photoWidget = $('#photo-widget');
+                    photoWidget.style.backgroundImage = '';
+                    
+                    // 清除localStorage中的数据
+                    localStorage.removeItem('saved_music_background');
+                    localStorage.removeItem('saved_photo_widget');
+                    
+                    // 从IndexedDB中删除图片数据
+                    const savedBgId = loadData('saved_music_background');
+                    const savedPhotoId = loadData('saved_photo_widget');
+                    
+                    if (savedBgId) {
+                        await deleteImageFromDB(savedBgId);
+                        saveData('saved_music_background', null);
+                        totalCleared++;
+                    }
+                    
+                    if (savedPhotoId) {
+                        await deleteImageFromDB(savedPhotoId);
+                        saveData('saved_photo_widget', null);
+                        totalCleared++;
+                    }
+                    
+                    // 清除应用图标
+                    const appIcons = $$('.app-icon');
+                    for (const iconEl of appIcons) {
+                        const appName = iconEl.dataset.appName;
+                        const savedIconId = loadData(`saved_icon_${appName}`);
+                        
+                        if (savedIconId) {
+                            await deleteImageFromDB(savedIconId);
+                            saveData(`saved_icon_${appName}`, null);
+                            iconEl.style.backgroundImage = '';
+                            iconEl.style.backgroundSize = '';
+                            iconEl.style.backgroundPosition = '';
+                            iconEl.style.backgroundRepeat = '';
+                            iconEl.style.border = '';
+                            // 显示原始图标
+                            const originalIcon = iconEl.querySelector('i');
+                            if (originalIcon) originalIcon.style.display = 'block';
+                            totalCleared++;
+                        }
+                    }
+                    
+                    showNotification(`所有主界面内容已清除，共清除 ${totalCleared} 项！`, 'success');
+                    
+                    // 重新渲染应用图标设置界面
+                    renderAppIconSettings();
+                } catch (error) {
+                    console.error('清除主界面内容失败:', error);
+                    showNotification('清除主界面内容失败，请重试', 'error');
+                }
+            });
+
+            $('#clear-app-icons').addEventListener('click', async () => {
+                try {
+                    // 获取所有应用图标
+                    const appIcons = $$('.app-icon');
+                    let clearedCount = 0;
+                    
+                    for (const iconEl of appIcons) {
+                        const appName = iconEl.dataset.appName;
+                        const savedIconId = loadData(`saved_icon_${appName}`);
+                        
+                        if (savedIconId) {
+                            // 删除IndexedDB中的图片数据
+                            await deleteImageFromDB(savedIconId);
+                            // 清除localStorage中的数据
+                            saveData(`saved_icon_${appName}`, null);
+                            // 恢复默认图标
+                            iconEl.style.backgroundImage = '';
+                            iconEl.style.backgroundSize = '';
+                            iconEl.style.backgroundPosition = '';
+                            iconEl.style.backgroundRepeat = '';
+                            iconEl.style.border = '';
+                            // 显示原始图标
+                            const originalIcon = iconEl.querySelector('i');
+                            if (originalIcon) originalIcon.style.display = 'block';
+                            clearedCount++;
+                        }
+                    }
+                    
+                    showNotification(`已清除 ${clearedCount} 个应用图标，恢复默认显示！`, 'success');
+                    
+                    // 重新渲染应用图标设置界面
+                    renderAppIconSettings();
+                } catch (error) {
+                    console.error('清除应用图标失败:', error);
+                    showNotification('清除应用图标失败，请重试', 'error');
                 }
             });
 
@@ -29010,7 +29840,7 @@ function addNewEventListeners() {
                         const file = e.target.files[0];
                         if (file) {
                             try {
-                                const imageBlob = await compressImage(file, { maxWidth: 128, maxHeight: 128 });
+                                const imageBlob = await compressImage(file, { maxWidth: 256, maxHeight: 256, quality: 0.95, outputFormat: 'image/png' });
                                 const imageId = `icon_${appName}_${Date.now()}`;
                                 await saveImageToDB(imageId, imageBlob);
                                 saveData(`saved_icon_${appName}`, imageId);
@@ -30803,6 +31633,13 @@ function addNewEventListeners() {
             
             // 修复钱包余额异常问题
             resetWalletBalance();
+            
+            // 应用默认的其他文字颜色
+            setTimeout(() => {
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                const defaultOtherTextColor = isDarkMode ? '#ffffff' : '#000000';
+                applyOtherTextColor(defaultOtherTextColor);
+            }, 200);
             
             // 核心功能函数定义区 (将之前独立的函数放入此区域)
             
@@ -35380,10 +36217,10 @@ ${giftListForAI}
 
         // 为新弹窗添加关闭事件
         document.addEventListener('DOMContentLoaded', () => {
-            const modal = $('#recalled-message-modal');
-            const closeBtn = $('#close-recalled-modal');
+            const modal = document.getElementById('recalled-message-modal');
+            const closeBtn = document.getElementById('close-recalled-modal');
             
-            if (closeBtn) {
+            if (closeBtn && modal) {
                 closeBtn.addEventListener('click', () => modal.classList.remove('visible'));
             }
             if (modal) {
@@ -35472,17 +36309,101 @@ ${giftListForAI}
 
             }
 
-            // ====== 【【新增】】栖木设置相关事件绑定 ======
-            $('#perch-settings-btn').addEventListener('click', openPerchSettingsModal);
-            $('#close-perch-settings-modal').addEventListener('click', () => $('#perch-settings-modal').classList.remove('visible'));
-            $('#save-perch-settings-btn').addEventListener('click', savePerchSettings);
+            // ====== 【【新增】】场景主题设置相关事件绑定 ======
+            document.getElementById('apply-theme-btn').addEventListener('click', saveThemeSettings);
+            document.getElementById('reset-theme-btn').addEventListener('click', resetToDefaultTheme);
 
-            $('#add-custom-npc-btn').addEventListener('click', () => openCustomNpcModal());
-            $('#cancel-custom-npc-btn').addEventListener('click', () => $('#perch-custom-npc-modal').classList.remove('visible'));
-            $('#save-custom-npc-btn').addEventListener('click', saveCustomNpc);
+            // 实时预览功能 - 颜色改变时立即应用
+            document.getElementById('bg-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-bg-color', e.target.value);
+            });
+            document.getElementById('header-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-header-color', e.target.value);
+            });
+            document.getElementById('title-text-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-title-color', e.target.value);
+            });
+            document.getElementById('content-text-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-content-color', e.target.value);
+            });
+            document.getElementById('content-bg-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-content-bg-color', e.target.value);
+            });
+            document.getElementById('input-border-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-input-border-color', e.target.value);
+            });
+            document.getElementById('refresh-btn-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-refresh-btn-color', e.target.value);
+            });
+            document.getElementById('send-btn-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-send-btn-color', e.target.value);
+            });
+            document.getElementById('send-btn-border-color-picker').addEventListener('input', (e) => {
+                document.documentElement.style.setProperty('--scenario-send-btn-border-color', e.target.value);
+            });
+
+            // ====== 【【注意】】栖木设置相关事件绑定已移到独立函数initPerchSettingsEvents中 ======
 
         });
         // [新代码结束]
+
+        // 独立的栖木设置事件绑定函数
+        function initPerchSettingsEvents() {
+            console.log('初始化栖木设置事件绑定...');
+            
+            const perchSettingsBtn = document.getElementById('perch-settings-btn');
+            const closePerchSettingsModal = document.getElementById('close-perch-settings-modal');
+            const savePerchSettingsBtn = document.getElementById('save-perch-settings-btn');
+            const addCustomNpcBtn = document.getElementById('add-custom-npc-btn');
+            const cancelCustomNpcBtn = document.getElementById('cancel-custom-npc-btn');
+            const saveCustomNpcBtn = document.getElementById('save-custom-npc-btn');
+
+            console.log('栖木设置按钮元素:', perchSettingsBtn);
+            if (perchSettingsBtn) {
+                // 移除可能存在的旧事件监听器
+                perchSettingsBtn.removeEventListener('click', openPerchSettingsModal);
+                perchSettingsBtn.addEventListener('click', function() {
+                    console.log('栖木设置按钮被点击了');
+                    openPerchSettingsModal();
+                });
+                console.log('栖木设置按钮事件绑定成功');
+            } else {
+                console.log('找不到栖木设置按钮！');
+            }
+            
+            if (closePerchSettingsModal) {
+                closePerchSettingsModal.addEventListener('click', () => {
+                    const perchSettingsModal = document.getElementById('perch-settings-modal');
+                    if (perchSettingsModal) {
+                        perchSettingsModal.classList.remove('visible');
+                    }
+                });
+            }
+            if (savePerchSettingsBtn) {
+                savePerchSettingsBtn.addEventListener('click', savePerchSettings);
+            }
+            if (addCustomNpcBtn) {
+                addCustomNpcBtn.addEventListener('click', () => openCustomNpcModal());
+            }
+            if (cancelCustomNpcBtn) {
+                cancelCustomNpcBtn.addEventListener('click', () => {
+                    const perchCustomNpcModal = document.getElementById('perch-custom-npc-modal');
+                    if (perchCustomNpcModal) {
+                        perchCustomNpcModal.classList.remove('visible');
+                    }
+                });
+            }
+            if (saveCustomNpcBtn) {
+                saveCustomNpcBtn.addEventListener('click', saveCustomNpc);
+            }
+        }
+
+        // 在页面完全加载后绑定栖木设置事件
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initPerchSettingsEvents);
+        } else {
+            initPerchSettingsEvents();
+        }
 
 // ================== 栖木设置功能核心 V1.0 ==================
 
@@ -35490,12 +36411,16 @@ ${giftListForAI}
 function openPerchSettingsModal() {
     renderMutedNpcList();
     renderCustomNpcList();
-    $('#perch-settings-modal').classList.add('visible');
+    const perchSettingsModal = document.getElementById('perch-settings-modal');
+    if (perchSettingsModal) {
+        perchSettingsModal.classList.add('visible');
+    }
 }
 
 // 渲染被屏蔽的内置NPC列表
 function renderMutedNpcList() {
-    const container = $('#mute-npc-list');
+    const container = document.getElementById('mute-npc-list');
+    if (!container) return;
     container.innerHTML = '';
     npcProfiles.forEach(npc => {
         const isMuted = mutedNpcs.includes(npc.npcId);
@@ -35512,7 +36437,8 @@ function renderMutedNpcList() {
 
 // 渲染自定义NPC列表
 function renderCustomNpcList() {
-    const container = $('#custom-npc-list-container');
+    const container = document.getElementById('custom-npc-list-container');
+    if (!container) return;
     container.innerHTML = '';
     if (customNpcs.length === 0) {
         container.innerHTML = '<p class="text-xs text-center text-gray-500 py-2">还未添加自定义NPC</p>';
@@ -35537,37 +36463,64 @@ function renderCustomNpcList() {
 
 // 打开用于添加或编辑自定义NPC的面板
 function openCustomNpcModal(npcId = null) {
-    const modal = $('#perch-custom-npc-modal');
+    const modal = document.getElementById('perch-custom-npc-modal');
+    if (!modal) return;
+    
     if (npcId) {
         // 编辑模式
         const npc = customNpcs.find(n => n.npcId === npcId);
         if (!npc) return;
-        $('#custom-npc-modal-title').textContent = '编辑NPC';
-        $('#editing-npc-id').value = npc.npcId;
-        $('#custom-npc-name').value = npc.name;
-        $('#custom-npc-avatar').value = npc.avatar;
-        $('#custom-npc-persona').value = npc.persona;
-        $('#custom-npc-style').value = npc.style;
+        const titleElement = document.getElementById('custom-npc-modal-title');
+        const editingIdElement = document.getElementById('editing-npc-id');
+        const nameElement = document.getElementById('custom-npc-name');
+        const avatarElement = document.getElementById('custom-npc-avatar');
+        const personaElement = document.getElementById('custom-npc-persona');
+        const styleElement = document.getElementById('custom-npc-style');
+        
+        if (titleElement) titleElement.textContent = '编辑NPC';
+        if (editingIdElement) editingIdElement.value = npc.npcId;
+        if (nameElement) nameElement.value = npc.name;
+        if (avatarElement) avatarElement.value = npc.avatar;
+        if (personaElement) personaElement.value = npc.persona;
+        if (styleElement) styleElement.value = npc.style;
     } else {
         // 添加模式
-        $('#custom-npc-modal-title').textContent = '添加新NPC';
-        $('#editing-npc-id').value = '';
-        $('#custom-npc-name').value = '';
-        $('#custom-npc-avatar').value = '';
-        $('#custom-npc-persona').value = '';
-        $('#custom-npc-style').value = '';
+        const titleElement = document.getElementById('custom-npc-modal-title');
+        const editingIdElement = document.getElementById('editing-npc-id');
+        const nameElement = document.getElementById('custom-npc-name');
+        const avatarElement = document.getElementById('custom-npc-avatar');
+        const personaElement = document.getElementById('custom-npc-persona');
+        const styleElement = document.getElementById('custom-npc-style');
+        
+        if (titleElement) titleElement.textContent = '添加新NPC';
+        if (editingIdElement) editingIdElement.value = '';
+        if (nameElement) nameElement.value = '';
+        if (avatarElement) avatarElement.value = '';
+        if (personaElement) personaElement.value = '';
+        if (styleElement) styleElement.value = '';
     }
     modal.classList.add('visible');
 }
 
 // 保存自定义NPC的更改
 function saveCustomNpc() {
-    const npcId = $('#editing-npc-id').value;
+    const editingIdElement = document.getElementById('editing-npc-id');
+    const nameElement = document.getElementById('custom-npc-name');
+    const avatarElement = document.getElementById('custom-npc-avatar');
+    const personaElement = document.getElementById('custom-npc-persona');
+    const styleElement = document.getElementById('custom-npc-style');
+    
+    if (!editingIdElement || !nameElement || !avatarElement || !personaElement || !styleElement) {
+        showMessageBox('表单元素未找到！');
+        return;
+    }
+    
+    const npcId = editingIdElement.value;
     const npcData = {
-        name: $('#custom-npc-name').value.trim(),
-        avatar: $('#custom-npc-avatar').value.trim(),
-        persona: $('#custom-npc-persona').value.trim(),
-        style: $('#custom-npc-style').value.trim(),
+        name: nameElement.value.trim(),
+        avatar: avatarElement.value.trim(),
+        persona: personaElement.value.trim(),
+        style: styleElement.value.trim(),
         // 确保每个NPC都有一个独特的ID
         npcId: npcId || `custom_${Date.now()}`
     };
@@ -35588,7 +36541,10 @@ function saveCustomNpc() {
 
     saveData('custom_npcs', customNpcs);
     renderCustomNpcList();
-    $('#perch-custom-npc-modal').classList.remove('visible');
+    const modal = document.getElementById('perch-custom-npc-modal');
+    if (modal) {
+        modal.classList.remove('visible');
+    }
 }
 
 // 删除一个自定义NPC
@@ -35611,7 +36567,10 @@ function savePerchSettings() {
     });
     saveData('muted_npcs', mutedNpcs);
     showMessageBox('设置已保存！');
-    $('#perch-settings-modal').classList.remove('visible');
+    const perchSettingsModal = document.getElementById('perch-settings-modal');
+    if (perchSettingsModal) {
+        perchSettingsModal.classList.remove('visible');
+    }
 }
 // ==========================================================
 
@@ -35721,7 +36680,340 @@ function savePerchSettings() {
         </div>
     </div>
 
+    <script>
+        // 初始化时检测所有现有的多行消息
+        function detectMultilineMessages() {
+            const messageWrappers = document.querySelectorAll('.chat-message-wrapper');
+            messageWrappers.forEach(wrapper => {
+                const bubble = wrapper.querySelector('.chat-message');
+                if (bubble && !bubble.classList.contains('image-message') && !bubble.classList.contains('sticker-message')) {
+                    // 获取气泡的实际渲染高度
+                    const bubbleHeight = bubble.offsetHeight;
+                    const lineHeight = parseFloat(window.getComputedStyle(bubble).lineHeight) || 24;
+                    
+                    // 如果高度超过1.5倍行高，认为是多行内容
+                    if (bubbleHeight > lineHeight * 1.5) {
+                        wrapper.classList.add('has-multiline');
+                    }
+                }
+            });
 
+            // ====== 【新增】剧场主题自定义功能 ======
+            const themeBtn = document.getElementById('scenario-theme-btn');
+            const themeModal = document.getElementById('scenario-theme-modal');
+            const closeThemeModal = document.getElementById('close-theme-modal');
+            const applyThemeBtn = document.getElementById('apply-theme-btn');
+            const resetThemeBtn = document.getElementById('reset-theme-btn');
+            
+            // 背景图片相关元素
+            const bgImageInput = document.getElementById('bg-image-input');
+            const bgImageBtn = document.getElementById('bg-image-btn');
+            const bgImageName = document.getElementById('bg-image-name');
+            const bgOpacitySlider = document.getElementById('bg-opacity-slider');
+            const bgOpacityValue = document.getElementById('bg-opacity-value');
+            const bgBlurSlider = document.getElementById('bg-blur-slider');
+            const bgBlurValue = document.getElementById('bg-blur-value');
+            const removeBgBtn = document.getElementById('remove-bg-btn');
+            const previewBgBtn = document.getElementById('preview-bg-btn');
+
+            // 打开主题设置面板
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    // 加载当前保存的主题设置
+                    loadSavedTheme();
+                    themeModal.classList.add('visible');
+                });
+            }
+
+            // 关闭主题设置面板
+            if (closeThemeModal) {
+                closeThemeModal.addEventListener('click', () => {
+                    themeModal.classList.remove('visible');
+                });
+            }
+
+            // 点击模态框外部关闭
+            if (themeModal) {
+                themeModal.addEventListener('click', (e) => {
+                    if (e.target === themeModal) {
+                        themeModal.classList.remove('visible');
+                    }
+                });
+            }
+
+            // 应用主题设置
+            if (applyThemeBtn) {
+                applyThemeBtn.addEventListener('click', () => {
+                    applyThemeSettings();
+                    themeModal.classList.remove('visible');
+                    showMessageBox('主题设置已应用');
+                });
+            }
+
+            // 重置为默认主题
+            if (resetThemeBtn) {
+                resetThemeBtn.addEventListener('click', () => {
+                    resetToDefaultTheme();
+                    showMessageBox('已重置为默认主题');
+                });
+            }
+
+            // 背景图片功能
+            if (bgImageBtn && bgImageInput) {
+                bgImageBtn.addEventListener('click', () => {
+                    bgImageInput.click();
+                });
+
+                bgImageInput.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.size > 10 * 1024 * 1024) { // 10MB限制
+                            showMessageBox('图片文件大小不能超过10MB');
+                            return;
+                        }
+                        
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const imageData = e.target.result;
+                            localStorage.setItem('scenario-bg-image', imageData);
+                            bgImageName.textContent = file.name;
+                            updateBackgroundImage();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // 透明度滑块
+            if (bgOpacitySlider && bgOpacityValue) {
+                bgOpacitySlider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    bgOpacityValue.textContent = value + '%';
+                    const opacity = value / 100;
+                    document.documentElement.style.setProperty('--scenario-bg-opacity', opacity);
+                });
+            }
+
+            // 模糊滑块
+            if (bgBlurSlider && bgBlurValue) {
+                bgBlurSlider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    bgBlurValue.textContent = value + 'px';
+                    document.documentElement.style.setProperty('--scenario-bg-blur', value + 'px');
+                });
+            }
+
+            // 移除背景按钮
+            if (removeBgBtn) {
+                removeBgBtn.addEventListener('click', () => {
+                    localStorage.removeItem('scenario-bg-image');
+                    document.documentElement.style.setProperty('--scenario-bg-image', 'none');
+                    bgImageName.textContent = '未选择图片';
+                    bgImageInput.value = '';
+                    
+                    const theaterScreen = document.getElementById('theater-screen');
+                    if (theaterScreen) {
+                        theaterScreen.classList.remove('has-bg-image');
+                    }
+                    
+                    showMessageBox('背景图片已移除');
+                });
+            }
+
+            // 预览效果按钮
+            if (previewBgBtn) {
+                previewBgBtn.addEventListener('click', () => {
+                    updateBackgroundImage();
+                    showMessageBox('背景效果已更新');
+                });
+            }
+
+            // 更新背景图片
+            function updateBackgroundImage() {
+                const imageData = localStorage.getItem('scenario-bg-image');
+                const theaterScreen = document.getElementById('theater-screen');
+                
+                if (imageData) {
+                    document.documentElement.style.setProperty('--scenario-bg-image', `url("${imageData}")`);
+                    if (theaterScreen) {
+                        theaterScreen.classList.add('has-bg-image');
+                    }
+                } else {
+                    document.documentElement.style.setProperty('--scenario-bg-image', 'none');
+                    if (theaterScreen) {
+                        theaterScreen.classList.remove('has-bg-image');
+                    }
+                }
+                
+                // 强制重新渲染
+                if (theaterScreen) {
+                    theaterScreen.style.display = 'none';
+                    theaterScreen.offsetHeight; // 触发重绘
+                    theaterScreen.style.display = '';
+                }
+            }
+
+            // 加载保存的主题设置
+            function loadSavedTheme() {
+                const savedTheme = loadData('scenarioTheme') || {};
+                
+                document.getElementById('bg-color-picker').value = savedTheme.bgColor || '#4d3a2a';
+                document.getElementById('header-color-picker').value = savedTheme.headerColor || '#4d3a2a';
+                document.getElementById('title-text-color-picker').value = savedTheme.titleColor || '#f5f2ed';
+                document.getElementById('content-text-color-picker').value = savedTheme.contentColor || '#3e2723';
+                document.getElementById('content-bg-color-picker').value = savedTheme.contentBgColor || '#f5f2ed';
+                document.getElementById('input-border-color-picker').value = savedTheme.inputBorderColor || '#8b6559';
+                document.getElementById('refresh-btn-color-picker').value = savedTheme.refreshBtnColor || '#8b6559';
+                document.getElementById('send-btn-color-picker').value = savedTheme.sendBtnColor || '#6d4c41';
+                document.getElementById('send-btn-border-color-picker').value = savedTheme.sendBtnBorderColor || '#5d4037';
+                
+                // 加载背景图片设置
+                const imageData = localStorage.getItem('scenario-bg-image');
+                if (imageData) {
+                    bgImageName.textContent = '已设置背景图片';
+                } else {
+                    bgImageName.textContent = '未选择图片';
+                }
+                
+                bgOpacitySlider.value = savedTheme.bgOpacity || 70;
+                bgOpacityValue.textContent = (savedTheme.bgOpacity || 70) + '%';
+                bgBlurSlider.value = savedTheme.bgBlur || 2;
+                bgBlurValue.textContent = (savedTheme.bgBlur || 2) + 'px';
+            }
+
+            // 应用主题设置
+            function applyThemeSettings() {
+                const themeSettings = {
+                    bgColor: document.getElementById('bg-color-picker').value,
+                    headerColor: document.getElementById('header-color-picker').value,
+                    titleColor: document.getElementById('title-text-color-picker').value,
+                    contentColor: document.getElementById('content-text-color-picker').value,
+                    contentBgColor: document.getElementById('content-bg-color-picker').value,
+                    inputBorderColor: document.getElementById('input-border-color-picker').value,
+                    refreshBtnColor: document.getElementById('refresh-btn-color-picker').value,
+                    sendBtnColor: document.getElementById('send-btn-color-picker').value,
+                    sendBtnBorderColor: document.getElementById('send-btn-border-color-picker').value,
+                    bgOpacity: bgOpacitySlider.value,
+                    bgBlur: bgBlurSlider.value,
+                };
+
+                // 保存设置到本地存储
+                saveData('scenarioTheme', themeSettings);
+
+                // 应用CSS变量
+                const root = document.documentElement;
+                root.style.setProperty('--scenario-bg-color', themeSettings.bgColor);
+                root.style.setProperty('--scenario-header-color', themeSettings.headerColor);
+                root.style.setProperty('--scenario-title-color', themeSettings.titleColor);
+                root.style.setProperty('--scenario-content-color', themeSettings.contentColor);
+                root.style.setProperty('--scenario-content-bg-color', themeSettings.contentBgColor);
+                root.style.setProperty('--scenario-input-border-color', themeSettings.inputBorderColor);
+                root.style.setProperty('--scenario-refresh-btn-color', themeSettings.refreshBtnColor);
+                root.style.setProperty('--scenario-send-btn-color', themeSettings.sendBtnColor);
+                root.style.setProperty('--scenario-send-btn-border-color', themeSettings.sendBtnBorderColor);
+                root.style.setProperty('--scenario-bg-opacity', themeSettings.bgOpacity / 100);
+                root.style.setProperty('--scenario-bg-blur', themeSettings.bgBlur + 'px');
+                
+                // 应用背景图片
+                updateBackgroundImage();
+            }
+
+            // 重置为默认主题
+            function resetToDefaultTheme() {
+                const defaultTheme = {
+                    bgColor: '#4d3a2a',
+                    headerColor: '#4d3a2a',
+                    titleColor: '#f5f2ed',
+                    contentColor: '#3e2723',
+                    contentBgColor: '#f5f2ed',
+                    inputBorderColor: '#8b6559',
+                    refreshBtnColor: '#8b6559',
+                    sendBtnColor: '#6d4c41',
+                    sendBtnBorderColor: '#5d4037',
+                    bgOpacity: 70,
+                    bgBlur: 2,
+                };
+
+                // 更新颜色选择器
+                document.getElementById('bg-color-picker').value = defaultTheme.bgColor;
+                document.getElementById('header-color-picker').value = defaultTheme.headerColor;
+                document.getElementById('title-text-color-picker').value = defaultTheme.titleColor;
+                document.getElementById('content-text-color-picker').value = defaultTheme.contentColor;
+                document.getElementById('content-bg-color-picker').value = defaultTheme.contentBgColor;
+                document.getElementById('input-border-color-picker').value = defaultTheme.inputBorderColor;
+                document.getElementById('refresh-btn-color-picker').value = defaultTheme.refreshBtnColor;
+                document.getElementById('send-btn-color-picker').value = defaultTheme.sendBtnColor;
+                document.getElementById('send-btn-border-color-picker').value = defaultTheme.sendBtnBorderColor;
+
+                // 重置背景图片设置
+                bgOpacitySlider.value = defaultTheme.bgOpacity;
+                bgOpacityValue.textContent = defaultTheme.bgOpacity + '%';
+                bgBlurSlider.value = defaultTheme.bgBlur;
+                bgBlurValue.textContent = defaultTheme.bgBlur + 'px';
+                
+                // 移除背景图片
+                localStorage.removeItem('scenario-bg-image');
+                bgImageName.textContent = '未选择图片';
+                bgImageInput.value = '';
+                
+                const theaterScreen = document.getElementById('theater-screen');
+                if (theaterScreen) {
+                    theaterScreen.classList.remove('has-bg-image');
+                }
+
+                // 应用默认主题
+                saveData('scenarioTheme', defaultTheme);
+                
+                // 应用CSS变量
+                const root = document.documentElement;
+                root.style.setProperty('--scenario-bg-color', defaultTheme.bgColor);
+                root.style.setProperty('--scenario-header-color', defaultTheme.headerColor);
+                root.style.setProperty('--scenario-title-color', defaultTheme.titleColor);
+                root.style.setProperty('--scenario-content-color', defaultTheme.contentColor);
+                root.style.setProperty('--scenario-content-bg-color', defaultTheme.contentBgColor);
+                root.style.setProperty('--scenario-input-border-color', defaultTheme.inputBorderColor);
+                root.style.setProperty('--scenario-refresh-btn-color', defaultTheme.refreshBtnColor);
+                root.style.setProperty('--scenario-send-btn-color', defaultTheme.sendBtnColor);
+                root.style.setProperty('--scenario-send-btn-border-color', defaultTheme.sendBtnBorderColor);
+                root.style.setProperty('--scenario-bg-opacity', defaultTheme.bgOpacity / 100);
+                root.style.setProperty('--scenario-bg-blur', defaultTheme.bgBlur + 'px');
+                root.style.setProperty('--scenario-bg-image', 'none');
+            }
+
+            // 页面加载时应用保存的主题
+            const savedTheme = loadData('scenarioTheme');
+            if (savedTheme) {
+                const root = document.documentElement;
+                root.style.setProperty('--scenario-bg-color', savedTheme.bgColor);
+                root.style.setProperty('--scenario-header-color', savedTheme.headerColor);
+                root.style.setProperty('--scenario-title-color', savedTheme.titleColor);
+                root.style.setProperty('--scenario-content-color', savedTheme.contentColor);
+                if (savedTheme.contentBgColor) {
+                    root.style.setProperty('--scenario-content-bg-color', savedTheme.contentBgColor);
+                }
+                root.style.setProperty('--scenario-input-border-color', savedTheme.inputBorderColor);
+                root.style.setProperty('--scenario-refresh-btn-color', savedTheme.refreshBtnColor);
+                root.style.setProperty('--scenario-send-btn-color', savedTheme.sendBtnColor);
+                root.style.setProperty('--scenario-send-btn-border-color', savedTheme.sendBtnBorderColor);
+                
+                // 应用背景图片设置
+                if (savedTheme.bgOpacity) {
+                    root.style.setProperty('--scenario-bg-opacity', savedTheme.bgOpacity / 100);
+                }
+                if (savedTheme.bgBlur) {
+                    root.style.setProperty('--scenario-bg-blur', savedTheme.bgBlur + 'px');
+                }
+            }
+            
+            // 延迟应用背景图片，确保DOM完全加载
+            setTimeout(() => {
+                updateBackgroundImage();
+            }, 100);
+        }
+
+        // 页面加载完成后检测现有消息
+        setTimeout(detectMultilineMessages, 100);
+    </script>
 
         </body>
 </html>
