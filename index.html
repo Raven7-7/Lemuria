@@ -10939,9 +10939,13 @@
             color: #3b82f6; /* 蓝色 */
         }
         .quoted-content {
-            white-space: nowrap;
+            /* white-space: nowrap; */ /* 我们不再需要这行，可以删除或注释掉 */
             overflow: hidden;
             text-overflow: ellipsis;
+            /* 新增下面三行，实现最多显示2行，超出部分显示省略号 */
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* 您可以修改这个数字来控制最多显示几行 */
+            -webkit-box-orient: vertical;
         }
 
         /* ====== 【【新增】】礼物商城样式 ====== */
@@ -30324,38 +30328,52 @@ function addNewEventListeners() {
 
                 menu.querySelector('[data-action="retry"]').style.display = sender === 'ai' ? 'flex' : 'none';
 
-                // 【核心修改开始】
-                const bubbleRect = bubble.getBoundingClientRect();
-                const screenRect = phoneScreen.getBoundingClientRect();
+                // ================== 在这里粘贴下面的新代码 ==================
+                // --- 确保菜单在计算前是可见的，以便获取正确尺寸 ---
+                menu.classList.add('visible');
+                const menuRect = menu.getBoundingClientRect();
                 
-                // 【新增】获取聊天界面的标题栏元素及其高度
+                // --- 全新 V2 定位逻辑 ---
+                const bubbleRect = bubble.getBoundingClientRect();
+                const container = document.getElementById('wechat-content-chat');
+                const containerRect = container.getBoundingClientRect();
                 const headerElement = $('#wechat-chat-screen .app-header');
                 const headerHeight = headerElement ? headerElement.offsetHeight : 0;
 
-                // 确保菜单在计算前是可见的，以便获取正确尺寸
-                menu.classList.add('visible');
-                const menuRect = menu.getBoundingClientRect();
-
-                // 【修改】更精确的判断逻辑
-                // 计算标题栏在屏幕中的绝对底部位置
-                const headerBottomY = screenRect.top + headerHeight;
-
-                // 默认将菜单放在气泡上方
-                let top = bubble.offsetTop - menuRect.height - 8;
-
-                // 如果菜单放在上方会与标题栏重叠，则翻转到下方
-                // bubbleRect.top 是气泡顶部相对于浏览器窗口的位置
-                if (bubbleRect.top - menuRect.height - 8 < headerBottomY) {
-                    top = bubble.offsetTop + bubble.offsetHeight + 8;
+                // --- 垂直位置计算 (Y轴) ---
+                let finalTop = bubble.offsetTop - menuRect.height - 8; // 默认在上方
+                // 检查是否会与标题栏碰撞
+                if ((bubbleRect.top - containerRect.top) - menuRect.height - 8 < headerHeight) {
+                    finalTop = bubble.offsetTop + bubble.offsetHeight + 8; // 翻转到下方
                 }
-                // 【核心修改结束】
 
-                const leftOffset = (bubble.offsetWidth / 2) - (menuRect.width / 2);
-                let finalLeft = bubble.offsetLeft + leftOffset;
+                // --- 水平位置计算 (X轴)，这是本次修复的核心 ---
+                let finalLeft;
+                const bubbleCenter = bubble.offsetLeft + bubble.offsetWidth / 2;
+                const idealLeft = bubbleCenter - menuRect.width / 2; // 理想的居中位置
 
-                menu.style.top = `${top}px`;
+                if (idealLeft < 0) {
+                    // 如果居中会导致超出左边界，则将菜单左侧与气泡左侧对齐
+                    finalLeft = bubble.offsetLeft;
+                } else if (idealLeft + menuRect.width > container.clientWidth) {
+                    // 如果居中会导致超出右边界，则将菜单右侧与气泡右侧对齐
+                    finalLeft = bubble.offsetLeft + bubble.offsetWidth - menuRect.width;
+                } else {
+                    // 空间足够，正常居中
+                    finalLeft = idealLeft;
+                }
+                
+                // 再次进行边界矫正，确保万无一失
+                if (finalLeft < 4) finalLeft = 4;
+                if (finalLeft + menuRect.width > container.clientWidth - 4) {
+                    finalLeft = container.clientWidth - menuRect.width - 4;
+                }
+                
+                // 应用最终计算出的安全位置
+                menu.style.top = `${finalTop}px`;
                 menu.style.left = `${finalLeft}px`;
-                menu.style.transform = 'translateX(0)';
+                menu.style.transform = 'translateX(0)'; // 确保重置transform
+                // ================== 新代码结束 ==================
 
                 activeMenu = menu;
             }
