@@ -16481,9 +16481,27 @@ if (type === 'image') {
                 // 这是我们想要的“去气泡”逻辑
                 messageBubble.className = `chat-message ${senderClass} sticker-message sticker-bubble`;
                 const stickerImg = document.createElement('img');
-                stickerImg.src = content;
                 stickerImg.alt = 'sticker';
                 stickerImg.classList.add('sticker-image');
+
+                // ====== 新增的智能加载逻辑 START ======
+                if (typeof content === 'string' && (content.startsWith('http') || content.startsWith('data:image'))) {
+                    // 如果是 外部URL 或 旧的base64数据，直接使用
+                    stickerImg.src = content;
+                } else {
+                    // 否则，认为是 ID，从数据库异步加载
+                    getImageFromDB(content).then(blob => {
+                        if (blob) {
+                            stickerImg.src = URL.createObjectURL(blob);
+                        } else {
+                            stickerImg.alt = '表情加载失败';
+                            // 可以设置一个裂图的占位符
+                            stickerImg.src = 'https://placehold.co/100x100/333/fff?text=Error'; 
+                        }
+                    });
+                }
+                // ====== 新增的智能加载逻辑 END ======
+
                 messageBubble.appendChild(stickerImg);
             }
             
@@ -16699,7 +16717,18 @@ if (type === 'image') {
 
                 messageWrapper.className = 'chat-message-wrapper justify-center';
                 avatar.style.display = 'none';
-            } else {
+            }
+            // ================== 在这里添加新增的代码块 START ==================
+            else if (type === 'recalled') {
+                messageBubble.className = 'recall-notification';
+                messageBubble.innerHTML = `<i class="ri-arrow-go-back-line mr-2"></i> ${character?.name || 'TA'} 撤回了一条消息`;
+                messageBubble.setAttribute('onclick', `showRecalledMessage('${timestamp}')`);
+                messageWrapper.className = 'chat-message-wrapper justify-center';
+                messageWrapper.dataset.noMenu = 'true';
+                avatar.style.display = 'none';
+            }
+            // ================== 新增代码块 END ==================
+            else {
                 // 文本消息
                 messageBubble.className = `chat-message ${senderClass}`;
                 messageBubble.textContent = content;
@@ -16862,12 +16891,29 @@ if (type === 'image') {
             }
             // 表情包逻辑现在是独立的，不再嵌套
             else if (type === 'sticker') {
-                // 这是我们想要的"去气泡"逻辑
                 messageBubble.className = `chat-message ${senderClass} sticker-message sticker-bubble`;
                 const stickerImg = document.createElement('img');
-                stickerImg.src = content;
                 stickerImg.alt = 'sticker';
                 stickerImg.classList.add('sticker-image');
+
+                // ====== 新增的智能加载逻辑 START ======
+                if (typeof content === 'string' && (content.startsWith('http') || content.startsWith('data:image'))) {
+                    // 如果是 外部URL 或 旧的base64数据，直接使用
+                    stickerImg.src = content;
+                } else {
+                    // 否则，认为是 ID，从数据库异步加载
+                    getImageFromDB(content).then(blob => {
+                        if (blob) {
+                            stickerImg.src = URL.createObjectURL(blob);
+                        } else {
+                            stickerImg.alt = '表情加载失败';
+                            // 可以设置一个裂图的占位符
+                            stickerImg.src = 'https://placehold.co/100x100/333/fff?text=Error'; 
+                        }
+                    });
+                }
+                // ====== 新增的智能加载逻辑 END ======
+
                 messageBubble.appendChild(stickerImg);
             }
             // 正确连接到后续的 voice 判断
@@ -17516,6 +17562,19 @@ ${moduleStyleContext || "无"}
                             return { role, content: translatedContent };
                         }
                         
+                        // ================== 在这里插入新增的代码块 START ==================
+                        // 优先处理表情包，将其转换为带有关建词的文本提示
+                        if (msg.type === 'sticker') {
+                            // 在 userStickers 数组中查找这个表情包对象
+                            const stickerObject = userStickers.find(s => s.url === msg.content);
+                            const keywords = stickerObject ? stickerObject.keywords.join(', ') : '一个';
+                            
+                            // 构造成AI能理解的文本指令
+                            const stickerPrompt = `[用户发送了一个与"${keywords}"相关的表情包。请对此做出回应。]`;
+                            return { role: 'user', content: stickerPrompt };
+                        }
+                        // ================== 新增代码块 END ==================
+
                         // 如果是用户发送的图片或表情包消息
                         if (msg.sender === 'user' && (msg.type === 'image' || msg.type === 'sticker')) {
                             console.log('🖼️ 检测到图片消息:', msg);
@@ -30735,69 +30794,33 @@ function addNewEventListeners() {
                     stickerItem.appendChild(img);
                     
                     stickerItem.addEventListener('click', () => {
-                        if (!isDeleteMode) {
-                            // 【核心修复】确保发送时也能正确处理网络链接和本地图片
-                            if (typeof stickerObject.url === 'string' && stickerObject.url.startsWith('http')) {
-                                // 如果是网络链接，直接发送URL
-                                const timestamp = Date.now();
-                                const stickerMsg = { 
-                                    content: stickerObject.url, 
-                                    sender: 'user', 
-                                    type: 'sticker', 
-                                    timestamp: timestamp,
-                                    ...(currentReplyToTimestamp && { replyTo: currentReplyToTimestamp })
-                                };
-                                
-                                // 保存到历史记录
-                                if (!chatHistories[currentChatCharacterId]) {
-                                    chatHistories[currentChatCharacterId] = { history: [], pinned: false };
-                                }
-                                chatHistories[currentChatCharacterId].history.push(stickerMsg);
-                                saveData('chatHistories', chatHistories);
-                                
-                                // 渲染消息
-                                appendMessage(stickerMsg, true);
-                                
-                                // 取消回复模式
-                                if (currentReplyToTimestamp) {
-                                    cancelReplyMode();
-                                }
-                            } else {
-                                // 如果是本地ID，从数据库读取并转换为dataURL再发送
-                                getImageFromDB(stickerObject.url).then(blob => {
-                                    if(blob) {
-                                        const reader = new FileReader();
-                                        reader.onloadend = () => {
-                                            const timestamp = Date.now();
-                                            const stickerMsg = { 
-                                                content: reader.result, 
-                                                sender: 'user', 
-                                                type: 'sticker', 
-                                                timestamp: timestamp,
-                                                ...(currentReplyToTimestamp && { replyTo: currentReplyToTimestamp })
-                                            };
-                                            
-                                            // 保存到历史记录
-                                            if (!chatHistories[currentChatCharacterId]) {
-                                                chatHistories[currentChatCharacterId] = { history: [], pinned: false };
-                                            }
-                                            chatHistories[currentChatCharacterId].history.push(stickerMsg);
-                                            saveData('chatHistories', chatHistories);
-                                            
-                                            // 渲染消息
-                                            appendMessage(stickerMsg, true);
-                                            
-                                            // 取消回复模式
-                                            if (currentReplyToTimestamp) {
-                                                cancelReplyMode();
-                                            }
-                                        };
-                                        reader.readAsDataURL(blob);
-                                    }
-                                });
-                            }
-                            stickerPanel.classList.remove('visible');
+                        if (isDeleteMode) return;
+
+                        // 不再需要判断是本地还是网络，直接发送stickerObject.url (它本身就是ID或URL)
+                        const timestamp = Date.now();
+                        const stickerMsg = { 
+                            content: stickerObject.url, // <-- 核心修改：直接保存ID或URL
+                            sender: 'user', 
+                            type: 'sticker', 
+                            timestamp: timestamp,
+                            ...(currentReplyToTimestamp && { replyTo: currentReplyToTimestamp })
+                        };
+                        
+                        // 保存到历史记录
+                        if (!chatHistories[currentChatCharacterId]) {
+                            chatHistories[currentChatCharacterId] = { history: [], pinned: false };
                         }
+                        chatHistories[currentChatCharacterId].history.push(stickerMsg);
+                        saveData('chatHistories', chatHistories);
+                        
+                        // 渲染消息
+                        appendMessage(stickerMsg, true);
+                        
+                        // 取消回复模式
+                        if (currentReplyToTimestamp) {
+                            cancelReplyMode();
+                        }
+                        stickerPanel.classList.remove('visible');
                     });
                     
                     stickerGrid.appendChild(stickerItem);
@@ -37017,6 +37040,7 @@ function savePerchSettings() {
 
         </body>
 </html>
+
 
 
 
