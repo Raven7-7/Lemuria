@@ -3479,10 +3479,38 @@
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1rem;
             transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+            /* 【【V8.3 修复】】添加滚动支持，确保小屏幕能访问所有功能 */
+            max-height: 240px; /* 约2.5行的高度，确保小手机能显示 */
+            overflow-y: auto;
         }
         .light-mode #more-features-panel {
             background: #f8f8f8;
             border-top-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* 【【V8.3 修复】】更多功能面板滚动条美化 */
+        #more-features-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+        #more-features-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        #more-features-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        #more-features-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .light-mode #more-features-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        .light-mode #more-features-panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .light-mode #more-features-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.5);
         }
         .features-grid {
             display: grid;
