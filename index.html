@@ -13565,7 +13565,22 @@
         async function handleTopicInteraction(player, topic) {
             const character = characters.find(c => c.id === currentChatCharacterId);
             if (!character) return;
-            
+
+            // --- 【【核心修改1：在这里创建一条"记忆备忘录"】】 ---
+            // 这条消息对用户不可见，但会成为AI重试时的关键上下文
+            const internalMemoryPrompt = `[记忆提醒：我们正在玩"爱之迷-宫"，现在是关于"${topic}"的话题。上一个行动的玩家是 ${player === 'user' ? '我（用户）' : '你（AI）'}。请严格基于这个情景进行回应。]`;
+            const internalMemoryMsg = {
+                content: internalMemoryPrompt,
+                sender: 'system',
+                type: 'system-internal', // 特殊类型，不会被渲染
+                timestamp: Date.now() + 1 // 确保时间戳在用户消息之后
+            };
+            // 将这条记忆消息存入历史记录
+            if (!chatHistories[currentChatCharacterId]) chatHistories[currentChatCharacterId] = { history: [], pinned: false };
+            chatHistories[currentChatCharacterId].history.push(internalMemoryMsg);
+            saveData('chatHistories', chatHistories);
+            // --- 【修改结束】 ---
+
             const context = gatherAIContext(character.id);
             let systemPrompt = '';
             let userPrompt = "请开始你的回应。"; // 默认的用户提示
@@ -30983,14 +30998,25 @@ function addNewEventListeners() {
                     const wrapperToRetry = $(`[data-timestamp="${timestamp}"]`);
                     if (!wrapperToRetry) return; // Element not found in DOM
 
-                    // 找到要重新生成的消息之前的最后一个用户消息
+                    // --- 【【核心修改：在这里寻找"记忆备忘录"】】 ---
+                    // 向前查找，看在AI回应之前，是否存在一个"system-internal"的记忆消息
                     let lastUserMessageIndex = -1;
+                    let hasInternalMemory = false;
                     for (let i = msgIndex - 1; i >= 0; i--) {
+                        if (history[i].type === 'system-internal') {
+                            // 找到了！这是一个游戏消息的重试
+                            hasInternalMemory = true;
+                            // 重试的上下文应该从这条记忆消息开始
+                            lastUserMessageIndex = i;
+                            break;
+                        }
                         if (history[i].sender === 'user') {
+                            // 如果先找到了用户消息，说明这是普通聊天
                             lastUserMessageIndex = i;
                             break;
                         }
                     }
+                    // --- 【修改结束】 ---
 
                     if (lastUserMessageIndex === -1) {
                         showMessageBox('無法找到有效的重試上下文');
@@ -37614,5 +37640,8 @@ function savePerchSettings() {
 
         </body>
 </html>
+
+
+
 
 
