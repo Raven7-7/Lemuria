@@ -23,6 +23,68 @@
     <!-- 星空图缩放库 -->
     <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
     <style>
+        /* ====== 【【V6.1 黑底粉字美观版】】爱之迷宫主题样式 ====== */
+        #love-map-board {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); /* 【【核心修改】】从4列变为6列 */
+            grid-template-rows: repeat(9, 1fr);   /* 【【核心修改】】减少行数以适应屏幕 */
+            gap: 4px; /* 缩小格子间距 */
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .map-cell {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(244, 114, 182, 0.4);
+            border-radius: 8px; /* 边角更柔和 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 9px; /* 调整字体大小以适应更小的格子 */
+            line-height: 1.2;
+            padding: 1px;
+            box-sizing: border-box;
+            color: #F9A8D4;
+            backdrop-filter: blur(2px);
+            transition: all 0.3s ease;
+            white-space: pre-wrap;
+            box-shadow: inset 0 0 8px rgba(244, 114, 182, 0.3);
+            overflow: hidden; /* 防止文字溢出 */
+        }
+
+        .map-cell.start-point, .map-cell.end-point {
+            background: #F472B6;
+            color: #000000;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 0 15px #F472B6, inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .map-piece {
+            position: absolute; /* 保持绝对定位以实现平滑移动 */
+            width: 22px;   /* 棋子尺寸微调 */
+            height: 22px;
+            border-radius: 50%;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        .user-piece { background-color: #F472B6; border: 2px solid #000000; box-shadow: 0 0 12px #F472B6, 0 0 20px #F472B6; color: #000000; }
+        .ai-piece { background-color: #EC4899; border: 2px solid #000000; box-shadow: 0 0 12px #EC4899, 0 0 20px #EC4899; color: #000000; }
+
+        /* 骰子动画 (保持不变) */
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(1); box-shadow: 0 0 10px #F472B6; }
+            50% { transform: rotate(180deg) scale(1.2); box-shadow: 0 0 25px #F472B6; }
+            100% { transform: rotate(360deg) scale(1); box-shadow: 0 0 10px #F472B6; }
+        }
+        .dice-rolling { animation: roll 0.6s ease-in-out; }
+
         /* ====== 【【新增】】HTML内容防溢出安全网 ====== */
         .html-content-bubble > * {
             /* 核心规则：让HTML内容的最大宽度不超过其父容器（也就是我们的透明气泡） */
@@ -10942,9 +11004,10 @@
             /* white-space: nowrap; */ /* 我们不再需要这行，可以删除或注释掉 */
             overflow: hidden;
             text-overflow: ellipsis;
-            /* 新增下面三行，实现最多显示2行，超出部分显示省略号 */
+            /* 新增下面四行，实现最多显示2行，超出部分显示省略号 */
             display: -webkit-box;
             -webkit-line-clamp: 2; /* 您可以修改这个数字来控制最多显示几行 */
+            line-clamp: 2; /* 标准属性，提供更好的兼容性 */
             -webkit-box-orient: vertical;
         }
 
@@ -12171,6 +12234,11 @@
                                 <div class="feature-icon-wrapper"><i class="ri-capsule-line"></i></div>
                                 <span>聊天胶囊</span>
                             </div>
+
+                            <div id="flight-chess-btn" class="feature-item">
+                                <div class="feature-icon-wrapper"><i class="ri-heart-pulse-line"></i></div>
+                                <span>爱之迷宫</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -13290,6 +13358,407 @@
     </div>
 
     <script>
+        // ====== 【【新增】】爱之迷宫存档/读档/删档核心函数 ======
+        function saveLoveMapState() {
+            if (loveMapState && loveMapState.characterId) {
+                // 将当前游戏状态保存到 localStorage，并与角色ID绑定
+                localStorage.setItem(`loveMapProgress_${loveMapState.characterId}`, JSON.stringify(loveMapState));
+                console.log(`爱之迷宫：为角色 ${loveMapState.characterId} 保存了进度。`);
+            }
+        }
+
+        function loadLoveMapState(characterId) {
+            const savedState = localStorage.getItem(`loveMapProgress_${characterId}`);
+            if (savedState) {
+                console.log(`爱之迷宫：为角色 ${characterId} 读取了进度。`);
+                return JSON.parse(savedState);
+            }
+            return null; // 没有存档
+        }
+
+        function clearLoveMapState(characterId) {
+            if (characterId) {
+                localStorage.removeItem(`loveMapProgress_${characterId}`);
+                console.log(`爱之迷宫：为角色 ${characterId} 清除了进度。`);
+            }
+        }
+
+        // ====== 【【V7.0 布局最终优化版】】爱之迷宫棋盘数据 ======
+        const loveMapPath = [
+            // R=Row, C=Column (行, 列)
+            { topic: "起点", pos: { r: 1, c: 1 } }, // 0
+            { topic: "“爱”是动词还是名词？", pos: { r: 2, c: 1 } }, // 1
+            { topic: "给TA一个只有TA能使用的“专属称呼”。", pos: { r: 3, c: 1 } }, // 2
+            { topic: "如果能进入对方的梦境一晚，你会做什么？", pos: { r: 4, c: 1 } }, // 3
+            { topic: "觉得对方像哪种小动物", pos: { r: 5, c: 1 } }, // 4
+            { topic: "一个关于TA的秘密观察", pos: { r: 5, c: 2 } }, // 5
+            { topic: "想和TA去的一个地方", pos: { r: 4, c: 2 } }, // 6
+            { topic: "会用什么歌曲形容TA", pos: { r: 3, c: 2 } }, // 7
+            { topic: "TA最吸引你的特质", pos: { r: 2, c: 2 } }, // 8
+            { topic: "共享感官5分钟你想感受什么？", pos: { r: 1, c: 2 } }, // 9
+            { topic: "坦白一个你对我撒过的、无关紧要的小谎。", pos: { r: 1, c: 3 } }, // 10
+            { topic: "一个你从未告诉过我的特殊癖好？", pos: { r: 2, c: 3 } }, // 11
+            { topic: "描述一个你认为TA最性感的瞬间", pos: { r: 3, c: 3 } }, // 12
+            { topic: "过去到未来你最害怕的事情", pos: { r: 4, c: 3 } }, // 13
+            { topic: "你产生过的对我最坏的念头是？", pos: { r: 5, c: 3 } }, // 14
+            { topic: "用三个词描述你想象中我们下次见面的吻", pos: { r: 5, c: 4 } }, // 15
+            { topic: "喜欢哪种拥抱、亲吻方式", pos: { r: 4, c: 4 } }, // 16
+            { topic: "对我用吐真剂，你会问什么？", pos: { r: 3, c: 4 } }, // 17
+            { topic: "Makelove最想看TA穿什么衣服？", pos: { r: 2, c: 4 } }, // 18
+            { topic: "你对TA的占有欲最强的时刻", pos: { r: 1, c: 4 } }, // 19
+            { topic: "创造一个只属于我们的、很傻的节日。", pos: { r: 1, c: 5 } }, // 20
+            { topic: "如果我们是一本书，你希望书名是什么？", pos: { r: 2, c: 5 } }, // 21
+            { topic: "如果变成透明人一天，你会做什么？", pos: { r: 3, c: 5 } }, // 22
+            { topic: "一个只有你知道的TA的优点", pos: { r: 4, c: 5 } }, // 23
+            { topic: "分享一个最近梦到TA的场景", pos: { r: 5, c: 5 } }, // 24
+            { topic: "分享一个你的小秘密", pos: { r: 5, c: 6 } }, // 25
+            { topic: "如果我们的灵魂可以对话，它们此刻在聊什么？", pos: { r: 4, c: 6 } }, // 26
+            { topic: "为我们的‘未来’，写下一个开场白", pos: { r: 3, c: 6 } }, // 27
+            { topic: "描述一次完美的约会", pos: { r: 2, c: 6 } }, // 28
+            { topic: "你最想和我一起沉溺的一件事是？", pos: { r: 1, c: 6 } }, // 29
+            { topic: "你觉得我们关系的核心“气候”是怎样的？", pos: { r: 6, c: 6 } }, // 30
+            { topic: "最想和TA一起看的电影", pos: { r: 7, c: 6 } }, // 31
+            { topic: "用一个天气来形容你对TA的欲望。", pos: { r: 7, c: 5 } }, // 32
+            { topic: "一个我们没玩过的角色扮演", pos: { r: 6, c: 5 } }, // 33
+            { topic: "你会如何撒娇", pos: { r: 6, c: 4 } }, // 34
+            { topic: "吵架后会如何和好", pos: { r: 7, c: 4 } }, // 35
+            { topic: "坦白一个只有在深夜才会出现的、关于我的念头。", pos: { r: 7, c: 3 } }, // 36
+            { topic: "如果我们一起做视频博主，会因为什么而“塌房”？", pos: { r: 6, c: 3 } }, // 37
+            { topic: "一个关于欲望的幻想\n(成人话题)", pos: { r: 6, c: 2 } }, // 38
+            { topic: "你希望我们的墓碑上刻下怎样一句话？", pos: { r: 7, c: 2 } }, // 39
+            { topic: "如果TA是一个商品，TA的“使用警告”是？", pos: { r: 7, c: 1 } }, // 40
+            { topic: "TA最能激起你欲望的行为？", pos: { r: 8, c: 1 } }, // 41
+            { topic: "如果你要“犯罪”，会是什么罪名？", pos: { r: 8, c: 2 } }, // 42
+            { topic: "想送给对方的三首歌", pos: { r: 8, c: 3 } }, // 43
+            { topic: "描述一晚完美的“筋疲力尽”", pos: { r: 8, c: 4 } }, // 44
+            { topic: "想和TA一起迎接的第一个清晨", pos: { r: 8, c: 5 } }, // 45
+            { topic: "最想修改我的哪个“出厂设置”？", pos: { r: 8, c: 6 } }, // 46
+            { topic: "描绘我们家的样子", pos: { r: 9, c: 6 } }, // 47
+            { topic: "\"我爱你\"的另一种说法", pos: { r: 9, c: 5 } }, // 48
+            { topic: "除了卧室，最想在哪和我亲密", pos: { r: 9, c: 4 } }, // 49
+            { topic: "一个你一直想问但没敢问我的问题", pos: { r: 9, c: 3 } }, // 50
+            { topic: "终点：\n对TA许下一个永恒的诺言", pos: { r: 9, c: 2 } }  // 51
+        ];
+
+        // ====== 【【最终版】】爱之迷宫游戏核心逻辑 V4.0 ======
+        let loveMapState = null; // 全局游戏状态，用于持久化
+
+        // ====== 【【V5.0 版】】打开游戏的主入口函数 ======
+        // ====== 【【V6.0 修正版】】打开游戏的主入口函数 ======
+        // ====== 【【V6.0 最终修正版 + 存档功能】】打开游戏的主入口函数 ======
+        function openLoveMapGame() {
+            const character = characters.find(c => c.id === currentChatCharacterId);
+            if (!character) {
+                showMessageBox("请先开始一段对话再进行游戏。");
+                return;
+            }
+
+            const savedState = loadLoveMapState(currentChatCharacterId);
+
+            if (savedState) {
+                loveMapState = savedState;
+                console.log("爱之迷宫：返回已保存的游戏。");
+            } else {
+                console.log("爱之迷宫：开启新的一局。");
+                loveMapState = {
+                    userPosition: 0,
+                    aiPosition: 0,
+                    currentTurn: 'user',
+                    gameStatus: 'waiting_roll',
+                    characterId: currentChatCharacterId 
+                };
+                sendGameSystemMessage(`我们的地图之旅开始了！`);
+            }
+            
+            // 【【核心修正1：先让弹窗显示出来】】
+            document.getElementById('love-map-modal').classList.add('visible');
+            
+            // 【【核心修正2：延迟一小会儿再渲染棋盘和棋子】】
+            // 这给了浏览器足够的时间来正确布局弹窗
+            setTimeout(() => {
+                renderLoveMapBoard();
+                updateLoveMapUI();
+            }, 10); // 10毫秒的延迟用户是感觉不到的
+        }
+
+        // ====== 【【V5.0 版】】渲染棋盘 ======
+        function renderLoveMapBoard() {
+            const board = document.getElementById('love-map-board');
+            board.innerHTML = ''; 
+            loveMapPath.forEach((cell, index) => {
+                const cellEl = document.createElement('div');
+                cellEl.className = 'map-cell';
+                cellEl.innerHTML = cell.topic.replace(/\\n/g, '<br>');
+                cellEl.style.gridRowStart = cell.pos.r;
+                cellEl.style.gridColumnStart = cell.pos.c;
+                cellEl.dataset.index = index;
+                if (index === 0) cellEl.classList.add('start-point');
+                if (index === loveMapPath.length - 1) cellEl.classList.add('end-point');
+                board.appendChild(cellEl);
+            });
+            renderPiece('user', loveMapState.userPosition, false); // false表示非动画
+            renderPiece('ai', loveMapState.aiPosition, false);
+        }
+
+        // ====== 【【V5.0 版】】渲染棋子 ======
+        function renderPiece(player, position, animate = true) {
+            const board = document.getElementById('love-map-board');
+            let piece = board.querySelector(`.${player}-piece`);
+            if (!piece) {
+                piece = document.createElement('div');
+                piece.className = `map-piece ${player}-piece`;
+                piece.innerHTML = `<i class="${player === 'user' ? 'ri-user-star-line' : 'ri-user-heart-line'}"></i>`;
+                board.appendChild(piece);
+                piece.style.transition = 'none'; // 首次渲染无动画
+            } else {
+                piece.style.transition = animate ? 'all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55)' : 'none';
+            }
+            const targetCell = board.querySelector(`.map-cell[data-index="${position}"]`);
+            if (targetCell) {
+                const cellRect = targetCell.getBoundingClientRect();
+                const boardRect = board.getBoundingClientRect();
+                const top = cellRect.top - boardRect.top + (cellRect.height / 2);
+                const left = cellRect.left - boardRect.left + (cellRect.width / 2);
+                piece.style.top = `calc(${top}px - 12px)`;
+                piece.style.left = `calc(${left}px - 12px)`;
+            }
+        }
+
+        // ====== 【【V5.0 版】】掷骰子并触发整个回合流程 ======
+        async function rollDiceAndMove(player) {
+            if (loveMapState.gameStatus !== 'waiting_roll') return;
+            loveMapState.gameStatus = 'processing';
+            updateLoveMapUI();
+
+            const diceElement = document.getElementById('love-map-dice');
+            diceElement.classList.add('dice-rolling');
+            await new Promise(resolve => setTimeout(resolve, 600));
+
+            const diceResult = Math.floor(Math.random() * 3) + 1;
+            diceElement.textContent = diceResult;
+            diceElement.classList.remove('dice-rolling');
+
+            let currentPosition = player === 'user' ? loveMapState.userPosition : loveMapState.aiPosition;
+            let newPosition = Math.min(currentPosition + diceResult, loveMapPath.length - 1);
+            
+            if (player === 'user') {
+                loveMapState.userPosition = newPosition;
+            } else {
+                loveMapState.aiPosition = newPosition;
+            }
+            
+            // 立即保存位置更新，避免因异常导致进度丢失
+            saveLoveMapState();
+            
+            renderPiece(player, newPosition, true); // 直接移动到终点
+
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            const triggeredTopic = loveMapPath[newPosition].topic.replace('\n', ' ');
+            const character = characters.find(c => c.id === currentChatCharacterId);
+            sendGameSystemMessage(`${player === 'user' ? '你' : character.name} 掷出了 ${diceResult} 点，抵达 **「${triggeredTopic}」**`);
+            
+            await handleTopicInteraction(player, triggeredTopic);
+        }
+
+        // ====== 【【V7.0 交互逻辑最终修正版】】AI互动核心 ======
+        async function handleTopicInteraction(player, topic) {
+            const character = characters.find(c => c.id === currentChatCharacterId);
+            if (!character) return;
+            
+            const context = gatherAIContext(character.id);
+            let systemPrompt = '';
+            let userPrompt = "请开始你的回应。"; // 默认的用户提示
+
+            // 【【【核心逻辑修正：根据玩家角色，生成完全不同的AI指令】】】
+
+            if (player === 'user') {
+                // --- 情况一：玩家的回合 (AI提问) ---
+                // 这是您掷骰子后，AI应该做的事情。
+                systemPrompt = `
+# 指令身份
+你将扮演我的soulmate，${character.name}。
+# 游戏场景
+我们正在玩"爱之迷宫"。我（用户）刚刚抵达了写着 **「${topic}」** 的格子。
+# 核心任务
+你的任务是，作为 ${character.name}，**向我（用户）提出这个话题**。你需要将格子上的主题，转换成一句自然的、符合你人设的问话。
+# 案例分析
+- 如果话题是"对方第一印象"，你应该问我："轮到你了。说实话，你第一次见到我的时候，心里是怎么想的？"
+- 如果话题是"喜欢的拥抱方式"，你应该问我："这个有意思...你最喜欢我怎么抱你？"
+- 如果话题是"宣誓主权的方式"，你可以带点挑逗地问我："嗯？你想怎么向别人宣示，我是你的？"
+# 核心规则
+1.  【提问者身份】：你现在是游戏的主持人，负责向我提问。
+2.  【人设灵魂】：你的提问方式【必须】完全符合你的人设 (${character.persona})。
+3.  【格式天条】：你的回复必须模仿真实聊天，将想法拆分成多个简短句子，并用 "|||" 作为分隔符。禁止使用旁白。
+# 你的记忆与人设
+---
+[你的设定]: ${character.persona}
+[与我的关系]: ${character.myPersona}
+[最近的聊天回顾]: ${context.chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+[我们的记忆回顾]: ${context.memoryContext}
+---
+`;
+                userPrompt = "请就格子上的主题，向我提问。";
+
+            } else { // player === 'ai'
+                // --- 情况二：AI的回合 (AI回答/发言) ---
+                // 这是AI自己掷骰子后，它应该做的事情。
+                systemPrompt = `
+# 指令身份
+你将扮演我的soulmate，${character.name}。
+# 游戏场景
+我们正在玩"爱之迷宫"。轮到我（${character.name}）移动，我抵达了写着 **「${topic}」** 的格子。
+# 核心任务
+我的任务是，根据这个话题，**主动向你（用户）坦诚我的想法或感受**。
+# 案例分析
+- 如果话题是"害怕的事情"，我需要向你坦白一件我害怕的事情。
+- 如果话题是"喜欢的拥抱方式"，我需要描述我最喜欢的拥抱方式。
+- 如果话题是"对TA提出一个走心问题"，我就要向你提出一个深刻的问题。
+# 核心规则
+1.  【回答者身份】：你现在是玩家，需要回答自己格子上的问题。
+2.  【记忆融合】: 你的回答【必须】参考我们 [最近的聊天回顾] 和 [我们的记忆回顾]。
+3.  【人设灵魂】: 你的回答【必须】完全符合你的人设 (${character.persona})。
+4.  【成人化许可】: 如果话题足够私密，你可以且应该进行大胆、坦诚的语言互动。
+5.  【【格式天条】】: 你的回复必须模仿真实聊天，将想法拆分成多个简短句子，并用 "|||" 作为分隔符。禁止使用旁白。
+# 你的记忆与人设
+---
+[你的设定]: ${character.persona}
+[与我的关系]: ${character.myPersona}
+[最近的聊天回顾]: ${context.chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+[我们的记忆回顾]: ${context.memoryContext}
+---
+`;
+                userPrompt = "请根据你抵达的格子主题，主动发言。";
+            }
+
+            const aiResponse = await callAI(systemPrompt, userPrompt);
+
+            if (aiResponse) {
+                // 使用我们已有的 processAndDisplayAIMessages 函数来处理AI的回复
+                // 这样它就能自动实现分段发送（空行效果）
+                processAndDisplayAIMessages(aiResponse, currentChatCharacterId);
+            }
+            
+            // 后续的游戏结束判断和回合切换逻辑保持不变
+            const isGameOver = (player === 'user' && loveMapState.userPosition === loveMapPath.length - 1) || (player === 'ai' && loveMapState.aiPosition === loveMapPath.length - 1);
+            
+            if (isGameOver) {
+                const winnerName = player === 'user' ? '你' : character.name;
+                sendGameSystemMessage(`${winnerName} 到达了终点！旅程已完成。`);
+                loveMapState.gameStatus = 'game_over';
+
+                // 【【请在这里添加新代码】】
+                clearLoveMapState(loveMapState.characterId); // 游戏结束后，清除存档
+
+                updateLoveMapUI();
+            } else if (player === 'user') {
+                loveMapState.currentTurn = 'ai';
+                loveMapState.gameStatus = 'waiting_roll';
+
+                // 【【请在这里添加新代码】】
+                if (loveMapState.gameStatus !== 'game_over') {
+                    saveLoveMapState();
+                }
+
+                updateLoveMapUI();
+            } else { 
+                loveMapState.currentTurn = 'user';
+                loveMapState.gameStatus = 'waiting_roll';
+
+                // 【【请在这里添加新代码】】
+                if (loveMapState.gameStatus !== 'game_over') {
+                    saveLoveMapState();
+                }
+
+                updateLoveMapUI();
+            }
+        }
+
+        function updateLoveMapUI() {
+            const turnIndicator = document.getElementById('love-map-turn-indicator');
+            const rollBtn = document.getElementById('roll-love-map-dice-btn');
+            const character = characters.find(c => c.id === currentChatCharacterId);
+            if (!loveMapState) return;
+            if (loveMapState.gameStatus === 'game_over') {
+                turnIndicator.textContent = '旅程终点';
+                rollBtn.disabled = true;
+                rollBtn.textContent = '游戏结束';
+            } else if (loveMapState.currentTurn === 'user') {
+                turnIndicator.textContent = '轮到你了';
+                rollBtn.disabled = loveMapState.gameStatus === 'processing';
+                rollBtn.textContent = '掷骰子';
+            } else {
+                turnIndicator.textContent = `轮到${character.name || '对方'}了`;
+                rollBtn.disabled = loveMapState.gameStatus === 'processing';
+                rollBtn.textContent = '让TA行动';
+            }
+        }
+
+        // 发送游戏消息
+        function sendGameSystemMessage(message) {
+            const systemMsg = { content: `[爱之迷宫] ${message}`, sender: 'system', type: 'system', timestamp: Date.now() };
+            appendMessage(systemMsg, true);
+            if (!chatHistories[currentChatCharacterId]) chatHistories[currentChatCharacterId] = { history: [], pinned: false };
+            chatHistories[currentChatCharacterId].history.push(systemMsg);
+            saveData('chatHistories', chatHistories);
+        }
+
+        // ====== 【【最终版】】爱之迷宫事件绑定函数 V5.0 ======
+        function setupLoveMapEvents() {
+            const loveMapBtn = document.getElementById('flight-chess-btn');
+            if (loveMapBtn) {
+                const newBtn = loveMapBtn.cloneNode(true);
+                loveMapBtn.parentNode.replaceChild(newBtn, loveMapBtn);
+                newBtn.addEventListener('click', () => {
+                    if (!currentChatCharacterId) {
+                        showMessageBox("请先选择一个聊天对象开始游戏。");
+                        return;
+                    }
+                    openLoveMapGame();
+                });
+            }
+
+            document.getElementById('close-love-map-btn').addEventListener('click', () => {
+                document.getElementById('love-map-modal').classList.remove('visible');
+            });
+
+            document.getElementById('quit-love-map-btn').addEventListener('click', () => {
+                if (confirm('确定要结束这次地图之旅吗？当前进度将会被清除。')) {
+                    sendGameSystemMessage('地图之旅已结束。');
+
+                    // 【【请在这里添加新代码】】
+                    if (loveMapState) {
+                        clearLoveMapState(loveMapState.characterId);
+                    }
+
+                    loveMapState = null;
+                    document.getElementById('love-map-modal').classList.remove('visible');
+                }
+            });
+
+            document.getElementById('reset-love-map-btn').addEventListener('click', () => {
+                if (confirm('确定要放弃当前进度，重新开始一局吗？')) {
+
+                    // 【【请在这里添加新代码】】
+                    if (loveMapState) {
+                        clearLoveMapState(loveMapState.characterId);
+                    }
+
+                    loveMapState = null;
+                    openLoveMapGame();
+                }
+            });
+
+            document.getElementById('roll-love-map-dice-btn').addEventListener('click', () => {
+                if (!loveMapState || loveMapState.gameStatus === 'processing' || loveMapState.gameStatus === 'game_over') return;
+                if (loveMapState.currentTurn === 'user') {
+                    rollDiceAndMove('user');
+                } else {
+                    rollDiceAndMove('ai');
+                }
+            });
+        }
+
         // 🚀 全局API类型检测和CORS处理函数
         function getApiType(url) {
             if (url.includes('googleapis.com')) return 'google';
@@ -26015,16 +26484,58 @@ ${isReversed ? '🔄 逆位' : '✅ 正位'}
         return getWalletBalance() >= numericAmount;
     }
 
-    // 重置钱包余额到正确数值（临时修复函数）
+    // 重置钱包余额到正确数值（修复版）
     function resetWalletBalance() {
-        // 如果余额异常大（可能是字符串拼接错误），重置为合理数值
+        // 计算实际应有的余额：总收入 - 总支出
+        const claimedPayments = JSON.parse(localStorage.getItem('claimedPayments') || '{}');
+        const giftPurchases = JSON.parse(localStorage.getItem('giftPurchases') || '[]');
+        
+        // 计算总收入（包括初始余额和所有收到的款项）
+        let totalIncome = 1000; // 初始余额
+        Object.entries(claimedPayments).forEach(([id, payment]) => {
+            const amount = parseFloat(payment.amount) || 0;
+            totalIncome += amount;
+        });
+        
+        // 计算总支出（只计算商城购买，不计算红包和转账）
+        let totalExpenses = 0;
+        giftPurchases.forEach(purchase => {
+            const amount = parseFloat(purchase.price) || 0;
+            totalExpenses += amount;
+        });
+        
+        // 注意：红包和转账在这个应用中是虚拟的社交功能，不应该真的扣除用户余额
+        // 因为用户发出的红包和转账并没有对应的真实收款方
+        // 所以我们需要把之前错误扣除的红包和转账金额加回来
+        
+        // 计算所有聊天记录中发出的红包和转账总额
+        let redPacketAndTransferTotal = 0;
+        if (chatHistories) {
+            Object.values(chatHistories).forEach(chat => {
+                if (chat.history) {
+                    chat.history.forEach(msg => {
+                        if ((msg.type === 'red-packet' || msg.type === 'transfer') && msg.sender === 'user') {
+                            const amount = parseFloat(msg.content.amount) || 0;
+                            redPacketAndTransferTotal += amount;
+                        }
+                    });
+                }
+            });
+        }
+        
+        // 正确的余额 = 初始余额 + 收入 - 商城支出（红包转账不应该扣钱）
+        const correctBalance = totalIncome - totalExpenses;
         const currentBalance = getWalletBalance();
-        if (currentBalance > 100000) {  // 如果余额超过10万，可能是拼接错误
-            localStorage.setItem('walletBalance', '6200');  // 重置为1000初始+5200转账=6200
+        
+        // 如果当前余额与计算出的正确余额不符，则修正
+        if (Math.abs(currentBalance - correctBalance) > 0.01) {
+            localStorage.setItem('walletBalance', correctBalance.toString());
             if (window.updateWalletAfterClaim) {
                 window.updateWalletAfterClaim();
             }
-            console.log('钱包余额已重置为正确数值：¥6200');
+            console.log(`钱包余额已修正：从¥${currentBalance.toFixed(2)}修正为¥${correctBalance.toFixed(2)}`);
+            console.log(`总收入：¥${totalIncome.toFixed(2)}，商城支出：¥${totalExpenses.toFixed(2)}`);
+            console.log(`红包转账总额：¥${redPacketAndTransferTotal.toFixed(2)}（已恢复，因为这是虚拟社交功能）`);
         }
     }
 
@@ -26417,6 +26928,18 @@ ${context.planContext}
 
 
             deductFromWallet(item.price);
+            
+            // 保存购买记录
+            const giftPurchases = JSON.parse(localStorage.getItem('giftPurchases') || '[]');
+            giftPurchases.push({
+                id: item.id,
+                name: item.name,
+                price: item.price,
+                characterId: currentChatCharacterId,
+                timestamp: Date.now()
+            });
+            localStorage.setItem('giftPurchases', JSON.stringify(giftPurchases));
+            
             const userMessage = $('#gift-message-input').value.trim();
             const character = characters.find(c => c.id === currentChatCharacterId);
 
@@ -31038,8 +31561,8 @@ function addNewEventListeners() {
                 }
                 
                 if (amount > 0) {
-                    // 扣除余额
-                    deductFromWallet(amount);
+                    // 红包是虚拟社交功能，不扣除真实余额
+                    // deductFromWallet(amount); // 注释掉真实扣款
                     const content = { amount: amount.toFixed(2), message };
                     const timestamp = Date.now();
                     const redPacketMsg = { 
@@ -31089,8 +31612,8 @@ function addNewEventListeners() {
                 }
                 
                 if (amount > 0) {
-                    // 扣除余额
-                    deductFromWallet(amount);
+                    // 转账是虚拟社交功能，不扣除真实余额
+                    // deductFromWallet(amount); // 注释掉真实扣款
                     const content = { amount: amount.toFixed(2), message };
                     const timestamp = Date.now();
                     const transferMsg = { 
@@ -36446,6 +36969,13 @@ ${giftListForAI}
             initPerchSettingsEvents();
         }
 
+        // 在页面完全加载后绑定爱之迷宫事件
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupLoveMapEvents);
+        } else {
+            setupLoveMapEvents();
+        }
+
 // ================== 栖木设置功能核心 V1.0 ==================
 
 // 打开主设置面板
@@ -36653,6 +37183,31 @@ function savePerchSettings() {
             <div class="flex justify-around">
                 <button id="cancel-buy-gift-btn" class="px-6 py-2 rounded-lg">再想想</button>
                 <button id="confirm-buy-gift-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg">确认赠送</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="love-map-modal" class="modal-overlay hidden">
+        <div class="modal-content w-[95%] max-w-[390px] h-[90vh] flex flex-col p-2 bg-black/95 backdrop-blur-xl border border-pink-400/50">
+            <div class="flex justify-between items-center p-2 border-b border-pink-400/30 flex-shrink-0">
+                <button id="reset-love-map-btn" class="text-xl text-pink-400/80 hover:text-pink-300 transition-colors" title="新开一局">
+                    <i class="ri-refresh-line"></i>
+                </button>
+                <h3 id="love-map-turn-indicator" class="text-lg font-bold text-pink-300">轮到你了</h3>
+                <button id="close-love-map-btn" class="text-2xl text-pink-400/80 hover:text-pink-300">&times;</button>
+            </div>
+
+            <div class="flex-grow flex items-center justify-center p-2 my-2 relative">
+                <div id="love-map-board" class="w-full h-full">
+                    </div>
+            </div>
+
+            <div class="flex items-center justify-around p-2 border-t border-pink-400/30 flex-shrink-0">
+                <div id="love-map-dice" class="w-12 h-12 bg-black border-2 border-pink-400 rounded-lg flex items-center justify-center text-2xl font-bold text-pink-300 shadow-lg shadow-pink-500/20">?</div>
+                
+                <button id="roll-love-map-dice-btn" class="px-4 py-2 bg-pink-600 hover:bg-pink-500 text-black font-semibold text-sm rounded-lg shadow-md shadow-pink-500/30 transition-all transform hover:scale-105">掷骰子</button>
+                
+                <button id="quit-love-map-btn" class="px-4 py-2 bg-pink-700 hover:bg-pink-600 text-pink-100 font-semibold text-sm rounded-lg shadow-md shadow-pink-500/30 transition-all transform hover:scale-105">结束旅程</button>
             </div>
         </div>
     </div>
@@ -37054,11 +37609,10 @@ function savePerchSettings() {
 
         // 页面加载完成后检测现有消息
         setTimeout(detectMultilineMessages, 100);
+
     </script>
 
         </body>
 </html>
-
-
 
 
