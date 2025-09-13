@@ -31,7 +31,33 @@
             gap: 4px; /* 缩小格子间距 */
             width: 100%;
             height: 100%;
+            max-width: 100%;
+            max-height: 100%;
             position: relative;
+            overflow: auto; /* 【【V8.0 新增】】当内容超出时显示滚动条 */
+            /* 美化滚动条样式 */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(244, 114, 182, 0.6) rgba(0, 0, 0, 0.3);
+        }
+
+        /* 【【V8.0 新增】】Webkit 浏览器滚动条样式 */
+        #love-map-board::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        #love-map-board::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        #love-map-board::-webkit-scrollbar-thumb {
+            background: rgba(244, 114, 182, 0.6);
+            border-radius: 4px;
+        }
+        
+        #love-map-board::-webkit-scrollbar-thumb:hover {
+            background: rgba(244, 114, 182, 0.8);
         }
 
         .map-cell {
@@ -13514,13 +13540,18 @@
                 piece.style.transition = animate ? 'all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55)' : 'none';
             }
             const targetCell = board.querySelector(`.map-cell[data-index="${position}"]`);
-            if (targetCell) {
-                const cellRect = targetCell.getBoundingClientRect();
-                const boardRect = board.getBoundingClientRect();
-                const top = cellRect.top - boardRect.top + (cellRect.height / 2);
-                const left = cellRect.left - boardRect.left + (cellRect.width / 2);
-                piece.style.top = `calc(${top}px - 12px)`;
-                piece.style.left = `calc(${left}px - 12px)`;
+            if (targetCell && loveMapPath[position]) {
+                // 【【V8.2 修复】】使用实际地图坐标进行定位，确保棋子按正确路径移动
+                const cellData = loveMapPath[position];
+                const row = cellData.pos.r; // 使用实际行坐标
+                const col = cellData.pos.c; // 使用实际列坐标
+                
+                // 计算百分比位置（网格：6列×9行）
+                const leftPercent = ((col - 1) / 6) * 100 + (100 / 6) / 2; // 格子中心，col从1开始
+                const topPercent = ((row - 1) / 9) * 100 + (100 / 9) / 2;  // 格子中心，row从1开始
+                
+                piece.style.left = `calc(${leftPercent}% - 11px)`; // 11px = 棋子半径
+                piece.style.top = `calc(${topPercent}% - 11px)`;
             }
         }
 
@@ -37223,8 +37254,8 @@ function savePerchSettings() {
                 <button id="close-love-map-btn" class="text-2xl text-pink-400/80 hover:text-pink-300">&times;</button>
             </div>
 
-            <div class="flex-grow flex items-center justify-center p-2 my-2 relative">
-                <div id="love-map-board" class="w-full h-full">
+            <div class="flex-grow flex items-center justify-center p-2 my-2 relative overflow-hidden">
+                <div id="love-map-board" class="w-full h-full max-w-full max-h-full">
                     </div>
             </div>
 
