@@ -84,7 +84,7 @@
             background: #F472B6;
             color: #000000;
             font-weight: bold;
-            font-size: 10px;
+            font-size: 10px; /* 【【V8.3 修复】】调小终点文字大小，避免显示过大 */
             box-shadow: 0 0 15px #F472B6, inset 0 0 10px rgba(0,0,0,0.3);
         }
 
@@ -17823,6 +17823,10 @@ if (type === 'image') {
                 if (bubble) bubble.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             }
 
+            // 🚀 第一优先级：API类型检测和CORS处理（在try块外部定义，确保catch块可以访问）
+            const apiType = getApiType(apiSettings.url);
+            const needsProxyMode = needsProxy(apiSettings.url);
+
             try {
                 const context = gatherAIContext(characterIdForThisRequest);
                 if (!context) {
@@ -18036,10 +18040,6 @@ ${moduleStyleContext || "无"}
                 `;
                 // --- 系统指令结束 ---
 
-                // 🚀 第一优先级：API类型检测和CORS处理（使用全局函数）
-                const apiType = getApiType(apiSettings.url);
-                const needsProxyMode = needsProxy(apiSettings.url);
-                
                 // 🚀 API兼容性和优化建议
                 console.log(`📡 检测到API类型: ${apiType}`);
                 if (needsProxyMode) {
@@ -37699,7 +37699,6 @@ function savePerchSettings() {
 
         </body>
 </html>
-
 
 
 
