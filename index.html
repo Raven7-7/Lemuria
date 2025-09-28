@@ -11440,6 +11440,365 @@
             transform: scale(1.1);
         }
 
+        /* ====== 心有灵犀弹窗美化样式 - 黑白银灰浅粉配色 ====== */
+        
+        /* 主弹窗容器 */
+        #wg-main-modal .word-guess-modal-content {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+        }
+
+        /* 弹窗标题区域 */
+        #wg-main-modal .wg-title {
+            background: linear-gradient(90deg, #f8bbd9 0%, #e0e0e0 50%, #f8bbd9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* 谜题显示区域 */
+        .wg-puzzle-display {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%);
+            border: 2px solid rgba(192, 192, 192, 0.15);
+            box-shadow: 
+                inset 0 2px 10px rgba(0, 0, 0, 0.3),
+                0 4px 15px rgba(248, 187, 217, 0.1);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wg-puzzle-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        /* 谜题文字 */
+        .wg-puzzle-word {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 800;
+            text-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(248, 187, 217, 0.3);
+            letter-spacing: 2px;
+        }
+
+        /* 提示文字 */
+        .wg-hint {
+            color: #c0c0c0;
+            font-weight: 500;
+            opacity: 0.9;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 按钮样式重新设计 */
+        .wg-action-btn {
+            background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            color: #e0e0e0;
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wg-action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(248, 187, 217, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .wg-action-btn:hover {
+            background: linear-gradient(135deg, #4a4a4a 0%, #3d3d3d 100%);
+            border-color: rgba(248, 187, 217, 0.4);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(248, 187, 217, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .wg-action-btn:hover::before {
+            left: 100%;
+        }
+
+        .wg-action-btn:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* 关闭按钮 */
+        #wg-close-main-modal {
+            color: #c0c0c0;
+            font-weight: 300;
+            transition: all 0.3s ease;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        #wg-close-main-modal:hover {
+            color: #f8bbd9;
+            transform: rotate(90deg) scale(1.1);
+            text-shadow: 0 0 10px rgba(248, 187, 217, 0.5);
+        }
+
+        /* 边框分割线美化 */
+        #wg-main-modal .border-t {
+            border-color: rgba(192, 192, 192, 0.15) !important;
+            position: relative;
+        }
+
+        #wg-main-modal .border-b {
+            border-color: rgba(192, 192, 192, 0.15) !important;
+            position: relative;
+        }
+
+        #wg-main-modal .border-t::before,
+        #wg-main-modal .border-b::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(248, 187, 217, 0.3), transparent);
+        }
+
+        /* 自定义词库弹窗样式 */
+        #wg-custom-db-modal .word-guess-modal-content {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+        }
+
+        /* 模式选择弹窗样式 */
+        #wg-mode-select-modal .word-guess-modal-content {
+            background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+        }
+
+        /* 输入框样式 */
+        #wg-new-word-input {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%) !important;
+            border: 1px solid rgba(192, 192, 192, 0.2) !important;
+            color: #e0e0e0 !important;
+            border-radius: 12px;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.2),
+                0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        #wg-new-word-input:focus {
+            border-color: rgba(248, 187, 217, 0.5) !important;
+            box-shadow: 
+                inset 0 2px 6px rgba(0, 0, 0, 0.2),
+                0 0 0 3px rgba(248, 187, 217, 0.1),
+                0 1px 0 rgba(255, 255, 255, 0.05);
+            outline: none;
+        }
+
+        #wg-new-word-input::placeholder {
+            color: #9ca3af;
+        }
+
+        /* 词库列表项美化 */
+        .wg-custom-word-item {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 100%) !important;
+            border: 1px solid rgba(192, 192, 192, 0.1);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wg-custom-word-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #f8bbd9, #e0e0e0);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .wg-custom-word-item:hover {
+            background: linear-gradient(135deg, #3a3a3a 0%, #2d2d2d 100%) !important;
+            border-color: rgba(248, 187, 217, 0.3);
+            transform: translateX(5px);
+        }
+
+        .wg-custom-word-item:hover::before {
+            opacity: 1;
+        }
+
+        /* 滚动条美化 */
+        #wg-custom-word-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #wg-custom-word-list::-webkit-scrollbar-track {
+            background: rgba(26, 26, 26, 0.5);
+            border-radius: 4px;
+        }
+
+        #wg-custom-word-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #f8bbd9, #c0c0c0);
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        #wg-custom-word-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #f8bbd9, #e0e0e0);
+        }
+
+        /* 开始游戏按钮样式 */
+        .wg-start-btn {
+            background: linear-gradient(135deg, #f8bbd9 0%, #e0e0e0 50%, #f8bbd9 100%);
+            border: 2px solid rgba(248, 187, 217, 0.3);
+            color: #2d2d2d;
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+            box-shadow: 
+                0 6px 20px rgba(248, 187, 217, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wg-start-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s;
+        }
+
+        .wg-start-btn:hover {
+            background: linear-gradient(135deg, #f8bbd9 0%, #ffffff 50%, #f8bbd9 100%);
+            border-color: rgba(248, 187, 217, 0.6);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 
+                0 12px 30px rgba(248, 187, 217, 0.4),
+                0 0 30px rgba(248, 187, 217, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        .wg-start-btn:hover::before {
+            left: 100%;
+        }
+
+        .wg-start-btn:active {
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 
+                0 4px 15px rgba(248, 187, 217, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* 浅色模式适配 */
+        .light-mode #wg-main-modal .word-guess-modal-content,
+        .light-mode #wg-custom-db-modal .word-guess-modal-content,
+        .light-mode #wg-mode-select-modal .word-guess-modal-content {
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .light-mode .wg-puzzle-display {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 2px solid rgba(108, 117, 125, 0.2);
+            box-shadow: 
+                inset 0 2px 10px rgba(0, 0, 0, 0.05),
+                0 4px 15px rgba(248, 187, 217, 0.2);
+        }
+
+        .light-mode .wg-puzzle-word {
+            color: #212529;
+            text-shadow: 
+                0 2px 4px rgba(255, 255, 255, 0.8),
+                0 0 20px rgba(248, 187, 217, 0.4);
+        }
+
+        .light-mode .wg-hint {
+            color: #6c757d;
+        }
+
+        .light-mode .wg-action-btn {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border: 1px solid rgba(108, 117, 125, 0.2);
+            color: #495057;
+        }
+
+        .light-mode .wg-action-btn:hover {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-color: rgba(248, 187, 217, 0.6);
+            color: #212529;
+        }
+
+        .light-mode .wg-start-btn {
+            background: linear-gradient(135deg, #f8bbd9 0%, #ffffff 50%, #f8bbd9 100%);
+            border: 2px solid rgba(248, 187, 217, 0.4);
+            color: #2d2d2d;
+            box-shadow: 
+                0 6px 20px rgba(248, 187, 217, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        }
+
+        .light-mode .wg-start-btn:hover {
+            background: linear-gradient(135deg, #f8bbd9 0%, #ffffff 70%, #f8bbd9 100%);
+            border-color: rgba(248, 187, 217, 0.7);
+            box-shadow: 
+                0 12px 30px rgba(248, 187, 217, 0.3),
+                0 0 30px rgba(248, 187, 217, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
     </style>
 </head>
 <body class="dark-mode">
