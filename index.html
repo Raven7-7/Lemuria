@@ -13261,6 +13261,30 @@
         </div>
     </div>
 
+    <div class="p-4 rounded-lg bg-card">
+        <h3 class="font-bold mb-4 flex items-center">
+            <i class="fas fa-book-open mr-2"></i>
+            AI日记生成设置
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="diary-min-interval" class="block text-sm font-medium mb-2">日记最小间隔 (小时)</label>
+                <input type="number" id="diary-min-interval" min="0.5" max="24" step="0.5" value="2" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">角色生成一篇日记后，**至少要等这么多小时**才能生成下一篇，防止日记过于频繁。<br><strong>案例：</strong>设置为`2`，则角色2小时内最多生成一篇日记。</p>
+            </div>
+            <div>
+                <label for="diary-similarity-threshold" class="block text-sm font-medium mb-2">内容相似度阈值 (%)</label>
+                <input type="number" id="diary-similarity-threshold" min="50" max="95" step="5" value="70" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">当新日记与最近日记的内容相似度**超过这个百分比**时，将跳过生成，避免重复内容。<br><strong>案例：</strong>设置为`70`，则相似度超过70%的日记不会生成。</p>
+            </div>
+            <div>
+                <label for="diary-min-messages" class="block text-sm font-medium mb-2">最小新消息数</label>
+                <input type="number" id="diary-min-messages" min="1" max="10" step="1" value="3" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">只有当上次日记后有**至少这么多条新的有意义消息**时，才考虑生成新日记。<br><strong>案例：</strong>设置为`3`，则需要至少3条新消息才会触发日记生成。</p>
+            </div>
+        </div>
+    </div>
+
                     <div class="p-4 rounded-lg bg-card">
                         <h3 class="font-bold mb-4 flex items-center">
                             <i class="fas fa-users-slash mr-2"></i>
@@ -15611,7 +15635,10 @@ function getChatBackgroundElement() {
             momentsTimeTriggerInterval: 6, // 小时
             momentsTriggerProbability: 80, // 百分比
             crowdReactionEnabled: true, // 路人评论开关
-            npcReactionEnabled: true // 内置NPC评论开关
+            npcReactionEnabled: true, // 内置NPC评论开关
+            diaryMinInterval: 2, // 日记最小间隔（小时）
+            diarySimilarityThreshold: 70, // 日记相似度阈值（百分比）
+            diaryMinMessages: 3 // 生成日记所需的最小新消息数
         };
 
         // 加载心跳设置到界面
@@ -15638,6 +15665,11 @@ function getChatBackgroundElement() {
             // 加载开关状态
             document.getElementById('toggle-crowd-reaction').checked = settings.crowdReactionEnabled !== false; // 默认开启
             document.getElementById('toggle-npc-reaction').checked = settings.npcReactionEnabled !== false; // 默认开启
+            
+            // 加载日记设置
+            document.getElementById('diary-min-interval').value = settings.diaryMinInterval;
+            document.getElementById('diary-similarity-threshold').value = settings.diarySimilarityThreshold;
+            document.getElementById('diary-min-messages').value = settings.diaryMinMessages;
         }
 
         // 保存心跳设置
@@ -15662,7 +15694,12 @@ function getChatBackgroundElement() {
                 
                 // 开关状态
                 crowdReactionEnabled: document.getElementById('toggle-crowd-reaction').checked,
-                npcReactionEnabled: document.getElementById('toggle-npc-reaction').checked
+                npcReactionEnabled: document.getElementById('toggle-npc-reaction').checked,
+                
+                // 日记设置
+                diaryMinInterval: parseFloat(document.getElementById('diary-min-interval').value),
+                diarySimilarityThreshold: parseInt(document.getElementById('diary-similarity-threshold').value),
+                diaryMinMessages: parseInt(document.getElementById('diary-min-messages').value)
             };
 
             saveData('heartbeatSettings', settings);
@@ -19478,8 +19515,8 @@ ${moduleStyleContext || "无"}
                     return;
                 }
 
-                // 检查是否应该生成日记
-                const shouldGenerate = await checkDiaryGenerationConditions(characterId);
+                // 检查是否应该生成日记（使用三重检测）
+                const shouldGenerate = await shouldGenerateDiary(characterId);
                 if (!shouldGenerate) {
                     console.log(`[日记系统] 角色 ${characterId} 不满足日记生成条件`);
                     return;
@@ -20354,11 +20391,18 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
          * 根据概率决定是否触发AI写日记。
          * @param {string} characterId - 角色ID。
          */
-        function triggerAIDiaryEntry(characterId) {
+        async function triggerAIDiaryEntry(characterId) {
             const triggerProbability = 0.15; // 15%的概率写日记
             console.log(`【AI日记系统】：正在为 ${characterId} 检查日记触发概率...`);
             
             if (Math.random() < triggerProbability) {
+                // 检查是否应该生成日记（三重检测）
+                const shouldGenerate = await shouldGenerateDiary(characterId);
+                if (!shouldGenerate) {
+                    console.log(`【AI日记系统】：${characterId} 不满足日记生成条件，跳过生成。`);
+                    return;
+                }
+                
                 const randomDelay = Math.random() * 5000 + 5000; // 5到10秒延迟
                 setTimeout(() => {
                     generateAndSaveAIDiaryEntry(characterId);
@@ -20366,6 +20410,178 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
             } else {
                 console.log(`【AI日记系统】：${characterId} 本次未触发写日记。`);
             }
+        }
+
+        /**
+         * 检查日记时间间隔
+         * @param {string} characterId - 角色ID
+         * @returns {boolean} 是否在时间间隔限制内
+         */
+        function checkDiaryTimeInterval(characterId) {
+            const character = characters.find(c => c.id === characterId);
+            if (!character || !character.diaries || character.diaries.length === 0) {
+                return false; // 没有日记，可以生成
+            }
+            
+            const heartbeatSettings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+            const lastDiary = character.diaries[character.diaries.length - 1];
+            const timeDiff = Date.now() - lastDiary.timestamp;
+            const minInterval = heartbeatSettings.diaryMinInterval * 60 * 60 * 1000; // 转换为毫秒
+            
+            const withinInterval = timeDiff < minInterval;
+            if (withinInterval) {
+                console.log(`【日记系统】：${characterId} 距离上次日记仅${Math.round(timeDiff / 60000)}分钟，未达到${heartbeatSettings.diaryMinInterval}小时间隔要求`);
+            }
+            return withinInterval;
+        }
+
+        /**
+         * 检查聊天内容是否有实质性变化
+         * @param {string} characterId - 角色ID
+         * @returns {boolean} 是否有足够的新内容
+         */
+        function hasSignificantContentChange(characterId) {
+            const chatHistory = chatHistories[characterId]?.history || [];
+            const character = characters.find(c => c.id === characterId);
+            const heartbeatSettings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+            
+            if (chatHistory.length === 0) {
+                console.log(`【日记系统】：${characterId} 没有聊天记录`);
+                return false;
+            }
+            
+            // 获取上次日记后的新消息
+            const lastDiaryTime = character?.diaries?.length > 0 ? 
+                character.diaries[character.diaries.length - 1].timestamp : 0;
+            
+            const newMessages = chatHistory.filter(msg => msg.timestamp > lastDiaryTime);
+            
+            // 过滤出有意义的消息（排除简单回应）
+            const meaningfulMessages = newMessages.filter(msg => {
+                if (!msg.content || msg.content.length < 10) return false;
+                if (msg.content.match(/^(嗯|好的|是的|哦|啊|呵呵|👍|😊|❤️)$/)) return false;
+                return true;
+            });
+            
+            const hasEnoughMessages = meaningfulMessages.length >= heartbeatSettings.diaryMinMessages;
+            if (!hasEnoughMessages) {
+                console.log(`【日记系统】：${characterId} 新消息数量不足(${meaningfulMessages.length}/${heartbeatSettings.diaryMinMessages})`);
+            }
+            return hasEnoughMessages;
+        }
+
+        /**
+         * 提取文本关键词
+         * @param {string} text - 文本内容
+         * @returns {Array} 关键词数组
+         */
+        function extractKeywords(text) {
+            if (!text) return [];
+            
+            // 移除标点符号和特殊字符，分割成词
+            const words = text.replace(/[^\u4e00-\u9fa5\w\s]/g, ' ')
+                             .split(/\s+/)
+                             .filter(word => word.length > 1)
+                             .map(word => word.toLowerCase());
+            
+            // 简单的停用词过滤
+            const stopWords = ['的', '了', '是', '我', '你', '他', '她', '它', '在', '和', '与', '或', '但', '不', '也', '都', '很', '最', '更', '就', '还', '又', '而', '只', '把', '被', '让', '使', '给', '对', '向', '从', '到', '为', '以', 'by', 'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'must'];
+            
+            return words.filter(word => !stopWords.includes(word));
+        }
+
+        /**
+         * 计算两个关键词数组的相似度
+         * @param {Array} keywords1 - 第一个关键词数组
+         * @param {Array} keywords2 - 第二个关键词数组
+         * @returns {number} 相似度百分比 (0-100)
+         */
+        function calculateSimilarity(keywords1, keywords2) {
+            if (!keywords1.length || !keywords2.length) return 0;
+            
+            const set1 = new Set(keywords1);
+            const set2 = new Set(keywords2);
+            
+            // 计算交集和并集
+            const intersection = new Set([...set1].filter(x => set2.has(x)));
+            const union = new Set([...set1, ...set2]);
+            
+            // Jaccard相似度
+            const similarity = (intersection.size / union.size) * 100;
+            return Math.round(similarity);
+        }
+
+        /**
+         * 检查内容相似度
+         * @param {string} characterId - 角色ID
+         * @returns {boolean} 是否内容重复
+         */
+        async function checkContentSimilarity(characterId) {
+            const character = characters.find(c => c.id === characterId);
+            const heartbeatSettings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+            
+            if (!character?.diaries || character.diaries.length === 0) {
+                return false; // 没有历史日记，不重复
+            }
+            
+            // 获取当前聊天内容
+            const chatHistory = chatHistories[characterId]?.history || [];
+            const lastDiaryTime = character.diaries[character.diaries.length - 1].timestamp;
+            const newMessages = chatHistory.filter(msg => msg.timestamp > lastDiaryTime);
+            const currentContent = newMessages.map(msg => msg.content).join(' ');
+            const currentKeywords = extractKeywords(currentContent);
+            
+            if (currentKeywords.length === 0) {
+                console.log(`【日记系统】：${characterId} 当前内容无关键词`);
+                return true; // 没有关键词，认为是重复
+            }
+            
+            // 检查最近3篇日记的相似度
+            const recentDiaries = character.diaries.slice(-3);
+            
+            for (const diary of recentDiaries) {
+                const diaryKeywords = extractKeywords(diary.content);
+                const similarity = calculateSimilarity(currentKeywords, diaryKeywords);
+                
+                console.log(`【日记系统】：${characterId} 与历史日记相似度: ${similarity}%`);
+                
+                if (similarity >= heartbeatSettings.diarySimilarityThreshold) {
+                    console.log(`【日记系统】：${characterId} 内容相似度过高(${similarity}% >= ${heartbeatSettings.diarySimilarityThreshold}%), 跳过生成`);
+                    return true; // 相似度过高
+                }
+            }
+            
+            return false; // 相似度可接受
+        }
+
+        /**
+         * 综合检查是否应该生成日记（三重检测组合）
+         * @param {string} characterId - 角色ID
+         * @returns {boolean} 是否应该生成日记
+         */
+        async function shouldGenerateDiary(characterId) {
+            console.log(`【日记系统】：开始为 ${characterId} 进行三重检测...`);
+            
+            // 检测1：时间间隔
+            if (checkDiaryTimeInterval(characterId)) {
+                console.log(`【日记系统】：${characterId} 时间间隔检测未通过`);
+                return false;
+            }
+            
+            // 检测2：内容变化
+            if (!hasSignificantContentChange(characterId)) {
+                console.log(`【日记系统】：${characterId} 内容变化检测未通过`);
+                return false;
+            }
+            
+            // 检测3：相似度检测
+            if (await checkContentSimilarity(characterId)) {
+                console.log(`【日记系统】：${characterId} 相似度检测未通过`);
+                return false;
+            }
+            
+            console.log(`【日记系统】：${characterId} 三重检测全部通过，可以生成日记`);
+            return true;
         }
         // [新代码结束]
 
