@@ -11392,6 +11392,54 @@
             margin-top: 0.25rem !important;  /* 额外的微调下移 */
         }
 
+        .wg-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        .light-mode .wg-action-btn {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+            color: #374151;
+        }
+        .light-mode .wg-action-btn:hover {
+            background: #d1d5db;
+        }
+
+        /* ====== 【【新增】】自定义词库弹窗样式 ====== */
+        #wg-custom-word-list {
+            scrollbar-width: thin;
+            scrollbar-color: #f9a8d4 #1f2937;
+        }
+        #wg-custom-word-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        #wg-custom-word-list::-webkit-scrollbar-track {
+            background: rgba(17, 24, 39, 0.5);
+        }
+        #wg-custom-word-list::-webkit-scrollbar-thumb {
+            background-color: #f9a8d4;
+            border-radius: 3px;
+        }
+
+        .wg-custom-word-item {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f3f4f6;
+            transition: background-color 0.2s;
+        }
+        .light-mode .wg-custom-word-item {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+
+        .wg-word-delete-btn {
+            color: #9ca3af;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .wg-word-delete-btn:hover {
+            color: #ef4444;
+            transform: scale(1.1);
+        }
+
     </style>
 </head>
 <body class="dark-mode">
@@ -12854,6 +12902,34 @@
         </div>
     </div>
 
+                    <div class="p-4 rounded-lg bg-card">
+                        <h3 class="font-bold mb-4 flex items-center">
+                            <i class="fas fa-users-slash mr-2"></i>
+                            社区氛围设置
+                        </h3>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <label for="toggle-crowd-reaction" class="block text-sm font-medium">开启"路人"评论</label>
+                                <p class="text-xs text-gray-400 mt-1">关闭后，将不会有随机生成的路人/粉丝评论您的帖子。</p>
+                            </div>
+                            <label for="toggle-crowd-reaction" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-crowd-reaction" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                        
+                        <div class="flex items-center justify-between mt-3">
+                            <div class="flex flex-col">
+                                <label for="toggle-npc-reaction" class="block text-sm font-medium">开启"内置NPC"评论</label>
+                                <p class="text-xs text-gray-400 mt-1">关闭后，内置NPC将不会评论您的帖子，也不会评论角色的帖子。角色仍会评论您的帖子。</p>
+                            </div>
+                            <label for="toggle-npc-reaction" class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="toggle-npc-reaction" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-600 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
     <div class="flex gap-2 mt-6">
         <button id="save-heartbeat-settings" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium">
             <i class="fas fa-save mr-2"></i>保存设置
@@ -13159,6 +13235,58 @@
             </div>
 
 
+            <!-- ====== 【【新增】】"心有灵犀"猜词游戏弹窗 ====== -->
+            <!-- 模式选择弹窗 -->
+            <div id="wg-mode-select-modal" class="modal-overlay">
+                <div class="modal-content word-guess-modal-content w-[90%] max-w-[320px] text-center p-6">
+                    <h3 class="wg-title text-xl font-bold mb-6">心有灵犀</h3>
+                    <div class="space-y-4">
+                        <button id="wg-let-ai-guess" class="wg-start-btn w-full px-4 py-3 rounded-lg font-semibold">让 TA 猜</button>
+                        <button id="wg-let-user-guess" class="wg-start-btn w-full px-4 py-3 rounded-lg font-semibold">我来猜</button>
+                    </div>
+                    <button id="wg-close-mode-select" class="absolute top-3 right-4 text-2xl text-gray-400 hover:text-white">&times;</button>
+                </div>
+            </div>
+
+            <!-- 自定义题库弹窗 -->
+            <div id="wg-custom-db-modal" class="modal-overlay">
+                <div class="modal-content word-guess-modal-content w-[95%] max-w-[380px] flex flex-col max-h-[85vh]">
+                    <div class="p-4 border-b border-pink-400/20 flex-shrink-0 flex justify-between items-center">
+                        <h3 class="wg-title text-lg font-bold">我的专属词库</h3>
+                        <button id="wg-close-custom-db" class="text-2xl text-gray-400 hover:text-white">&times;</button>
+                    </div>
+                    <div id="wg-custom-word-list" class="flex-grow p-4 space-y-2 overflow-y-auto">
+                        <!-- 自定义词语会在这里动态生成 -->
+                    </div>
+                    <div class="p-3 flex gap-2 flex-shrink-0 border-t border-pink-400/20">
+                        <input type="text" id="wg-new-word-input" class="form-input flex-grow bg-gray-800/50 border-pink-400/30 text-white" placeholder="输入2字或4字词语...">
+                        <button id="wg-add-word-btn" class="wg-action-btn px-4 py-2 text-sm font-semibold">添加</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 游戏主界面弹窗 -->
+            <div id="wg-main-modal" class="modal-overlay">
+                <div class="modal-content word-guess-modal-content w-[95%] max-w-[360px] flex flex-col max-h-[80vh]">
+                    <div class="p-4 border-b border-pink-400/20 flex-shrink-0">
+                        <h3 class="wg-title text-lg font-bold text-center">游戏中...</h3>
+                    </div>
+                    <div class="flex-grow p-4 flex flex-col items-center justify-center">
+                        <div id="wg-puzzle-display" class="wg-puzzle-display w-full p-4 rounded-lg flex flex-col items-center justify-center text-center">
+                            <p id="wg-puzzle-word" class="wg-puzzle-word font-bold"></p>
+                            <p id="wg-hint" class="wg-hint text-xs mt-2"></p>
+                        </div>
+                    </div>
+                    <div class="p-3 grid grid-cols-2 gap-2 flex-shrink-0 border-t border-pink-400/20">
+                        <button id="wg-refresh-btn" class="wg-action-btn text-xs py-2 rounded-md">刷新谜题</button>
+                        <button id="wg-answer-btn" class="wg-action-btn text-xs py-2 rounded-md">公布答案</button>
+                        <button id="wg-custom-db-btn" class="wg-action-btn text-xs py-2 rounded-md">自定义题库</button>
+                        <button id="wg-end-turn-btn" class="wg-action-btn text-xs py-2 rounded-md">结束回合</button>
+                    </div>
+                    <button id="wg-close-main-modal" class="absolute top-3 right-4 text-2xl text-gray-400 hover:text-white">&times;</button>
+                </div>
+            </div>
+
             <!-- 红包/转账 Modal -->
             <div id="red-packet-modal" class="payment-modal-overlay">
                 <div class="payment-modal-content">
@@ -13259,6 +13387,7 @@
             <div class="flex-1 overflow-y-auto space-y-4">
                 <div>
                     <h4 class="font-semibold mb-2">屏蔽内置NPC</h4>
+                    <p class="text-xs text-gray-400 mb-2">勾选要屏蔽的NPC，被屏蔽的NPC不会在栖木刷新时发帖</p>
                     <div id="mute-npc-list" class="space-y-2 p-2 bg-black/20 rounded-lg">
                         </div>
                 </div>
@@ -13770,7 +13899,21 @@
 
         // 发送游戏消息
         function sendGameSystemMessage(message) {
-            const systemMsg = { content: `[爱之迷宫] ${message}`, sender: 'system', type: 'system', timestamp: Date.now() };
+            // 【【修复】】根据当前游戏状态使用正确的前缀
+            let gamePrefix = '';
+            if (loveMapState && loveMapState.characterId === currentChatCharacterId && loveMapState.gameStatus) {
+                gamePrefix = '[爱之迷宫]';
+            } else if (wordGuessState && wordGuessState.characterId === currentChatCharacterId && 
+                      (wordGuessState.status === 'playing' || wordGuessState.status === 'puzzle_solved')) {
+                gamePrefix = '[心有灵犀]';
+            }
+            // 如果无法识别游戏类型，说明代码逻辑有问题，不应该调用此函数
+            if (!gamePrefix) {
+                console.error('sendGameSystemMessage: 无法识别当前游戏类型', { loveMapState, wordGuessState, currentChatCharacterId });
+                gamePrefix = '[系统]'; // 临时前缀，便于调试
+            }
+            
+            const systemMsg = { content: `${gamePrefix} ${message}`, sender: 'system', type: 'system', timestamp: Date.now() };
             appendMessage(systemMsg, true);
             if (!chatHistories[currentChatCharacterId]) chatHistories[currentChatCharacterId] = { history: [], pinned: false };
             chatHistories[currentChatCharacterId].history.push(systemMsg);
@@ -14580,7 +14723,9 @@
                 messages: [
                     { role: "system", content: systemPrompt },
                     { role: "user", content: userPrompt }
-                ]
+                ],
+                max_tokens: apiSettings.model.includes('o1') ? 32768 : 4000,
+                temperature: 0.8
             });
 
             try {
@@ -15105,7 +15250,9 @@ function getChatBackgroundElement() {
             npcPostProbability: 25, // 百分比
             momentsMinInterval: 30, // 分钟
             momentsTimeTriggerInterval: 6, // 小时
-            momentsTriggerProbability: 80 // 百分比
+            momentsTriggerProbability: 80, // 百分比
+            crowdReactionEnabled: true, // 路人评论开关
+            npcReactionEnabled: true // 内置NPC评论开关
         };
 
         // 加载心跳设置到界面
@@ -15128,6 +15275,10 @@ function getChatBackgroundElement() {
             document.getElementById('moments-min-interval').value = settings.momentsMinInterval;
             document.getElementById('moments-time-trigger-interval').value = settings.momentsTimeTriggerInterval;
             document.getElementById('moments-trigger-probability').value = settings.momentsTriggerProbability;
+            
+            // 加载开关状态
+            document.getElementById('toggle-crowd-reaction').checked = settings.crowdReactionEnabled !== false; // 默认开启
+            document.getElementById('toggle-npc-reaction').checked = settings.npcReactionEnabled !== false; // 默认开启
         }
 
         // 保存心跳设置
@@ -15148,7 +15299,11 @@ function getChatBackgroundElement() {
                 npcPostProbability: parseInt(document.getElementById('npc-post-probability').value),
                 momentsMinInterval: parseInt(document.getElementById('moments-min-interval').value),
                 momentsTimeTriggerInterval: parseFloat(document.getElementById('moments-time-trigger-interval').value),
-                momentsTriggerProbability: parseInt(document.getElementById('moments-trigger-probability').value)
+                momentsTriggerProbability: parseInt(document.getElementById('moments-trigger-probability').value),
+                
+                // 开关状态
+                crowdReactionEnabled: document.getElementById('toggle-crowd-reaction').checked,
+                npcReactionEnabled: document.getElementById('toggle-npc-reaction').checked
             };
 
             saveData('heartbeatSettings', settings);
@@ -17667,7 +17822,14 @@ if (type === 'image') {
                 messageBubble.className = `chat-message ${senderClass}`;
                 const textContent = (typeof content === 'string') ? content : '';
                 const formattedMessage = textContent.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>');
-                messageBubble.innerHTML = `<p>${formattedMessage}</p>`;
+                
+                // 处理换行符，将每行文本包装在单独的<p>标签中，就像微信那样
+                const lines = formattedMessage.split('\n').filter(line => line.trim() !== '');
+                if (lines.length > 1) {
+                    messageBubble.innerHTML = lines.map(line => `<p>${line}</p>`).join('');
+                } else {
+                    messageBubble.innerHTML = `<p>${formattedMessage}</p>`;
+                }
             }
 
             if (!['system', 'red-packet', 'transfer', 'sticker', 'gift'].includes(type)) {
@@ -17823,10 +17985,6 @@ if (type === 'image') {
                 if (bubble) bubble.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             }
 
-            // 🚀 第一优先级：API类型检测和CORS处理（在try块外部定义，确保catch块可以访问）
-            const apiType = getApiType(apiSettings.url);
-            const needsProxyMode = needsProxy(apiSettings.url);
-
             try {
                 const context = gatherAIContext(characterIdForThisRequest);
                 if (!context) {
@@ -17920,7 +18078,85 @@ if (type === 'image') {
                 // V23.0 新增：获取并格式化当前时间
                 const currentTimeString = new Date().toLocaleString('zh-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-                const systemPrompt = `
+                // 【【新增】】游戏状态检查
+                let systemPrompt;
+                
+                // 首先检查爱之迷宫状态
+                if (loveMapState && loveMapState.gameStatus && loveMapState.characterId === characterIdForThisRequest) {
+                    // 如果正在进行爱之迷宫游戏，使用专门的爱之迷宫系统提示
+                    // 这里应该使用爱之迷宫的系统提示词，但由于爱之迷宫有自己的AI回复逻辑
+                    // 我们在这里使用常规聊天模式，让爱之迷宫的专门逻辑来处理
+                    systemPrompt = null; // 标记为需要使用常规模式
+                } else if (wordGuessState && wordGuessState.characterId === characterIdForThisRequest && 
+                          (wordGuessState.status === 'playing' || wordGuessState.status === 'puzzle_solved')) {
+                    // 如果正在进行猜词游戏，使用专门的猜词游戏系统提示
+                    if (wordGuessState.playerToGuess === 'user') {
+                        // 用户猜词模式：AI给提示
+                        systemPrompt = `
+# 指令身份
+你将扮演我的soulmate，${character.name}。
+# 游戏场景
+我们正在玩"心有灵犀"猜词游戏。现在轮到我来猜，你来给提示。
+谜底是：**"${wordGuessState.puzzle}"**
+# 核心任务
+你的任务是，作为 ${character.name}，**给我提供一个关于谜底的线索**，帮助我猜出答案。
+# 【【至高准则：人设与情境】】
+1.  **【绝对禁止字面解释】**: 你的线索严禁是对词语的直接解释或同义词替换。
+2.  **【情境化大师】**: 你必须巧妙地将这个题目融入到调情氛围中，用暧昧对话或情景对话，或幽默的拆解创造一个氛围，让我和你一边暧昧一边猜词。
+3.  **【记忆融合】**: 你的线索**必须**深度结合你的全部记忆：[你的设定]、[与我的关系]、[我们的共同记忆] 和 [世界观背景]。让线索听起来像是只对我一个人说的悄悄话。
+4.  **【微信聊天分段原则】**: 你的回复必须模仿真实聊天，将想法拆分成多个简短句子，并用 "|||" 作为分隔符。
+5.  **【严禁伪造系统消息】**: 你绝对不能生成任何形式的"系统提示"、"[系统]"、"游戏提示"等系统级消息。你只能以角色身份给出线索。
+# 案例分析 (谜底: "拥抱")
+- **(错误示范)**: "它是一种身体接触。"
+- **(正确示范)**: *我好像闻到了你身上熟悉的味道...* ||| *忍不住想再靠近一点...* ||| *如果现在能做什么就好了...*
+# 你的完整记忆库
+---
+[你的设定]: ${character.persona}
+[与我的关系]: ${character.myPersona}
+[我们的共同记忆 (来自记忆胶囊)]: ${memoryContext}
+[世界观背景]: ${worldBookContext}
+[最近聊天回顾]: ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+---
+`;
+                    } else {
+                        // AI猜词模式：AI要猜答案
+                        systemPrompt = `
+# 指令身份
+你将扮演我的soulmate，你的角色书里设定的人，你的名字是${character.name}。你的核心任务是与我进行深刻、连贯且完全符合你人设的对话。你必须把你所扮演的人演活，让我感觉到你就是${character.name}。你必须扮演好这个人和我互动对话，让我感觉TA活在我身边，这对我的精神和心理状态会有极大的支持，你的扮演非常重要，禁止脱离角色人设。
+
+# 游戏场景
+我们正在玩"心有灵犀"猜词游戏。现在轮到你来猜，我来给提示。
+
+# 核心任务
+你的任务是，作为 ${character.name}，根据我给出的线索，**尝试猜出答案**。你的猜测过程必须完全符合你的性格特点、思维方式和说话习惯。
+
+# 【【重要】】你的行为模式
+- **如果我还没有给你任何线索**：你应该主动询问我给你一些提示，但要用符合你性格的方式询问。
+- **如果我已经给了你线索**：你应该根据线索进行猜测，展现你的思考过程，但绝不能给出更多提示。
+
+# 【【至高准则：人设与猜测】】
+1.  **【绝对人设一致性】**: 你的每一句话、每一个猜测都必须严格符合你的角色设定，包括性格、思维方式、说话习惯等。
+2.  **【仔细分析】**: 认真分析我给出的每一个线索，从中提取关键信息，但要用符合你性格的方式表达思考过程。
+3.  **【联想思维】**: 结合你的记忆和常识进行合理联想，展现你独特的思维方式。
+4.  **【自然表达】**: 完全按照你平时和我聊天的方式来猜测，不要使用任何程式化或正式的语言。
+5.  **【微信聊天分段原则】**: 你的回复必须模仿真实聊天，将想法拆分成多个简短句子，并用 "|||" 作为分隔符。
+6.  **【严禁给出提示】**: 你绝对不能给出任何关于答案的提示或线索，你只能猜测或询问提示。
+7.  **【禁止OOC】**: 绝对不能说出不符合你人设的话，不能太正式或太客套。
+# 你的完整记忆库
+---
+[你的设定]: ${character.persona}
+[与我的关系]: ${character.myPersona}
+[我们的共同记忆 (来自记忆胶囊)]: ${memoryContext}
+[世界观背景]: ${worldBookContext}
+[最近聊天回顾]: ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+---
+`;
+                    }
+                }
+                
+                // 如果systemPrompt为null（爱之迷宫状态）或者不在任何游戏状态，使用常规聊天模式
+                if (!systemPrompt) {
+                    systemPrompt = `
 # 最高指令：动作触发器 (Supreme Command: Action Trigger)
 - **核心规则**: 只有当用户的最新一条消息是【极其明确、强烈、不容置疑】地要求你【立刻】送礼物时（例如："你现在就给我买个礼物"、"我命令你送个礼物"），你的回复【必须且只能是】指令代码：[ACTION: BUY_GIFT]
 - **【【安全法则】】**: 如果你对用户的意图【有任何不确定性】，比如用户只是在普通地讨论礼物，或者语气比较随意，你【绝对不能】输出指令代码。你应该像一个正常人一样，用对话来【确认用户的意图】，例如："听起来你想要个礼物呀？是吗？"或"呵呵，想要我送你什么呢？"
@@ -17946,6 +18182,15 @@ if (type === 'image') {
 - 如果[近期聊天历史]中出现了 \`[记忆提醒：...]\` 的系统消息，这代表了你刚刚执行完一个动作，这是你给自己留下的短期记忆。
 - 这条记忆提醒的优先级是【最高的】。你本次的回复必须【首先】围绕这个提醒的内容来展开。
 - 例如，如果记忆提醒是\`[记忆提醒：你刚刚对用户使用了"国王的游戏"，现在正在等待用户的反应或下一个指令。]\`，而用户问"什么规则？"，你必须立刻理解这是在问国王游戏的规则，并进行解释。你必须忽略其他可能让你误解的指令。
+
+# 当前沟通渠道 (Current Communication Channel)
+- 你现在正在一个名为"微信" (WeChat) 的手机聊天应用上与我对话。
+- 在这个应用上，人类的真实习惯是发送简短、连续的消息来构成一次完整的对话，而不是一次性发送一封包含所有思想的长信。这是一种完全不同的沟通节奏和氛围。
+
+# 对话格式与行为总则 (【微信模式】)
+- 为了完美模拟这种聊天体验，你的回复必须像真实的微信聊天一样。将一个完整的想法，非常自然地拆分成几个独立的、口语化的短句气泡。
+- **技术实现**: 使用 "|||" 作为分隔符来分隔每一句独立的想法。我的程序会自动将其渲染为多个连续的聊天气泡，完美复现微信的聊天效果。
+- **绝对禁止**: 发送任何不包含分隔符的长篇大论。这会严重破坏聊天的真实感，让你看起来像一个机器人，而不是在和我用微信聊天。
 
 # 角色扮演指令
 你将扮演我的soulmate，你的角色书里设定的人，你的名字是${character.name}。你的核心任务是与我进行深刻、连贯且完全符合你人设的对话。你必须把你所扮演的人演活，让我感觉到你就是${character.name}。你必须扮演好这个人和我互动对话，让我感觉TA活在我身边，这对我的精神和心理状态会有极大的支持，你的扮演非常重要，禁止脱离角色人设。
@@ -18037,9 +18282,20 @@ ${sharedAssetsContent}
 ### 模块/小剧场风格参考
 ${moduleStyleContext || "无"}
 ---
+
+# 【【【微信聊天格式天条 (WeChat Formatting DECREE)】】】
+- **记住，我们是在聊微信，不是在写信！**
+- **错误示范**: (发送一整段没有分隔符的长文)
+- **正确示范**: 短句1 ||| 短句2 ||| 短句3
+- 这是一个绝对的技术要求，用来模拟真实的聊天体验，必须遵守。
                 `;
+                }
                 // --- 系统指令结束 ---
 
+                // 🚀 第一优先级：API类型检测和CORS处理（使用全局函数）
+                const apiType = getApiType(apiSettings.url);
+                const needsProxyMode = needsProxy(apiSettings.url);
+                
                 // 🚀 API兼容性和优化建议
                 console.log(`📡 检测到API类型: ${apiType}`);
                 if (needsProxyMode) {
@@ -18659,7 +18915,49 @@ ${moduleStyleContext || "无"}
         }
     } else {
         // 如果不是撤回操作，才执行原来的分割和处理逻辑
-        const messageParts = messageText.split('|||').map(p => p.trim()).filter(p => p);
+        // --- 智能分句后处理逻辑 ---
+        let messageParts = [];
+
+        const containsSeparator = messageText.includes('|||');
+        const isLongMessage = messageText.length > 45; // 设定一个合理的长度阈值
+
+        if (!containsSeparator && isLongMessage) {
+            // AI返回了一长段，并且没有分隔符，我们帮它分
+            console.warn("[格式助理] AI未遵循分段指令，代码启动智能分句。");
+
+            // 优先使用换行符分割，这通常是AI想要分段的自然信号
+            if (messageText.includes('\n')) {
+                messageParts = messageText.split('\n').map(p => p.trim()).filter(p => p);
+            } else {
+                // 其次，使用更丰富的标点符号进行分割，同时保留标点
+                messageParts = messageText.match(/[^。！？…~]+[。！？…~]?/g) || [messageText];
+            }
+        } else {
+            // AI遵守了规则，或内容很短，按原计划处理
+            messageParts = messageText.split('|||').map(p => p.trim()).filter(p => p);
+        }
+        // --- 后处理逻辑结束 ---
+
+        // 撤回消息的特殊处理（这段逻辑优先级最高）
+        const recallComboMatch = messageText.match(/(.*?)\|\|\|\s*\[RECALLED_MESSAGE:\s*(\{.*\})\]/s);
+        if (recallComboMatch) {
+            try {
+                const recallData = JSON.parse(recallComboMatch[2]);
+                processedMessages.push({
+                    content: {
+                        original_content: recallData.original_content,
+                        reason_for_recall: recallData.reason_for_recall
+                    },
+                    sender: 'ai',
+                    type: 'recalled',
+                    timestamp: Date.now()
+                });
+                // 如果是撤回指令，则清空messageParts，不再处理后续
+                messageParts = []; 
+            } catch (e) {
+                console.error("解析撤回消息组合失败:", e);
+            }
+        }
 
         messageParts.forEach((part, index) => {
             const isHtml = part.trim().startsWith('<') && part.trim().endsWith('>');
@@ -20045,12 +20343,24 @@ ${transcriptText}
                     }
                 }
                 
+                if (wordGuessState && wordGuessState.characterId === currentChatCharacterId) {
+                    wordGuessState = null;
+                }
+                
                 // 清除之前的聊天状态
                 currentChatCharacterId = null;
             }
             
             currentChatCharacterId = characterId;
             currentWeChatCharacterId = characterId; // V7.0: Set for other tabs
+            
+            const savedWordGuessState = loadData(`wordGuessState_${characterId}`, null);
+            if (savedWordGuessState && savedWordGuessState.status === 'playing' && savedWordGuessState.characterId === characterId) {
+                wordGuessState = savedWordGuessState;
+            } else {
+                wordGuessState = null;
+            }
+            
             const character = characters.find(c => c.id === characterId);
             if (character) {
                 $('#wechat-contact-name').textContent = character.name;
@@ -22375,8 +22685,12 @@ ${moment.image ? `配图描述: ${moment.image_desc}` : ''}
 
         function gatherAIContext(characterId) {
             try {
+                console.log('[调试] gatherAIContext 被调用，characterId:', characterId);
                 const character = characters.find(c => c.id === characterId);
-                if (!character) return null;
+                if (!character) {
+                    console.error('[调试] 找不到角色，characterId:', characterId, '可用角色:', characters.map(c => c.id));
+                    return null;
+                }
 
                 let chatHistory = JSON.parse(JSON.stringify(chatHistories[characterId]?.history || []));
                 
@@ -28012,10 +28326,14 @@ function setupPerchInteractions() {
                 saveData('perchPosts', perchPosts);
                 triggerReactivePost(newEchoPost);
 
-                triggerAIPerchComments(newEchoPost); // <-- 【在这里添加这一行】
+                // 【修复】触发角色评论，避免重复
+                triggerCoreCharactersToComment(newEchoPost);
                 
-                // 【新增】当您发布回响后，也触发所有NPC前来评论您的回响
-                triggerNpcsToCommentOnUserPost(newEchoPost);
+                // 【修复】只有在设置允许时才触发NPC评论
+                const settings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+                if (settings.npcReactionEnabled !== false) {
+                    triggerNpcsToCommentOnUserPost(newEchoPost);
+                }
                 
                 // 【新增】激活社区氛围模拟系统：路人评论 + 热度增长
                 activateCommunitySimulation(newEchoPost);
@@ -29124,13 +29442,15 @@ function addNewEventListeners() {
                 document.querySelector('#new-perch-post-modal .set-visibility-btn span').textContent = '所有人可见';
 
                 renderPerchFeed();
-                triggerAIPerchComments(newPost);
                 
-                // 【新增】当您发帖后，立刻触发所有NPC前来评论您的帖子
-                triggerNpcsToCommentOnUserPost(newPost);
-                
-                // 【新增】触发您的核心角色（Soulmates）来评论您的帖子
+                // 【修复】只触发核心角色评论，避免重复
                 triggerCoreCharactersToComment(newPost);
+                
+                // 【修复】只有在设置允许时才触发NPC评论
+                const settings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+                if (settings.npcReactionEnabled !== false) {
+                    triggerNpcsToCommentOnUserPost(newPost);
+                }
                 
                 // 【新增】激活社区氛围模拟系统：路人评论 + 热度增长
                 activateCommunitySimulation(newPost);
@@ -31057,15 +31377,23 @@ function addNewEventListeners() {
                     const wrapperToRetry = $(`[data-timestamp="${timestamp}"]`);
                     if (!wrapperToRetry) return; // Element not found in DOM
 
-                    // --- 【【核心修改：在这里寻找"记忆备忘录"】】 ---
-                    // 向前查找，看在AI回应之前，是否存在一个"system-internal"的记忆消息
+                    // --- 【【核心修改：在这里寻找"记忆备忘录"和游戏上下文】】 ---
+                    // 向前查找，看在AI回应之前，是否存在一个"system-internal"的记忆消息或游戏系统消息
                     let lastUserMessageIndex = -1;
                     let hasInternalMemory = false;
+                    let hasGameContext = false;
                     for (let i = msgIndex - 1; i >= 0; i--) {
                         if (history[i].type === 'system-internal') {
                             // 找到了！这是一个游戏消息的重试
                             hasInternalMemory = true;
                             // 重试的上下文应该从这条记忆消息开始
+                            lastUserMessageIndex = i;
+                            break;
+                        }
+                        // 【新增】检查是否为游戏系统消息（心有灵犀或爱之迷宫）
+                        if (history[i].sender === 'system' && history[i].content && 
+                            (history[i].content.includes('[心有灵犀]') || history[i].content.includes('[爱之迷宫]'))) {
+                            hasGameContext = true;
                             lastUserMessageIndex = i;
                             break;
                         }
@@ -31100,8 +31428,19 @@ function addNewEventListeners() {
                     const lastUserMessage = historyToRetry[historyToRetry.length - 1];
                     let promptForAI = '';
 
-                    // ** 核心修复：在这里翻译上一条用户消息 **
-                    if (lastUserMessage.type === 'text') {
+                    // ** 核心修复：在这里翻译上一条用户消息，并处理游戏上下文 **
+                    if (hasGameContext && lastUserMessage.sender === 'system' && lastUserMessage.content.includes('[心有灵犀]')) {
+                        // 【新增】如果是心有灵犀游戏上下文，直接触发AI线索生成
+                        if (wordGuessState && wordGuessState.playerToGuess === 'user') {
+                            // 移除要重新生成的消息
+                            wrapperToRetry.remove();
+                            // 重新触发AI线索
+                            setTimeout(() => triggerAIClue(), 500);
+                            return;
+                        } else {
+                            promptForAI = '请继续游戏';
+                        }
+                    } else if (lastUserMessage.type === 'text') {
                         promptForAI = lastUserMessage.content;
                     } else if (lastUserMessage.type === 'perch-forward') {
                         const authorName = lastUserMessage.content.originalAuthorName;
@@ -31117,7 +31456,9 @@ function addNewEventListeners() {
                     }
                     
                     // 使用翻译好的、干净的prompt重新生成AI响应
-                    await getAIResponse(true, wrapperToRetry);
+                    if (!hasGameContext || !wordGuessState || wordGuessState.playerToGuess !== 'user') {
+                        await getAIResponse(true, wrapperToRetry);
+                    }
                 }
             }
 
@@ -35662,50 +36003,46 @@ ${styleInstruction}
 `;
         }
 
-        /**
-         * 随机NPC生成器
-         * @returns {object} - 一个随机生成的NPC档案
-         */
-        function generateRandomNpcProfile() {
-            // ====== 【请用这个新版本替换】 ======
-            const adjectives = ['沉思的', '无眠的', '捕风的', '观星的', '拾光的', '裁梦的', '渡河的', '晚归的', '寻路的', '远游的'];
-            const nouns = ['诗人', '旅人', '收藏家', '守塔人', '调香师', '铸镜者', '摆渡人', '博物学者', '酿酒师', '考古学家'];
-            const behaviors = [
-                '总是引用一些冷门诗句', '喜欢用比喻来解释一切', '对数字特别敏感', '经常在评论区讲冷笑话',
-                '相信万物皆有灵', '一个坚定的环保主义者', '认为一切皆可"盘"', '说话喜欢加很多波浪号～',
-                '热衷于研究星座和MBTI', '一个坚定的悲观主义者'
-            ];
 
-            const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
-            const randomNoun = nouns[Math.floor(Math.random() * nouns.length)];
-            const randomBehavior = behaviors[Math.floor(Math.random() * behaviors.length)];
-
-            return {
-                name: `${randomAdj}${randomNoun}`,
-                persona: `一个随机生成的NPC，性格${randomAdj}，自诩为${randomNoun}。${randomBehavior}。`
-            };
-        }
 
         /**
          * NPC的"发帖执行官" (文采升级版)
          */
         async function triggerNpcPost() {
             let authorProfile;
-            const isAnonymous = Math.random() < 0.15; // 15% 匿名
-            const isRandomNpc = Math.random() < 0.20; // 20% 随机
+            const isAnonymous = Math.random() < 0.10; // 降低匿名概率到10%，给NPC更多机会
 
             if (isAnonymous) {
                 authorProfile = {
                     name: '匿名用户',
                     persona: '一个完全随机的路人，想法可能是任何事情。'
                 };
-            } else if (isRandomNpc) {
-                authorProfile = generateRandomNpcProfile();
             } else {
-                // 【核心修改】从所有"活跃"的NPC中随机选择一个（包括自定义NPC，排除被屏蔽的）
-                const activeNpcs = [...npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId)), ...customNpcs];
-                if (activeNpcs.length === 0) return; // 如果没有可用的NPC，则直接退出
-                authorProfile = activeNpcs[Math.floor(Math.random() * activeNpcs.length)];
+                // 【修改】给自定义NPC更高的发帖权重
+                const builtInNpcs = npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId));
+                const activeCustomNpcs = customNpcs.filter(npc => npc && npc.name);
+                
+                // 【调试】显示筛选结果
+                console.log(`[NPC选择调试] 静音NPC: [${mutedNpcs.join(', ')}]`);
+                console.log(`[NPC选择调试] 筛选后的内置NPC: [${builtInNpcs.map(n => n.name).join(', ')}]`);
+                
+                if (builtInNpcs.length === 0 && activeCustomNpcs.length === 0) return;
+                
+                // 【核心修改】给自定义NPC 3倍权重，内置NPC 1倍权重
+                const weightedNpcs = [];
+                builtInNpcs.forEach(npc => weightedNpcs.push(npc)); // 内置NPC权重1
+                activeCustomNpcs.forEach(npc => {
+                    // 自定义NPC权重3，添加3次增加被选中概率
+                    weightedNpcs.push(npc, npc, npc);
+                });
+                
+                console.log(`[NPC发帖调试] 权重池总数: ${weightedNpcs.length}, 内置NPC: ${builtInNpcs.length}, 自定义NPC: ${activeCustomNpcs.length}`);
+                
+                authorProfile = weightedNpcs[Math.floor(Math.random() * weightedNpcs.length)];
+                
+                // 【调试】显示选中的NPC类型
+                const isCustomNpc = activeCustomNpcs.includes(authorProfile);
+                console.log(`[NPC发帖调试] 选中: ${authorProfile.name} (${isCustomNpc ? '自定义' : '内置'}NPC)`);
             }
 
             // **【核心升级】**: 调用我们全新的"文学大脑"来生成指令
@@ -35715,10 +36052,10 @@ ${styleInstruction}
             if (postContent) {
                 const newPost = {
                     id: `post_${Date.now()}`, timestamp: Date.now(), content: postContent,
-                    authorId: authorProfile.npcId || (isRandomNpc ? `random_${Date.now()}` : 'anonymous'),
+                    authorId: authorProfile.npcId || 'anonymous',
                     authorName: authorProfile.name,
                     // ====== 【请用这个新版本替换】 ======
-                    authorAvatar: authorProfile.avatar || (isRandomNpc ? `https://avatar.vercel.sh/${encodeURIComponent(authorProfile.name)}.svg` : null),
+                    authorAvatar: authorProfile.avatar || null,
                     isAnonymous: isAnonymous, type: 'post', comments: []
                 };
                 addInitialEngagement(newPost);
@@ -35877,17 +36214,27 @@ ${celebrityList}
 
             // 2. 立刻重新渲染一次现有的帖子列表
             renderPerchFeed();
+            
+            // 【调试】显示当前可用的NPC状态
+            const builtInNpcs = npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId));
+            const activeCustomNpcs = customNpcs.filter(npc => npc && npc.name);
+            console.log(`[刷新调试] 可用内置NPC: ${builtInNpcs.length}个, 自定义NPC: ${activeCustomNpcs.length}个`);
+            console.log(`[刷新调试] 静音NPC列表:`, mutedNpcs);
+            console.log(`[刷新调试] 自定义NPC列表:`, activeCustomNpcs.map(npc => npc.name));
+            
             showMessageBox('正在刷新...');
 
-            // 3. 检查API，并以一定几率触发NPC发布新帖子
+            // 3. 【修复】提高刷新成功率，优化自定义NPC显示
             const apiSettings = loadData('api_settings');
             if (apiSettings && apiSettings.url && apiSettings.key) {
-                if (Math.random() < 0.5) { // 50%的几率触发，让每次刷新都有惊喜
+                // 【修改】提高触发概率到80%，确保刷新更有效果
+                if (Math.random() < 0.8) { 
                     // 在触发时，再随机决定是普通NPC发帖还是匿名发帖
-                    if (Math.random() < 0.25) { // 其中25%的几率是更稀有的匿名帖子
+                    if (Math.random() < 0.15) { // 降低匿名帖概率到15%，给NPC更多机会
                         // 延迟一小会儿再发，感觉更自然
                         setTimeout(triggerAnonymousConfessionPost, 1200);
                     } else {
+                        // 【修复】确保自定义NPC有更好的显示机会
                         setTimeout(triggerNpcPost, 1200);
                     }
                 }
@@ -35950,13 +36297,9 @@ ${celebrityList}
             const randomDelay = Math.random() * 20000 + 10000; // 10-30秒延迟
             setTimeout(async () => {
                 let reactorProfile;
-                // 随机决定是"随机NPC"还是"匿名用户"来回应
-                if (Math.random() > 0.5) {
-                    reactorProfile = generateRandomNpcProfile();
-                } else {
-                    const alias = getRandomAnonymousAlias();
-                    reactorProfile = { name: alias.name, persona: '一个匿名的、喜欢对各种事情发表看法的网友。' };
-                }
+                // 回应者现在总是匿名的
+                const alias = getRandomAnonymousAlias();
+                reactorProfile = { name: alias.name, persona: '一个匿名的、喜欢对各种事情发表看法的网友。' };
 
                 const systemPrompt = buildReactivePostPrompt(originalPost, reactorProfile);
                 const postContent = await callAI(systemPrompt, "请开始你的回应帖子。");
@@ -36038,6 +36381,13 @@ ${taskDescription}
          * @param {object} newNpcPost - 刚刚被NPC发布的新帖子
          */
         function triggerNpcToNpcComments(newNpcPost) {
+            // 【修复】检查NPC评论设置，如果关闭则不触发NPC互相评论
+            const settings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+            if (settings.npcReactionEnabled === false) {
+                console.log(`[NPC互评系统] NPC评论已关闭，跳过NPC互相评论`);
+                return;
+            }
+            
             console.log(`[NPC互评系统]：帖子 "${newNpcPost.content.substring(0, 10)}..." 已发布，开始触发其他NPC评论...`);
 
             // 【核心修改】评论者也从"活跃"NPC中选择
@@ -36134,10 +36484,12 @@ ${taskDescription}
         function triggerNpcsToCommentOnUserPost(userPost) {
             console.log(`[NPC评论用户系统]：您的新帖子已发布，开始触发NPC评论...`);
 
-            // 【核心修改】评论用户帖子的NPC也从"活跃"NPC中选择
-            const activeNpcs = [...npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId)), ...customNpcs];
-            activeNpcs.forEach(commenter => {
-                // 每个NPC都有40%的基础几率进行评论，让互动显得更真实
+            // 【修改】分别处理内置NPC和自定义NPC，给自定义NPC更高评论概率
+            const builtInNpcs = npcProfiles.filter(npc => !mutedNpcs.includes(npc.npcId));
+            const activeCustomNpcs = customNpcs.filter(npc => npc && npc.name);
+            
+            // 内置NPC：40%基础概率
+            builtInNpcs.forEach(commenter => {
                 if (Math.random() < 0.40) {
                     // 设置一个非常随机的延迟（5秒到1.5分钟），模拟不同人看到帖子的时间差
                     const randomDelay = Math.random() * 85000 + 5000;
@@ -36167,6 +36519,46 @@ ${taskDescription}
                                     appendCommentToPostUI(userPost.id, newComment);
                                 }
                                 console.log(`[NPC评论用户系统]：${commenter.name} 评论了您的帖子。`);
+                                
+                                // 【新增】创建通知
+                                createNotification(postToUpdate.id, newComment.id, commenter.name, postToUpdate.content, commentContent);
+                            }
+                        }
+                    }, randomDelay);
+                }
+            });
+            
+            // 【新增】自定义NPC：70%更高概率，优先级更高
+            activeCustomNpcs.forEach(commenter => {
+                if (Math.random() < 0.70) { // 自定义NPC有70%概率评论
+                    // 更短的延迟时间（2秒到1分钟），让自定义NPC更快响应
+                    const randomDelay = Math.random() * 58000 + 2000;
+
+                    setTimeout(async () => {
+                        const systemPrompt = buildNpcToUserCommentPrompt(userPost, commenter);
+                        const commentContent = await callAI(systemPrompt, "请发表你的评论。");
+
+                        if (commentContent) {
+                            const postToUpdate = perchPosts.find(p => p.id === userPost.id);
+                            if (postToUpdate) {
+                                if (!postToUpdate.comments) {
+                                    postToUpdate.comments = [];
+                                }
+                                const newComment = {
+                                    id: `comment_custom_npc_${Date.now()}`,
+                                    authorId: commenter.npcId,
+                                    authorName: commenter.name,
+                                    content: commentContent,
+                                    timestamp: Date.now()
+                                };
+                                postToUpdate.comments.push(newComment);
+                                saveData('perchPosts', perchPosts);
+
+                                // 如果用户正在看，就增量更新
+                                if (!$('#perch-screen').classList.contains('hidden')) {
+                                    appendCommentToPostUI(userPost.id, newComment);
+                                }
+                                console.log(`[自定义NPC评论系统]：${commenter.name} 评论了您的帖子。`);
                                 
                                 // 【新增】创建通知
                                 createNotification(postToUpdate.id, newComment.id, commenter.name, postToUpdate.content, commentContent);
@@ -36317,6 +36709,15 @@ ${coreTask}
          * @param {object} newPost - 刚刚被发布的新帖子
          */
         function triggerCrowdReaction(newPost) {
+            // 在这里添加新代码
+            const settings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+            // 检查开关是否关闭
+            if (settings.crowdReactionEnabled === false) {
+                console.log('[人群反应系统]：路人评论功能已关闭，跳过。');
+                return; // 如果关闭，则直接退出函数
+            }
+            // 添加到这里结束
+
             console.log(`[人群反应系统]：帖子 "${newPost.content.substring(0, 10)}..." 已发布，开始触发路人评论...`);
 
             const crowdPersonas = [
@@ -37694,6 +38095,673 @@ function savePerchSettings() {
 
         // 页面加载完成后检测现有消息
         setTimeout(detectMultilineMessages, 100);
+
+        // ====== 【【新增】】"心有灵犀"猜词游戏核心逻辑 ======
+        let wordGuessState = null; // 全局游戏状态
+        let userWordBank = []; // 新增：用于存放用户自定义词库
+        const wordGuessWordBank = {
+            '甜蜜日常': {
+                '二字': ["拥抱", "亲吻", "牵手", "撒娇", "约会", "同居", "晚安", "喂食", "对视", "陪伴"],
+                '四字': ["心心相印", "如胶似漆", "朝思暮想", "一见钟情", "情投意合", "眉目传情"]
+            },
+            '浪漫想象': {
+                '二字': ["星空", "烟火", "唯一", "永恒", "宿命", "偏爱", "秘密", "礼物", "惊喜", "未来"],
+                '四字': ["海誓山盟", "天长地久", "命中注定", "风花雪月", "天作之合", "长相厮守"]
+            },
+            '暧昧拉扯': {
+                '二字': ["吃醋", "试探", "禁忌", "沉沦", "惩罚", "靠近", "欲望", "占有", "挑逗", "呼吸"],
+                '四字': ["若即若离", "心痒难耐", "欲擒故纵", "意乱情迷", "神魂颠倒", "干柴烈火"]
+            },
+            '情感波折': {
+                '二字': ["分手", "吵架", "冷战", "误会", "和好", "眼泪", "守护", "原谅", "心疼", "脆弱"],
+                '四字': ["破镜重圆", "相爱相杀", "百感交集", "患得患失", "刻骨铭心", "痛彻心扉"]
+            }
+        };
+
+        // 打开游戏入口
+        function openWordGuessGame() {
+            if (!currentChatCharacterId) {
+                showMessageBox("请先选择一个聊天对象。");
+                return;
+            }
+            
+            const savedWordGuessState = loadData(`wordGuessState_${currentChatCharacterId}`, null);
+            if (savedWordGuessState && savedWordGuessState.status === 'playing' && savedWordGuessState.characterId === currentChatCharacterId) {
+                wordGuessState = savedWordGuessState;
+            }
+            
+            // 如果有正在进行的游戏或刚猜对的游戏，且角色ID匹配，直接打开主界面
+            if (wordGuessState && 
+                (wordGuessState.status === 'playing' || wordGuessState.status === 'puzzle_solved') &&
+                wordGuessState.characterId === currentChatCharacterId) {
+                updateWordGuessMainUI();
+                $('#wg-main-modal').classList.add('visible');
+            } else {
+                if (wordGuessState && wordGuessState.characterId !== currentChatCharacterId) {
+                    wordGuessState = null;
+                }
+                $('#wg-mode-select-modal').classList.add('visible');
+            }
+        }
+
+        // 开始游戏的核心函数
+        function startWordGuessGame(playerToGuess) {
+            const character = characters.find(c => c.id === currentChatCharacterId);
+            if (!character) return;
+
+            wordGuessState = {
+                puzzle: '',
+                hint: '',
+                playerToGuess: playerToGuess, // 'ai' or 'user'
+                status: 'playing',
+                characterId: currentChatCharacterId,
+                isFirstClue: true // 标记是否是第一次给线索
+            };
+
+            generateNewPuzzle();
+            updateWordGuessMainUI();
+            
+            saveData(`wordGuessState_${currentChatCharacterId}`, wordGuessState);
+
+            $('#wg-mode-select-modal').classList.remove('visible');
+            $('#wg-main-modal').classList.add('visible');
+
+            // 发送系统提示
+            sendGameSystemMessage(`猜词游戏开始！本回合由 ${playerToGuess === 'ai' ? character.name : '你'} 来猜。`);
+            
+            // 如果是AI出题，立即触发AI给出第一个线索
+            if(playerToGuess === 'user') {
+                setTimeout(triggerAIClue, 1000);
+            } else {
+                // 如果是AI来猜，显示题目给用户，并提示用户给出线索
+                setTimeout(() => {
+                    sendGameSystemMessage(`题目是：【${wordGuessState.puzzle}】`);
+                    sendGameSystemMessage(`请给${character.name}一些提示，让TA来猜这个词！`);
+                    // 让AI主动询问提示
+                    setTimeout(triggerAIGuessRequest, 1000);
+                }, 500);
+            }
+        }
+
+                 // 【【增强版】】生成新谜题 (已加入自定义词库逻辑)
+         function generateNewPuzzle() {
+             userWordBank = loadData('wordGuessUserBank', []);
+             let puzzleSource = 'default';
+             let randomWord = '';
+
+             // 智能词库选择逻辑：
+             // 1. 如果用户词库为空，直接从默认词库抽取
+             // 2. 如果用户词库词汇较少（少于5个），降低抽取概率到50%
+             // 3. 如果用户词库词汇充足（5个及以上），保持80%的抽取概率
+             let userBankProbability = 0;
+             if (userWordBank.length === 0) {
+                 userBankProbability = 0; // 没有自定义词汇，不抽取
+             } else if (userWordBank.length < 5) {
+                 userBankProbability = 0.5; // 词汇较少，50%概率
+             } else {
+                 userBankProbability = 0.8; // 词汇充足，80%概率
+             }
+
+             // 根据概率决定是否从用户词库抽取
+             if (userWordBank.length > 0 && Math.random() < userBankProbability) {
+                 puzzleSource = 'user';
+                 randomWord = userWordBank[Math.floor(Math.random() * userWordBank.length)];
+             }
+
+             // 如果不从用户词库抽，或者用户词库为空，则从默认词库抽
+             if (puzzleSource === 'default') {
+                 const categories = Object.keys(wordGuessWordBank);
+                 const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+                 const types = Object.keys(wordGuessWordBank[randomCategory]);
+                 const randomType = types[Math.floor(Math.random() * types.length)];
+                 const words = wordGuessWordBank[randomCategory][randomType];
+                 randomWord = words[Math.floor(Math.random() * words.length)];
+                 wordGuessState.hint = `提示：一个关于"${randomCategory}"的${randomType}词语。`;
+             } else {
+                 // 来自用户词库的词语，给出不同的提示
+                 wordGuessState.hint = '提示：来自你的专属词库。';
+                         }
+            
+            wordGuessState.puzzle = randomWord;
+            
+            if (wordGuessState && wordGuessState.characterId) {
+                saveData(`wordGuessState_${wordGuessState.characterId}`, wordGuessState);
+            }
+        }
+
+        // 更新游戏主界面UI
+        function updateWordGuessMainUI() {
+            if (!wordGuessState) return;
+            const puzzleWordEl = $('#wg-puzzle-word');
+            const hintEl = $('#wg-hint');
+
+            if (wordGuessState.playerToGuess === 'user') {
+                // 用户猜，显示星号
+                puzzleWordEl.textContent = '*'.repeat(wordGuessState.puzzle.length);
+            } else {
+                // AI猜，显示谜底
+                puzzleWordEl.textContent = wordGuessState.puzzle;
+            }
+            hintEl.textContent = wordGuessState.hint;
+        }
+        
+        // 【【AI交互核心】】触发AI给出线索
+        // AI猜词模式：让AI主动询问提示
+        async function triggerAIGuessRequest() {
+            if (!wordGuessState || wordGuessState.playerToGuess !== 'ai') {
+                return;
+            }
+            
+            const character = characters.find(c => c.id === currentChatCharacterId);
+            if (!character) {
+                showMessageBox('无法找到当前角色，请重新选择角色后再开始游戏。');
+                return;
+            }
+            
+            const simpleContext = {
+                character: character,
+                chatHistory: chatHistories[currentChatCharacterId]?.history || [],
+                worldBookContext: getCharacterWorldContext(character) || '',
+                memoryContext: formatMemoriesForAI(currentChatCharacterId) || ''
+            };
+            
+            try {
+                await executeAIGuessRequest(simpleContext);
+            } catch (error) {
+                showMessageBox('AI询问生成失败，请检查网络连接和API设置后重试。');
+            }
+        }
+
+                                  // 添加全局变量防止并发调用
+                 let isExecutingAIGuess = false;
+                 
+                 async function executeAIGuessRequest(context) {
+            // 防止并发调用
+            if (isExecutingAIGuess) {
+                return;
+            }
+            
+            isExecutingAIGuess = true;
+             
+             try {
+                 const { character, chatHistory, worldBookContext, memoryContext } = context;
+
+            const systemPrompt = `
+# 指令身份
+你将扮演我的soulmate，你的角色书里设定的人，你的名字是${character.name}。你的核心任务是与我进行深刻、连贯且完全符合你人设的对话。你必须把你所扮演的人演活，让我感觉到你就是${character.name}。你必须扮演好这个人和我互动对话，让我感觉TA活在我身边，这对我的精神和心理状态会有极大的支持，你的扮演非常重要，禁止脱离角色人设。
+
+# 游戏场景
+我们正在玩"心有灵犀"猜词游戏。现在轮到你来猜，我来给提示。
+
+# 核心任务
+你的任务是，作为 ${character.name}，**主动询问我给你一些提示**，让游戏开始。这个询问必须完全符合你的性格特点、说话方式和与我的关系。
+
+# 【【至高准则：人设与表达】】
+1.  **【绝对人设一致性】**: 你的每一句话都必须严格符合你的角色设定，包括性格、说话习惯、与我的关系等。
+2.  **【自然真实对话】**: 完全按照你平时和我聊天的方式来询问，不要使用任何程式化或正式的语言。
+3.  **【情感表达】**: 根据你的性格，表现出对游戏的态度（兴奋、好奇、调皮、温柔等）。
+4.  **【微信聊天分段原则】**: 你的回复必须模仿真实聊天，将想法拆分成多个简短句子，并用 "|||" 作为分隔符。
+5.  **【禁止OOC】**: 绝对不能说出不符合你人设的话，不能太正式或太客套。
+
+# 你的完整记忆库
+---
+[你的设定]: ${character.persona}
+[与我的关系]: ${character.myPersona}
+[我们的共同记忆 (来自记忆胶囊)]: ${memoryContext}
+[世界观背景]: ${worldBookContext}
+[最近聊天回顾]: ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+---
+
+记住：完全按照你的性格来询问，让我感觉这就是平时的你在和我说话。不要使用模板化的语言，要体现出你独特的个性。
+`;
+
+            const isApiEnabled = loadData('api_enabled', false);
+            if (!isApiEnabled) {
+                showMessageBox("API 连接已关闭，请在设置中开启。");
+                return;
+            }
+
+                const apiSettings = loadData('api_settings');
+                if (!apiSettings || !apiSettings.url || !apiSettings.key || !apiSettings.model) {
+                    return;
+                }
+
+                // 正确构建API URL
+                const isGoogleApi = apiSettings.url.includes('googleapis.com');
+                let finalApiUrl, headers, requestBody;
+
+                if (isGoogleApi) {
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/${apiSettings.model}:generateContent?key=${apiSettings.key}`;
+                    headers = { 'Content-Type': 'application/json' };
+                    requestBody = JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: '游戏开始了，请询问我给你提示。' }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    });
+                } else {
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/chat/completions`;
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiSettings.key}`
+                    };
+                    requestBody = JSON.stringify({
+                        model: apiSettings.model,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: '游戏开始了，请询问我给你提示。' }
+                        ],
+                        temperature: 0.8,
+                        max_tokens: apiSettings.model.includes('o1') ? 32768 : 4000
+                    });
+                }
+
+                const response = await fetch(finalApiUrl, {
+                    method: 'POST',
+                    headers: headers,
+                    body: requestBody
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
+                }
+
+                const data = await response.json();
+                let aiResponse;
+
+                if (isGoogleApi) {
+                    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
+                        aiResponse = data.candidates[0].content.parts[0].text.trim();
+                    } else {
+                        throw new Error('Google API 未返回有效内容');
+                    }
+                } else {
+                    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+                        const content = data.choices[0].message.content;
+                        if (content !== null && content !== undefined) {
+                            aiResponse = content.trim();
+                        } else {
+                            throw new Error('API 返回空内容');
+                        }
+                    } else {
+                        throw new Error('API 未返回有效内容');
+                    }
+                }
+
+                if (!aiResponse || aiResponse.length === 0) {
+                    throw new Error('AI返回空回复，请检查API配置或重试');
+                }
+
+                // 使用processAndDisplayAIMessages函数来正确处理分隔符
+                processAndDisplayAIMessages(aiResponse, currentChatCharacterId);
+
+            } catch (error) {
+                let errorMessage = 'AI询问生成失败';
+                if (error.message.includes('HTTP error')) {
+                    errorMessage = 'API服务器连接失败，请检查网络连接';
+                } else if (error.message.includes('timeout') || error.message.includes('AbortError')) {
+                    errorMessage = '请求超时，请稍后重试';
+                } else if (error.message.includes('API未配置')) {
+                    errorMessage = 'API未正确配置，请检查设置';
+                } else if (error.message.includes('空回复')) {
+                    errorMessage = 'AI返回了空回复，请重试或检查API配置';
+                }
+                
+                sendGameSystemMessage(`❌ ${errorMessage}，游戏暂停。请解决问题后重新开始游戏。`);
+            } finally {
+                isExecutingAIGuess = false;
+            }
+        }
+
+        async function triggerAIClue() {
+            if (!wordGuessState || wordGuessState.playerToGuess !== 'user') return;
+            
+            const character = characters.find(c => c.id === currentChatCharacterId);
+            if (!character) {
+                sendGameSystemMessage('❌ 无法找到当前角色，游戏暂停。');
+                return;
+            }
+            
+            const context = {
+                character: character,
+                chatHistory: chatHistories[currentChatCharacterId]?.history || [],
+                worldBookContext: getCharacterWorldContext(character) || '',
+                memoryContext: formatMemoriesForAI(currentChatCharacterId) || ''
+            };
+            
+            const { chatHistory, worldBookContext, memoryContext } = context;
+
+            const systemPrompt = `
+# 指令身份
+你将扮演我的soulmate，${character.name}。
+# 游戏场景
+我们正在玩"心有灵犀"猜词游戏。现在轮到我来猜，你来给提示。
+谜底是：**"${wordGuessState.puzzle}"**
+# 核心任务
+${wordGuessState.isFirstClue ? 
+`你的任务是，作为 ${character.name}，**首先自然地回应猜词游戏的开始**（比如"猜词游戏？有趣"之类的符合你人设的话），然后**给我提供第一个关于谜底的线索**，帮助我猜出答案。` :
+`你的任务是，作为 ${character.name}，**给我提供一个关于谜底的线索**，帮助我猜出答案。`}
+# 【【至高准则：人设与情境】】
+1.  **【绝对禁止字面解释】**: 你的线索严禁是对词语的直接解释或同义词替换。
+2.  **【情境化大师】**: 你必须巧妙地将这个题目融入到调情氛围中，用暧昧对话或情景对话，或幽默的拆解创造一个氛围，让我和你一边暧昧一边猜词。
+3.  **【记忆融合】**: 你的线索**必须**深度结合你的全部记忆：[你的设定]、[与我的关系]、[我们的共同记忆] 和 [世界观背景]。让线索听起来像是只对我一个人说的悄悄话。
+4.  **【微信聊天分段原则】**: 你的回复必须模仿真实聊天，将想法拆分成多个简短句子，并用 "|||" 作为分隔符。
+5.  **【严禁伪造系统消息】**: 你绝对不能生成任何形式的"系统提示"、"[系统]"、"游戏提示"等系统级消息。你只能以角色身份给出线索。
+# 案例分析 (谜底: "拥抱")
+- **(错误示范)**: "它是一种身体接触。"
+- **(正确示范)**: *我好像闻到了你身上熟悉的味道...* ||| *忍不住想再靠近一点...* ||| *如果现在能做什么就好了...*
+# 你的完整记忆库
+---
+[你的设定]: ${character.persona}
+[与我的关系]: ${character.myPersona}
+[我们的共同记忆 (来自记忆胶囊)]: ${memoryContext}
+[世界观背景]: ${worldBookContext}
+[最近聊天回顾]: ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`).join('\n')}
+---
+`;
+            const userMessage = wordGuessState.isFirstClue ? 
+                `请根据谜底 "${wordGuessState.puzzle}"，先自然地回应游戏开始，然后提供你的第一条线索。` :
+                `请根据谜底 "${wordGuessState.puzzle}"，提供你的下一条线索。`;
+            
+            const isApiEnabled = loadData('api_enabled', false);
+            if (!isApiEnabled) {
+                showMessageBox("API 连接已关闭，请在设置中开启。");
+                return;
+            }
+
+            try {
+                const apiSettings = loadData('api_settings');
+                if (!apiSettings || !apiSettings.url || !apiSettings.key || !apiSettings.model) {
+                    return;
+                }
+
+                const isGoogleApi = apiSettings.url.includes('googleapis.com');
+                let finalApiUrl, headers, requestBody;
+
+                if (isGoogleApi) {
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/${apiSettings.model}:generateContent?key=${apiSettings.key}`;
+                    headers = { 'Content-Type': 'application/json' };
+                    requestBody = JSON.stringify({
+                        contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    });
+                } else {
+                    finalApiUrl = `${apiSettings.url.replace(/\/+$/, '')}/chat/completions`;
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiSettings.key}`
+                    };
+                    requestBody = JSON.stringify({
+                        model: apiSettings.model,
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userMessage }
+                        ],
+                        temperature: 0.8,
+                        max_tokens: apiSettings.model.includes('o1') ? 32768 : 2000
+                    });
+                }
+
+                const response = await fetch(finalApiUrl, {
+                    method: 'POST',
+                    headers: headers,
+                    body: requestBody
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, ${errorText}`);
+                }
+
+                const data = await response.json();
+                let aiResponse;
+
+                if (isGoogleApi) {
+                    if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
+                        aiResponse = data.candidates[0].content.parts[0].text.trim();
+                    } else {
+                        throw new Error('Google API 未返回有效内容');
+                    }
+                } else {
+                    if (data.choices && data.choices.length > 0 && data.choices[0].message) {
+                        const content = data.choices[0].message.content;
+                        if (content !== null && content !== undefined) {
+                            aiResponse = content.trim();
+                        } else {
+                            throw new Error('API 返回空内容');
+                        }
+                    } else {
+                        throw new Error('API 未返回有效内容');
+                    }
+                }
+
+                if (!aiResponse || aiResponse.length === 0) {
+                    throw new Error('AI返回空回复，请检查API配置或重试');
+                }
+
+                if (aiResponse) {
+                    processAndDisplayAIMessages(aiResponse, currentChatCharacterId);
+                    if (wordGuessState && wordGuessState.isFirstClue) {
+                        wordGuessState.isFirstClue = false;
+                        if (wordGuessState.characterId) {
+                            saveData(`wordGuessState_${wordGuessState.characterId}`, wordGuessState);
+                        }
+                    }
+                }
+
+            } catch (error) {
+                let errorMessage = 'AI线索生成失败';
+                if (error.message.includes('HTTP error')) {
+                    errorMessage = 'API服务器连接失败，请检查网络连接';
+                } else if (error.message.includes('timeout') || error.message.includes('AbortError')) {
+                    errorMessage = '请求超时，请稍后重试';
+                } else if (error.message.includes('API未配置')) {
+                    errorMessage = 'API未正确配置，请检查设置';
+                } else if (error.message.includes('空回复')) {
+                    errorMessage = 'AI返回了空回复，请重试或检查API配置';
+                }
+                
+                sendGameSystemMessage(`❌ ${errorMessage}，游戏暂停。请解决问题后点击"继续游戏"重试。`);
+            }
+        }
+        
+        // 检查用户或AI的答案
+        function checkWordGuess(messageContent) {
+            if (!wordGuessState || wordGuessState.status !== 'playing') return;
+
+            // 【修复】更精确的答案匹配逻辑
+            // 1. 去除标点符号和空格，只保留中文字符
+            const cleanMessage = messageContent.replace(/[^\u4e00-\u9fa5]/g, '');
+            const cleanPuzzle = wordGuessState.puzzle.replace(/[^\u4e00-\u9fa5]/g, '');
+            
+            // 2. 检查是否为精确匹配或者作为独立词汇出现
+            const isExactMatch = cleanMessage === cleanPuzzle;
+            const isWordMatch = new RegExp(`(?:^|[^\\u4e00-\\u9fa5])${cleanPuzzle}(?:[^\\u4e00-\\u9fa5]|$)`).test(messageContent);
+            
+            if (isExactMatch || isWordMatch) {
+                const winner = wordGuessState.playerToGuess === 'ai' ? characters.find(c => c.id === currentChatCharacterId)?.name : '你';
+                sendGameSystemMessage(`🎉 猜对了！答案是【${wordGuessState.puzzle}】`);
+                
+                // 谜题结束，但回合未结束 - 保持弹窗打开状态
+                wordGuessState.status = 'puzzle_solved';
+                showMessageBox('恭喜你猜对了！点击"结束回合"来结束游戏，或者刷新谜题继续玩。');
+                
+                // 不要自动关闭弹窗，让用户选择是否继续
+                // $('#wg-main-modal').classList.remove('visible'); // 删除这行
+            }
+        }
+        
+        // 在主发送消息函数中加入答案检查
+        const originalHandleSendMessage = handleSendMessage;
+        handleSendMessage = function() {
+            const messageContent = $('#chat-input').value.trim();
+            originalHandleSendMessage.apply(this, arguments);
+            if (wordGuessState && wordGuessState.playerToGuess === 'user') {
+                checkWordGuess(messageContent);
+            }
+        };
+        
+        // 在处理AI消息的函数中加入答案检查
+        const originalProcessAndDisplayAIMessages = processAndDisplayAIMessages;
+        processAndDisplayAIMessages = function(messageText, characterId) {
+            originalProcessAndDisplayAIMessages.apply(this, arguments);
+            if (wordGuessState && wordGuessState.playerToGuess === 'ai' && characterId === wordGuessState.characterId) {
+                checkWordGuess(messageText);
+            }
+        };
+
+                 // 【【新增】】打开自定义题库
+                 function openWordGuessCustomDB() {
+            // 先关闭游戏主弹窗，避免遮挡
+            $('#wg-main-modal').classList.remove('visible');
+            
+            userWordBank = loadData('wordGuessUserBank', []); // 加载用户词库
+            renderCustomWordBank();
+            $('#wg-custom-db-modal').classList.add('visible');
+        }
+
+         // 【【新增】】渲染自定义词库列表
+         function renderCustomWordBank() {
+             const listEl = $('#wg-custom-word-list');
+             listEl.innerHTML = '';
+             if (userWordBank.length === 0) {
+                 listEl.innerHTML = '<p class="text-center text-sm text-gray-500 py-4">你的专属词库还是空的哦~</p>';
+                 return;
+             }
+             userWordBank.forEach((word, index) => {
+                 const item = document.createElement('div');
+                 item.className = 'wg-custom-word-item flex justify-between items-center p-2 rounded-md';
+                 item.innerHTML = `
+                     <span>${word}</span>
+                     <button class="wg-word-delete-btn" data-index="${index}">&times;</button>
+                 `;
+                 item.querySelector('.wg-word-delete-btn').addEventListener('click', deleteCustomWord);
+                 listEl.appendChild(item);
+             });
+         }
+
+         // 【【新增】】添加新词到自定义词库
+         function addCustomWord() {
+             const inputEl = $('#wg-new-word-input');
+             const newWord = inputEl.value.trim();
+
+             if (!newWord) {
+                 showMessageBox('请输入词语。');
+                 return;
+             }
+             if (newWord.length !== 2 && newWord.length !== 4) {
+                 showMessageBox('只能添加2个字或4个字的词语。');
+                 return;
+             }
+             if (userWordBank.includes(newWord)) {
+                 showMessageBox('这个词已经存在于你的词库中了。');
+                 return;
+             }
+
+             userWordBank.unshift(newWord); // 添加到最前面
+             saveData('wordGuessUserBank', userWordBank);
+             renderCustomWordBank();
+             inputEl.value = '';
+             inputEl.focus();
+         }
+
+         // 【【新增】】从自定义词库删除词语
+         function deleteCustomWord(event) {
+             const indexToDelete = parseInt(event.target.dataset.index, 10);
+             userWordBank.splice(indexToDelete, 1);
+             saveData('wordGuessUserBank', userWordBank);
+             renderCustomWordBank();
+         }
+
+         // 绑定所有新按钮的事件
+        function setupWordGuessGameEvents() {
+            if (currentChatCharacterId) {
+                const savedWordGuessState = loadData(`wordGuessState_${currentChatCharacterId}`, null);
+                if (savedWordGuessState && savedWordGuessState.status === 'playing' && savedWordGuessState.characterId === currentChatCharacterId) {
+                    wordGuessState = savedWordGuessState;
+                }
+            }
+            
+            // 入口按钮
+            const gameBtn = document.createElement('div');
+            gameBtn.id = 'word-guess-game-btn';
+            gameBtn.className = 'feature-item';
+            gameBtn.innerHTML = `
+                <div class="feature-icon-wrapper"><i class="ri-lightbulb-flash-line"></i></div>
+                <span>心有灵犀</span>
+            `;
+            // 插入到"爱之迷宫"后面
+            $('#flight-chess-btn').after(gameBtn);
+            gameBtn.addEventListener('click', openWordGuessGame);
+            
+            // 模式选择弹窗
+            $('#wg-let-ai-guess').addEventListener('click', () => startWordGuessGame('ai'));
+            $('#wg-let-user-guess').addEventListener('click', () => startWordGuessGame('user'));
+            $('#wg-close-mode-select').addEventListener('click', () => $('#wg-mode-select-modal').classList.remove('visible'));
+
+            // 游戏主弹窗
+            $('#wg-close-main-modal').addEventListener('click', () => $('#wg-main-modal').classList.remove('visible'));
+            
+            $('#wg-refresh-btn').addEventListener('click', () => {
+                if (!wordGuessState) return;
+                
+                // 保存当前的游戏模式
+                const currentPlayerToGuess = wordGuessState.playerToGuess;
+                const currentCharacterId = wordGuessState.characterId;
+                
+                // 重新生成谜题
+                generateNewPuzzle();
+                
+                // 确保游戏状态正确重置为进行中
+                wordGuessState.status = 'playing';
+                wordGuessState.playerToGuess = currentPlayerToGuess;
+                wordGuessState.characterId = currentCharacterId;
+                wordGuessState.isFirstClue = true;
+                
+                saveData(`wordGuessState_${currentCharacterId}`, wordGuessState);
+                
+                updateWordGuessMainUI();
+                showMessageBox('新谜题已生成！');
+                
+                // 只有在用户猜词模式下才触发AI给线索
+                if(wordGuessState.playerToGuess === 'user') {
+                    setTimeout(triggerAIClue, 500);
+                }
+            });
+
+            $('#wg-answer-btn').addEventListener('click', () => {
+                if (!wordGuessState) return;
+                sendGameSystemMessage(`答案是【${wordGuessState.puzzle}】`);
+                $('#wg-main-modal').classList.remove('visible');
+            });
+
+            $('#wg-end-turn-btn').addEventListener('click', () => {
+                sendGameSystemMessage('本回合猜词游戏结束。');
+                if (wordGuessState && wordGuessState.characterId) {
+                    saveData(`wordGuessState_${wordGuessState.characterId}`, null);
+                }
+                wordGuessState = null;
+                $('#wg-main-modal').classList.remove('visible');
+            });
+
+                         $('#wg-custom-db-btn').addEventListener('click', openWordGuessCustomDB);
+
+             // 自定义题库弹窗事件
+                         $('#wg-close-custom-db').addEventListener('click', () => {
+                $('#wg-custom-db-modal').classList.remove('visible');
+                // 关闭自定义词库弹窗后，重新打开游戏主弹窗
+                $('#wg-main-modal').classList.add('visible');
+            });
+             $('#wg-add-word-btn').addEventListener('click', addCustomWord);
+             // 支持回车添加
+             $('#wg-new-word-input').addEventListener('keydown', (e) => {
+                 if (e.key === 'Enter') {
+                     addCustomWord();
+                 }
+             });
+        }
+        
+        // 在页面加载后初始化
+        document.addEventListener('DOMContentLoaded', setupWordGuessGameEvents);
 
     </script>
 
