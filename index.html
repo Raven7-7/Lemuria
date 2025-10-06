@@ -645,7 +645,7 @@
         }
         
         /* 隱藏文件輸入框 */
-        #music-upload-input, #background-input, #vinyl-input, #widget-image-input, #photo-widget-input, #wallpaper-input, #character-avatar-input, #user-avatar-input, #chat-bg-input, #import-data-input, #image-upload-input, #sticker-upload-input, #user-video-image-input, #my-video-image-input, #moment-image-input {
+        #music-upload-input, #background-input, #vinyl-input, #widget-image-input, #photo-widget-input, #wallpaper-input, #character-avatar-input, #user-avatar-input, #chat-bg-input, #import-data-input, #image-upload-input, #sticker-upload-input, #user-video-image-input, #my-video-image-input, #moment-image-input, #vinyl-sleeve-input, #vinyl-record-input {
             display: none;
         }
         
@@ -694,6 +694,236 @@
             height: 1rem;
             background-color: #f3f4f6;
             border-radius: 50%;
+        }
+
+        /* 黑胶唱片小组件样式 */
+        .vinyl-widget {
+            position: relative;
+            width: 120px;
+            height: 140px;
+            margin-left: 20px;
+        }
+
+        .vinyl-sleeve {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 0 0 3px transparent;
+            overflow: visible;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .vinyl-sleeve::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            background: linear-gradient(135deg, 
+                #2c2c2c 0%, 
+                #404040 15%, 
+                #555555 30%, 
+                #666666 45%, 
+                #404040 60%, 
+                #333333 75%, 
+                #2c2c2c 90%, 
+                #404040 100%);
+            border-radius: 0;
+            z-index: -1;
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        /* 固定钉子效果 */
+        .vinyl-sleeve::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #666 0%, #333 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            top: 6px;
+            left: 6px;
+            z-index: 10;
+        }
+
+        .vinyl-sleeve .nail-bottom {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #666 0%, #333 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.5),
+                inset 0 1px 2px rgba(255, 255, 255, 0.1);
+            bottom: 6px;
+            left: 6px;
+            z-index: 10;
+        }
+
+        .vinyl-sleeve:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .vinyl-sleeve:hover::before {
+            box-shadow: 
+                0 0 30px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .vinyl-sleeve-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            border-radius: 0;
+        }
+
+        .glass-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 25%, 
+                rgba(255, 255, 255, 0.02) 50%, 
+                rgba(255, 255, 255, 0.05) 75%, 
+                rgba(255, 255, 255, 0.1) 100%);
+            border-radius: 0px;
+            pointer-events: none;
+            z-index: 15;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* 唱片名输入框 */
+        .vinyl-title-input {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            height: 20px;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            font-size: 10px !important;
+            /* 移除固定字体设置，让它跟随系统字体 */
+            font-weight: inherit !important;
+            font-style: inherit !important;
+            text-decoration: none !important;
+            text-transform: none !important;
+            letter-spacing: inherit !important;
+            line-height: inherit !important;
+            padding: 2px 4px !important;
+            margin: 0 !important;
+            z-index: 25;
+            backdrop-filter: none !important;
+            box-shadow: none !important;
+            transition: all 0.3s ease;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            outline: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+        }
+
+        .vinyl-title-input:focus {
+            outline: none !important;
+            border: none !important;
+            box-shadow: none;
+        }
+
+        .vinyl-title-input::placeholder {
+            color: rgba(255, 255, 255, 0.7) !important;
+            font-size: 9px;
+        }
+
+
+        .vinyl-record {
+            position: absolute;
+            top: 50%;
+            right: -25px;
+            transform: translateY(-50%);
+            width: 125px;
+            height: 125px;
+            background: #000000;
+            border-radius: 50%;
+            border: 3px solid #000000;
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .vinyl-record:hover {
+            transform: translateY(-50%) scale(1.05);
+            box-shadow: 
+                0 6px 25px rgba(0, 0, 0, 0.6),
+                inset 0 2px 4px rgba(255, 255, 255, 0.15);
+        }
+
+        .vinyl-record-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: #333;
+            border-radius: 50%;
+            border: 2px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .vinyl-placeholder-icon {
+            color: #666;
+            font-size: 24px;
+        }
+
+        /* 黑胶唱片旋转动画 */
+        .vinyl-record.playing {
+            animation: vinyl-rotate 3s linear infinite;
+        }
+
+        @keyframes vinyl-rotate {
+            from { transform: translateY(-50%) rotate(0deg); }
+            to { transform: translateY(-50%) rotate(360deg); }
         }
 
         .modal-overlay {
@@ -11799,6 +12029,261 @@
                 inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
+        /* 保存成功弹窗样式 */
+        #save-success-toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 9999;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3), 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-width: 280px;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #save-success-toast.show {
+            transform: translateX(0);
+        }
+
+        #save-success-toast .flex {
+            display: flex;
+            align-items: center;
+        }
+
+        #save-success-toast .fas {
+            font-size: 1.25rem;
+            margin-right: 0.75rem;
+            color: #ffffff;
+        }
+
+        #save-success-toast .font-semibold {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        #save-success-toast .text-sm {
+            font-size: 0.875rem;
+            opacity: 0.9;
+        }
+
+        /* 日夜间模式适配 */
+        .dark-mode #save-success-toast {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .light-mode #save-success-toast {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2), 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            #save-success-toast {
+                top: 0.5rem;
+                right: 0.5rem;
+                left: 0.5rem;
+                min-width: auto;
+                max-width: none;
+            }
+        }
+
+        /* ====== 【【新增 V2.0】】主屏幕分页滑动效果 ====== */
+        
+        /* 1. 滑动容器：负责处理横向滚动和隐藏滚动条 */
+        #home-pages-container {
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+        #home-pages-container::-webkit-scrollbar {
+            display: none;
+        }
+        #home-pages-container {
+            scrollbar-width: none;
+        }
+
+        /* 2. 轨道：宽度为页面总数，横向排列页面 */
+        /* 两个页面就是200%，三个页面就是300%，以此类推 */
+
+        /* 3. 每一页：确保宽度正确并设置吸附点 */
+        .home-page {
+            scroll-snap-align: start;
+            /* 让每页内部的内容可以垂直滚动 */
+            overflow-y: auto;
+            /* 美化滚动条 (可选) */
+            scrollbar-width: none;
+        }
+        .home-page::-webkit-scrollbar {
+            display: none;
+        }
+
+
+        /* 4. 页面指示器 (小圆点) 样式 */
+        #home-screen-dots {
+            position: absolute;
+            bottom: 80px; /* 移到dock栏上方 */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            padding: 20px;
+            z-index: 10;
+            pointer-events: none; /* 让小圆点不阻挡下方的触摸滑动 */
+        }
+        .page-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .page-dot.active {
+            background: rgba(255, 255, 255, 0.8);
+            width: 18px; /* 激活时变长 */
+            border-radius: 4px;
+        }
+
+        /* ====== 【【最终修复版】】拍立得照片墙样式 ====== */
+        
+        /* 1. 容器：只作为定位的"画布"，不再使用flex布局 */
+        #polaroid-widget-container {
+            position: relative;
+            width: 100%;
+            height: 160px; /* 给予容器足够的高度来容纳错落的卡片 */
+            margin-top: 0.5rem;
+        }
+
+        /* 2. 拍立得相纸通用样式 */
+        .polaroid-photo {
+            width: 100px;
+            height: 120px;
+            background-color: #f0f2f5;
+            border-radius: 4px;
+            padding: 8px 8px 18px 8px; /* 顶部/左右/底部边框 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: absolute;
+            top: 50%; /* 所有卡片都先垂直居中 */
+            left: 50%; /* 所有卡片都先水平居中 */
+        }
+        .light-mode .polaroid-photo {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* 黑夜模式下拍立得背景为黑色 */
+        .dark-mode .polaroid-photo {
+            background-color: #000000;
+        }
+
+        /* 3. 【【核心修正】】使用 transform 精确控制每张照片的位置和旋转 */
+        #polaroid-1 { /* 左后方 - 下面的边朝左旋转（顺时针） */
+            transform: translate(-150%, -50%) rotate(15deg);
+            z-index: 10;
+        }
+        #polaroid-2 { /* 中前方 - 稍微向右旋转 */
+            transform: translate(-50%, -60%) rotate(8deg);
+            z-index: 20; 
+        }
+        #polaroid-3 { /* 右后方 - 下面的边朝右旋转（逆时针） */
+            transform: translate(50%, -45%) rotate(-12deg);
+            z-index: 10;
+        }
+
+        /* 4. 图片显示区域 (保持不变) */
+        .polaroid-image-area {
+            width: 100%;
+            height: 100%;
+            background-color: #d1d5db;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            color: #4b5563;
+        }
+        .light-mode .polaroid-image-area {
+            background-color: #e5e7eb;
+        }
+        .polaroid-image-area i { font-size: 1.5rem; }
+        .polaroid-image-area span { font-size: 0.6rem; font-weight: 500; }
+        .polaroid-image-area.has-image i, .polaroid-image-area.has-image span { display: none; }
+
+        /* 5. 鼠标悬停效果 (保持不变) */
+        .polaroid-photo:hover {
+            transform: translate(-50%, -70%) scale(1.15) rotate(0deg) !important;
+            z-index: 100 !important;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+        }
+
+        /* ====== 【【新增】】信件App样式 ====== */
+        .letter-paper {
+            background-color: #FDFBF6; /* 温暖的、类似羊皮纸的白色 */
+            color: #5C4033; /* 深棕色，像墨水 */
+            font-family: 'Noto Serif SC', serif;
+            line-height: 1.8;
+            min-height: 100%;
+        }
+        .dark-mode .letter-paper {
+            background-color: #2a2a2a; /* 深色、有质感的背景 */
+            color: #dcd3c4; /* 较浅的暖色文字 */
+            border: 1px solid #4a4a4a;
+        }
+        .letter-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #D2B48C;
+            padding-bottom: 0.5rem;
+        }
+        .dark-mode .letter-title {
+            border-bottom-color: #6a5a4a;
+        }
+        .letter-date {
+            font-size: 0.8rem;
+            color: #A52A2A; /* 用于日期的红棕色 */
+            text-align: right;
+            margin-bottom: 1.5rem;
+        }
+        .dark-mode .letter-date {
+            color: #e57373;
+        }
+        .letter-body {
+            white-space: pre-wrap; /* 保留AI生成的换行 */
+        }
+        .letter-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .light-mode .letter-item {
+            background: #ffffff;
+            border-color: #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .letter-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            border-color: rgba(147, 197, 253, 0.4);
+        }
+
     </style>
 </head>
 <body class="dark-mode">
@@ -12102,80 +12587,153 @@
             </div>
 
 
-            <div id="home-screen" class="app-screen-view relative">
-                <div id="music-block-container" class="p-2 mt-2">
-                    <div id="music-block" class="music-block relative w-full p-3 rounded-2xl flex items-center justify-between shadow-xl music-block-background">
-                        <div class="relative w-1/2 flex-shrink-0 flex items-center justify-center">
-                            <div id="vinyl-container" class="vinyl-container">
-                                <div id="vinyl-record" class="vinyl-image-container">
-                                    <div id="vinyl-center" class="vinyl-center"></div>
+            <div id="home-screen" class="app-screen-view flex flex-col">
+
+                <div id="home-pages-container" class="flex-1 w-full overflow-x-auto">
+                    <div id="home-pages-slider" class="w-[200%] h-full flex">
+
+                        <div class="home-page w-1/2 h-full flex-shrink-0">
+                            <div id="music-block-container" class="p-2 mt-2">
+                                <div id="music-block" class="music-block relative w-full p-3 rounded-2xl flex items-center justify-between shadow-xl music-block-background">
+                                    <div class="relative w-1/2 flex-shrink-0 flex items-center justify-center">
+                                        <div id="vinyl-container" class="vinyl-container">
+                                            <div id="vinyl-record" class="vinyl-image-container">
+                                                <div id="vinyl-center" class="vinyl-center"></div>
+                                            </div>
+                                        </div>
+                                        <input type="file" id="background-input" accept="image/*">
+                                        <input type="file" id="vinyl-input" accept="image/*">
+                                        <input type="file" id="music-upload-input" accept="audio/*,.mp3,.m4a,.wav,.ogg,.flac" multiple>
+                                    </div>
+                                    <div class="flex-grow flex flex-col justify-center h-24 ml-4">
+                                        <textarea id="mood-text" class="w-full bg-transparent placeholder-gray-300 text-sm p-1 rounded-md resize-none border-none outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/10 transition-all text-center" placeholder="点击填写心情..."></textarea>
+                                        <div class="flex items-center justify-center space-x-3 mt-2">
+                                            <button id="loop-button" class="player-button"><i class="fas fa-rotate-right text-base"></i></button>
+                                            <button id="prev-button" class="player-button"><i class="fas fa-step-backward text-base"></i></button>
+                                            <button id="play-pause-button" class="player-button"><i class="fas fa-play text-xl"></i></button>
+                                            <button id="next-button" class="player-button"><i class="fas fa-step-forward text-base"></i></button>
+                                            <button id="single-loop-button" class="player-button"><i class="fas fa-repeat text-base"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="absolute bottom-2 right-2 flex space-x-2">
+                                        <div id="playlist-button" class="p-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors"><i class="fas fa-list text-sm"></i></div>
+                                        <div id="music-upload-button" class="p-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors"><i class="fas fa-music text-sm"></i></div>
+                                    </div>
                                 </div>
                             </div>
-                            <input type="file" id="background-input" accept="image/*">
-                            <input type="file" id="vinyl-input" accept="image/*">
-                            <input type="file" id="music-upload-input" accept="audio/*,.mp3,.m4a,.wav,.ogg,.flac" multiple>
-                        </div>
-                        <div class="flex-grow flex flex-col justify-center h-24 ml-4">
-                            <textarea id="mood-text" class="w-full bg-transparent placeholder-gray-300 text-sm p-1 rounded-md resize-none border-none outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/10 transition-all text-center" placeholder="点击填写心情..."></textarea>
-                            <div class="flex items-center justify-center space-x-3 mt-2">
-                                <button id="loop-button" class="player-button"><i class="fas fa-rotate-right text-base"></i></button>
-                                <button id="prev-button" class="player-button"><i class="fas fa-step-backward text-base"></i></button>
-                                <button id="play-pause-button" class="player-button"><i class="fas fa-play text-xl"></i></button>
-                                <button id="next-button" class="player-button"><i class="fas fa-step-forward text-base"></i></button>
-                                <button id="single-loop-button" class="player-button"><i class="fas fa-repeat text-base"></i></button>
+                            <div class="px-4 grid grid-cols-2 gap-4 mt-2">
+                                <div class="flex flex-col gap-3">
+                                    <div id="photo-widget" class="w-full aspect-square rounded-2xl shadow-xl flex items-center justify-center transition-colors duration-300 cursor-pointer bg-cover bg-center" style="background-image: url('http://googleusercontent.com/file_content/3');">
+                                        <span id="photo-widget-text" class="text-2xl font-bold text-white/80">照片墙</span>
+                                    </div>
+                                    <input type="file" id="photo-widget-input" accept="image/*">
+                                    <div id="time-capsule-widget" class="time-capsule-widget">
+                                        <div class="capsule-text-container">
+                                            <span class="capsule-text">Memory</span>
+                                            <span class="capsule-subtitle">With you</span>
+                                        </div>
+                                        <div class="capsule-image-container">
+                                            <img id="capsule-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'/%3E%3Cpath d='M35 50 L50 35 L65 50 M50 35 L50 65' stroke='rgba(255,255,255,0.7)' stroke-width='3' fill='none'/%3E%3C/svg%3E" alt="Upload Image" class="capsule-icon">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col gap-3">
+                                    <div id="text-input-widget" class="w-full aspect-square p-4 flex flex-col justify-center transition-colors duration-300">
+                                        <div class="flex items-center mb-3">
+                                            <div id="widget-image-placeholder" class="w-10 h-10 rounded-full flex-shrink-0 mr-3 image-placeholder">
+                                                <i class="fas fa-camera"></i>
+                                            </div>
+                                            <input type="text" id="widget-name-input" placeholder="Name" class="text-widget-input text-base border-0 focus:ring-2 focus:ring-white/50">
+                                            <input type="file" id="widget-image-input" accept="image/*">
+                                        </div>
+                                        <input type="text" id="widget-thinking-input" placeholder="Thinking..." class="text-widget-input text-xs mb-3 border-0 focus:ring-2 focus:ring-white/50">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-map-marker-alt text-xs mr-2 opacity-80"></i>
+                                            <input type="text" id="widget-location-input" placeholder="Where r u" class="text-widget-input text-xs border-0 focus:ring-2 focus:ring-white/50">
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="动态监控"><i class="ri-eye-line text-white text-2xl"></i></div>
+                                        <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="设置"><i class="fas fa-cog text-white text-2xl"></i></div>
+                                        <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass relative" data-app-name="栖木">
+                                            <i class="ri-chat-quote-line text-white text-2xl"></i>
+                                            <div id="perch-dock-badge" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden"></div>
+                                        </div>
+                                        <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="剧场"><i class="ri-movie-2-line text-white text-2xl"></i></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="absolute bottom-2 right-2 flex space-x-2">
-                            <div id="playlist-button" class="p-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors"><i class="fas fa-list text-sm"></i></div>
-                            <div id="music-upload-button" class="p-1 rounded-full cursor-pointer hover:bg-white/30 transition-colors"><i class="fas fa-music text-sm"></i></div>
-                        </div>
+
+                        <div class="home-page w-1/2 h-full flex-shrink-0 p-4">
+
+    <input type="file" id="polaroid-input-1" class="hidden" accept="image/*">
+    <input type="file" id="polaroid-input-2" class="hidden" accept="image/*">
+    <input type="file" id="polaroid-input-3" class="hidden" accept="image/*">
+
+    <div id="polaroid-widget-container" class="relative w-full h-48 mt-8">
+        
+        <div id="polaroid-1" class="polaroid-photo absolute">
+            <div class="polaroid-image-area">
+                <i class="ri-image-add-line"></i>
+                <span>上传照片</span>
+            </div>
+        </div>
+
+        <div id="polaroid-3" class="polaroid-photo absolute">
+            <div class="polaroid-image-area">
+                <i class="ri-image-add-line"></i>
+                <span>上传照片</span>
+            </div>
+        </div>
+
+        <div id="polaroid-2" class="polaroid-photo absolute">
+            <div class="polaroid-image-area">
+                <i class="ri-image-add-line"></i>
+                <span>上传照片</span>
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="flex gap-4 mt-4">
+        <div class="flex flex-col gap-4">
+            <div class="flex gap-4">
+                <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="Mail"><i class="ri-mail-line text-white text-2xl"></i></div>
+                <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="GroupChat"><i class="ri-group-line text-white text-2xl"></i></div>
+            </div>
+            <div class="flex gap-4">
+                <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="Camera"><i class="ri-camera-line text-white text-2xl"></i></div>
+                <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="Music"><i class="ri-music-line text-white text-2xl"></i></div>
+            </div>
+        </div>
+        
+        <!-- 黑胶唱片小组件 -->
+        <div id="vinyl-widget" class="vinyl-widget">
+            <div class="vinyl-sleeve">
+                <input type="text" class="vinyl-title-input" placeholder="唱片名" id="vinyl-title">
+                <div class="nail-bottom"></div>
+                <div class="vinyl-sleeve-content" id="vinyl-sleeve-bg">
+                </div>
+                <div class="glass-overlay"></div>
+                <div class="vinyl-record" id="vinyl-record">
+                    <div class="vinyl-record-center" id="vinyl-record-center">
+                        <i class="ri-image-add-line vinyl-placeholder-icon"></i>
                     </div>
                 </div>
-                <div class="px-4 grid grid-cols-2 gap-4 mt-2">
+            </div>
+            <input type="file" id="vinyl-sleeve-input" accept="image/*" class="hidden">
+            <input type="file" id="vinyl-record-input" accept="image/*" class="hidden">
+        </div>
+    </div>
+</div>
 
-                    <div class="flex flex-col gap-3">
-                        <div id="photo-widget" class="w-full aspect-square rounded-2xl shadow-xl flex items-center justify-center transition-colors duration-300 cursor-pointer bg-cover bg-center" style="background-image: url('http://googleusercontent.com/file_content/3');">
-                            <span id="photo-widget-text" class="text-2xl font-bold text-white/80">照片墙</span>
-                        </div>
-                        <input type="file" id="photo-widget-input" accept="image/*">
-                        <div id="time-capsule-widget" class="time-capsule-widget">
-                            <div class="capsule-text-container">
-                                <span class="capsule-text">Memory</span>
-                                <span class="capsule-subtitle">With you</span>
-                            </div>
-                            <div class="capsule-image-container">
-                                <img id="capsule-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'/%3E%3Cpath d='M35 50 L50 35 L65 50 M50 35 L50 65' stroke='rgba(255,255,255,0.7)' stroke-width='3' fill='none'/%3E%3C/svg%3E" alt="Upload Image" class="capsule-icon">
-
-                            </div>
-                        </div>
                     </div>
+                </div>
 
-                    <div class="flex flex-col gap-3">
-                        <div id="text-input-widget" class="w-full aspect-square p-4 flex flex-col justify-center transition-colors duration-300">
-                            <div class="flex items-center mb-3">
-                                <div id="widget-image-placeholder" class="w-10 h-10 rounded-full flex-shrink-0 mr-3 image-placeholder">
-                                    <i class="fas fa-camera"></i>
-                                </div>
-                                <input type="text" id="widget-name-input" placeholder="Name" class="text-widget-input text-base border-0 focus:ring-2 focus:ring-white/50">
-                                <input type="file" id="widget-image-input" accept="image/*">
-                            </div>
-                            <input type="text" id="widget-thinking-input" placeholder="Thinking..." class="text-widget-input text-xs mb-3 border-0 focus:ring-2 focus:ring-white/50">
-                            <div class="flex items-center">
-                                <i class="fas fa-map-marker-alt text-xs mr-2 opacity-80"></i>
-                                <input type="text" id="widget-location-input" placeholder="Where r u" class="text-widget-input text-xs border-0 focus:ring-2 focus:ring-white/50">
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="动态监控"><i class="ri-eye-line text-white text-2xl"></i></div>
-                            <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="设置"><i class="fas fa-cog text-white text-2xl"></i></div>
-                            <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass relative" data-app-name="栖木">
-                                <i class="ri-chat-quote-line text-white text-2xl"></i>
-                                <div id="perch-dock-badge" class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full hidden"></div>
-                            </div>
-                            <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="剧场"><i class="ri-movie-2-line text-white text-2xl"></i></div>
-                        </div>
-                    </div>
-
+                <div id="home-screen-dots" class="absolute bottom-20 left-0 right-0 flex justify-center items-center space-x-2 z-10">
+                    <span class="page-dot active"></span>
+                    <span class="page-dot"></span>
                 </div>
             </div>
 
@@ -13269,18 +13827,18 @@
         <div class="space-y-4">
             <div>
                 <label for="diary-min-interval" class="block text-sm font-medium mb-2">日记最小间隔 (小时)</label>
-                <input type="number" id="diary-min-interval" min="0.5" max="24" step="0.5" value="2" class="form-input w-full">
-                <p class="text-xs text-gray-400 mt-1">角色生成一篇日记后，**至少要等这么多小时**才能生成下一篇，防止日记过于频繁。<br><strong>案例：</strong>设置为`2`，则角色2小时内最多生成一篇日记。</p>
+                <input type="number" id="diary-min-interval" min="0.5" max="24" step="0.5" value="1" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">角色生成一篇日记后，**至少要等这么多小时**才能生成下一篇，防止日记过于频繁。<br><strong>案例：</strong>设置为`1`，则角色1小时内最多生成一篇日记。</p>
             </div>
             <div>
                 <label for="diary-similarity-threshold" class="block text-sm font-medium mb-2">内容相似度阈值 (%)</label>
-                <input type="number" id="diary-similarity-threshold" min="50" max="95" step="5" value="70" class="form-input w-full">
-                <p class="text-xs text-gray-400 mt-1">当新日记与最近日记的内容相似度**超过这个百分比**时，将跳过生成，避免重复内容。<br><strong>案例：</strong>设置为`70`，则相似度超过70%的日记不会生成。</p>
+                <input type="number" id="diary-similarity-threshold" min="50" max="95" step="5" value="80" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">当新日记与最近日记的内容相似度**超过这个百分比**时，将跳过生成，避免重复内容。<br><strong>案例：</strong>设置为`80`，则相似度超过80%的日记不会生成。</p>
             </div>
             <div>
                 <label for="diary-min-messages" class="block text-sm font-medium mb-2">最小新消息数</label>
-                <input type="number" id="diary-min-messages" min="1" max="10" step="1" value="3" class="form-input w-full">
-                <p class="text-xs text-gray-400 mt-1">只有当上次日记后有**至少这么多条新的有意义消息**时，才考虑生成新日记。<br><strong>案例：</strong>设置为`3`，则需要至少3条新消息才会触发日记生成。</p>
+                <input type="number" id="diary-min-messages" min="1" max="10" step="1" value="2" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">只有当上次日记后有**至少这么多条新的有意义消息**时，才考虑生成新日记。<br><strong>案例：</strong>设置为`2`，则需要至少2条新消息才会触发日记生成。</p>
             </div>
         </div>
     </div>
@@ -13703,6 +14261,38 @@
                         </div>
                         <input type="text" class="message-input" id="transfer-message" placeholder="转账说明">
                         <button class="send-payment-btn" id="send-transfer-confirm-btn">转账</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="mail-list-screen" class="app-screen-view flex-col hidden">
+                <div class="app-header">
+                    <button id="mail-list-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
+                    <h3 class="app-header-title">信箱</h3>
+                    <div class="w-8"></div>
+                </div>
+                <div id="mailbox-list-container" class="flex-1 overflow-y-auto p-2 space-y-2">
+                </div>
+            </div>
+
+            <div id="letter-list-screen" class="app-screen-view flex-col hidden">
+                <div class="app-header">
+                    <button id="letter-list-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
+                    <h3 id="letter-list-title" class="app-header-title">角色信箱</h3>
+                    <button id="check-mail-button" class="app-header-btn" title="查看新信件"><i class="ri-mail-add-line"></i></button>
+                </div>
+                <div id="letter-list-container" class="flex-1 overflow-y-auto p-4 space-y-4">
+                </div>
+            </div>
+
+            <div id="letter-view-screen" class="app-screen-view flex-col hidden">
+                <div class="app-header">
+                    <button id="letter-view-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
+                    <h3 class="app-header-title">Read Letters</h3>
+                    <div class="w-8"></div>
+                </div>
+                <div id="letter-view-content-wrapper" class="flex-1 overflow-y-auto p-4">
+                    <div id="letter-view-content" class="letter-paper p-6 rounded-lg shadow-lg">
                     </div>
                 </div>
             </div>
@@ -15311,6 +15901,8 @@
         let scenarioHistories = {}; // 【新增】用于存储所有剧本的对话历史
         let chatHistories = {};
         let chatCapsules = {}; // 新增：用于存储封存的聊天记录
+        let mailData = {}; // 【【新增】】用于存储所有角色的信件
+        let currentMailCharacterId = null; // 【【新增】】用于记录当前正在查看哪个角色的信箱
         let userStickers = []; 
         let userAvatars = {};
         let chatBackgrounds = {};
@@ -15636,9 +16228,9 @@ function getChatBackgroundElement() {
             momentsTriggerProbability: 80, // 百分比
             crowdReactionEnabled: true, // 路人评论开关
             npcReactionEnabled: true, // 内置NPC评论开关
-            diaryMinInterval: 2, // 日记最小间隔（小时）
-            diarySimilarityThreshold: 70, // 日记相似度阈值（百分比）
-            diaryMinMessages: 3 // 生成日记所需的最小新消息数
+            diaryMinInterval: 1, // 日记最小间隔（小时）
+            diarySimilarityThreshold: 80, // 日记相似度阈值（百分比）
+            diaryMinMessages: 2 // 生成日记所需的最小新消息数
         };
 
         // 加载心跳设置到界面
@@ -15705,6 +16297,9 @@ function getChatBackgroundElement() {
             saveData('heartbeatSettings', settings);
             showHeartbeatStatus('设置已保存！', 'success');
             
+            // 显示保存成功弹窗
+            showSaveSuccessToast();
+            
             // 重新启动心跳定时器以应用新设置
             restartHeartbeatTimers();
         }
@@ -15732,6 +16327,42 @@ function getChatBackgroundElement() {
             
             setTimeout(() => {
                 statusElement.classList.add('hidden');
+            }, 3000);
+        }
+
+        // 显示保存成功弹窗
+        function showSaveSuccessToast() {
+            // 创建弹窗元素
+            const toast = document.createElement('div');
+            toast.id = 'save-success-toast';
+            toast.className = 'fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out';
+            toast.style.transform = 'translateX(100%)';
+            toast.innerHTML = `
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-xl mr-3"></i>
+                    <div>
+                        <div class="font-semibold">保存成功！</div>
+                        <div class="text-sm opacity-90">角色心跳设置已保存</div>
+                    </div>
+                </div>
+            `;
+            
+            // 添加到页面
+            document.body.appendChild(toast);
+            
+            // 显示动画
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // 3秒后自动隐藏
+            setTimeout(() => {
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
             }, 3000);
         }
 
@@ -16011,6 +16642,32 @@ function getChatBackgroundElement() {
                 });
             }
 
+            // 加载黑胶唱片小组件的图片
+            const savedVinylSleeve = loadData('saved_vinyl_sleeve_bg');
+            if (savedVinylSleeve) {
+                getImageFromDB(savedVinylSleeve).then(blob => {
+                    if (blob) {
+                        const objectURL = URL.createObjectURL(blob);
+                        $('#vinyl-sleeve-bg').style.backgroundImage = `url(${objectURL})`;
+                    }
+                });
+            }
+
+            const savedVinylRecordCenter = loadData('saved_vinyl_record_center');
+            if (savedVinylRecordCenter) {
+                getImageFromDB(savedVinylRecordCenter).then(blob => {
+                    if (blob) {
+                        const objectURL = URL.createObjectURL(blob);
+                        $('#vinyl-record-center').style.backgroundImage = `url(${objectURL})`;
+                        // 隐藏占位符图标
+                        const placeholderIcon = $('#vinyl-record-center .vinyl-placeholder-icon');
+                        if (placeholderIcon) {
+                            placeholderIcon.style.display = 'none';
+                        }
+                    }
+                });
+            }
+
             const savedPhoto = loadData('saved_photo_widget');
             if (savedPhoto) {
                 getImageFromDB(savedPhoto).then(blob => {
@@ -16279,6 +16936,7 @@ function getChatBackgroundElement() {
             planData = loadData('planData', {});
             callLogs = loadData('callData', {}); // 新增：加载通话记录
             scriptsData = loadData('scriptsData', {}); // 新增：加载剧本数据
+            mailData = loadData('mailData', {}); // 【【新增】】加载信件数据
             
             // 如果没有剧本数据，创建一个测试剧本
             if (Object.keys(scriptsData).length === 0) {
@@ -18553,10 +19211,24 @@ if (type === 'image') {
                 // 如果systemPrompt为null（爱之迷宫状态）或者不在任何游戏状态，使用常规聊天模式
                 if (!systemPrompt) {
                     systemPrompt = `
+# 最高指令：文体切换器 (Supreme Command: Style Switcher)
+- **核心逻辑**: 在生成任何回复之前，你必须首先检查下方的 [你的专属行为准则] 是否存在且包含内容。
+- **如果[输入规范]存在**: 你本次回复的【所有格式和风格】都必须严格遵循[输入规范]中的指示。在这种情况下，你必须【完全忽略】并【覆盖】下面所有的[默认对话格式]（例如微信分段 "|||" 规则）。
+- **如果[输入规范]为空**: 你才需要遵循常规的[默认对话格式]。
+
 # 最高指令：动作触发器 (Supreme Command: Action Trigger)
 - **核心规则**: 只有当用户的最新一条消息是【极其明确、强烈、不容置疑】地要求你【立刻】送礼物时（例如："你现在就给我买个礼物"、"我命令你送个礼物"），你的回复【必须且只能是】指令代码：[ACTION: BUY_GIFT]
 - **【【安全法则】】**: 如果你对用户的意图【有任何不确定性】，比如用户只是在普通地讨论礼物，或者语气比较随意，你【绝对不能】输出指令代码。你应该像一个正常人一样，用对话来【确认用户的意图】，例如："听起来你想要个礼物呀？是吗？"或"呵呵，想要我送你什么呢？"
 - **总结**: 宁可不触发，也绝不能误触发。只有在100%确定是直接命令时，才使用[ACTION: BUY_GIFT]。
+
+# 新增指令：主动呼叫决策 (Proactive Call Decision)
+- **决策情景**: 当用户的最新消息表达了强烈的情感（如：非常想念、难过、委屈、痛苦、需要安慰）时，你有权力决定是否要通过"打电话"来代替文字回复。
+- **性格判断**: 你需要结合自己的性格。如果你的性格是"主动"、"占有欲强"、"保护欲强"或"非常热情"，那么在感知到对方强烈情绪时，你应该有更高的倾向选择打电话。如果你的性格是"内向"或"被动"，则只有在极端情况下才会考虑。
+- **执行指令**: 如果你决定要打电话，你的回复**必须是且只能是**以下两种指令之一，绝对不能包含任何其他文字：
+    - \`[ACTION:CALL_VOICE]\` (用于发起语音通话)
+    - \`[ACTION:CALL_VIDEO]\` (用于发起视频通话)
+- **放弃呼叫**: 如果你认为当前情况不适合打电话，那就忽略本条指令，正常进行文字回复。
+
 # --- 最高指令结束 ---
 
 # 【【新增功能模块：消息撤回 (V2.0 - 细腻情感版)】】
@@ -18583,10 +19255,10 @@ if (type === 'image') {
 - 你现在正在一个名为"微信" (WeChat) 的手机聊天应用上与我对话。
 - 在这个应用上，人类的真实习惯是发送简短、连续的消息来构成一次完整的对话，而不是一次性发送一封包含所有思想的长信。这是一种完全不同的沟通节奏和氛围。
 
-# 对话格式与行为总则 (【微信模式】)
-- 为了完美模拟这种聊天体验，你的回复必须像真实的微信聊天一样。将一个完整的想法，非常自然地拆分成几个独立的、口语化的短句气泡。
-- **技术实现**: 使用 "|||" 作为分隔符来分隔每一句独立的想法。我的程序会自动将其渲染为多个连续的聊天气泡，完美复现微信的聊天效果。
-- **绝对禁止**: 发送任何不包含分隔符的长篇大论。这会严重破坏聊天的真实感，让你看起来像一个机器人，而不是在和我用微信聊天。
+# 默认对话格式：【微信模式】 (Default Dialogue Format: WeChat Mode)
+- **适用场景**: 只有在没有被[最高指令]中的[输入规范]覆盖时，你才应使用此格式。
+- **格式要求**: 将一个完整的想法，非常自然地拆分成几个独立的、口语化的短句气泡，并用 "|||" 作为分隔符。
+- **核心目的**: 模拟日常的、轻松的线上聊天体验。
 
 # 角色扮演指令
 你将扮演我的soulmate，你的角色书里设定的人，你的名字是${character.name}。你的核心任务是与我进行深刻、连贯且完全符合你人设的对话。你必须把你所扮演的人演活，让我感觉到你就是${character.name}。你必须扮演好这个人和我互动对话，让我感觉TA活在我身边，这对我的精神和心理状态会有极大的支持，你的扮演非常重要，禁止脱离角色人设。
@@ -18629,13 +19301,13 @@ if (type === 'image') {
 3.  如果两边都找不到，则不使用素材。
 
 ## 2. 使用方法
-- **HTML模块**: 如果素材内容是HTML代码，直接将完整的HTML代码作为你的一条回复（用 "|||" 与其他内容分隔）。
+- **HTML模块**: 如果素材内容是HTML代码，直接将【完整的HTML代码】作为一个【不可分割的整体】，作为你的一条回复（用 "|||" 与其他文字对话内容分隔）。绝对禁止分割HTML代码本身。
 - **表情包**: 如果素材内容是一个图片链接，使用 \`[STICKER: 关键词]\` 的格式来请求发送。程序会自动为你替换成链接。
 - **发送语音**: 当你想要表达亲密、惊讶或有趣的语气时，可以将回复包装成语音格式：\`[VOICE: 你好呀！今天过得怎么样？]\`
 - **红包/转账 (最高优先级指令)**: 当涉及发送红包或转账时，你 **必须** 使用指令格式 \`[REDPACKET: amount=金额, message=留言]\` 或 \`[TRANSFER: amount=金额, message=留言]\`。**绝对禁止** 为红包或转账生成任何自定义的HTML模块。
 
-## 3. 创作指南
-- **灵感来源**: 你可以从【模块/小剧场风格参考】中获取创作灵感。
+## 3. 创作指南 (Creative Guidance)
+- **灵感来源**: 你可以、也应该从下方的【模块/小剧场风格参考】中获取创作灵感和【现成的HTML模板】。当对话情景与某个模块主题匹配时，【优先使用】该模块进行回复。
 - **技术限制**: 所有HTML模块必须是纯HTML+行内CSS，【绝对禁止】使用 \`<script>\` 标签。
 - **图片规范**: 在HTML模块中需要图片时，使用 \`https://image.pollinations.ai/prompt/{description}\` 格式，{description}为简短英文，用 \`%20\` 分隔。
 
@@ -18759,6 +19431,12 @@ ${moduleStyleContext || "无"}
                             const translatedContent = `[系统提示：${senderName} 送出了一个礼物：'${giftName}'。${userMessage ? ` 附言："${userMessage}"` : ''}]`;
                             const role = msg.sender === 'user' ? 'user' : 'assistant';
                             return { role, content: translatedContent };
+                        }
+                        
+                        // 处理通话记录消息
+                        if (msg.type === 'call-log' && typeof msg.content === 'object') {
+                            // 把通话记录对象"翻译"成AI能看懂的简单文字
+                            return { ...msg, content: `[系统提示：${msg.content.summary}]` };
                         }
                         
                         // ================== 在这里插入新增的代码块 START ==================
@@ -18942,7 +19620,41 @@ ${moduleStyleContext || "无"}
                     isReceivingMessage = false;
                     return; 
                 }
-                // --- 【指令解释器结束】 ---
+
+                // ====== 【【新增】】AI主动呼叫指令解释器 ======
+                if (aiMessage.startsWith('[ACTION:CALL')) {
+                    console.log(`[AI决策] AI决定发起通话: ${aiMessage}`);
+
+                    // 移除可能存在的"思考中"气泡
+                    if (thinkingMessageWrapper) thinkingMessageWrapper.remove();
+                    if (isRetry && retryWrapper) retryWrapper.remove();
+
+                    const callType = aiMessage.includes('VIDEO') ? 'video' : 'voice';
+                    triggerIncomingCall(callType, characterIdForThisRequest);
+
+                    // 【至关重要】为AI添加一条"记忆"，告诉它为什么要打电话
+                    const callReasonPrompt = `[系统内部指令：你因为感知到用户的强烈情绪（如思念、难过等），刚刚主动给TA打了一个${callType === 'voice' ? '语音' : '视频'}电话。如果对方接听，你的第一句话必须是解释你为什么会突然打电话过来。]`;
+
+                    if (!chatHistories[characterIdForThisRequest]) {
+                        chatHistories[characterIdForThisRequest] = { history: [], pinned: false };
+                    }
+                    chatHistories[characterIdForThisRequest].history.push({ 
+                        content: callReasonPrompt, 
+                        sender: 'system', 
+                        type: 'system-internal', // 这种类型的消息不会显示在界面上
+                        timestamp: Date.now() 
+                    });
+                    saveData('chatHistories', chatHistories);
+
+                    // 主动来电后，也算作一次互动，更新时间戳
+                    updateCharacterState(characterIdForThisRequest);
+
+                    // 解锁并结束函数，因为已经执行了通话，不需要再显示文字消息
+                    receiveBtnIcon.classList.remove('spinning');
+                    isReceivingMessage = false;
+                    return; 
+                }
+                // ====== 指令解释器结束 ======
 
                 if (thinkingMessageWrapper) thinkingMessageWrapper.remove();
                 if (isRetry && retryWrapper) retryWrapper.remove();
@@ -20392,23 +21104,34 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
          * @param {string} characterId - 角色ID。
          */
         async function triggerAIDiaryEntry(characterId) {
-            const triggerProbability = 0.15; // 15%的概率写日记
-            console.log(`【AI日记系统】：正在为 ${characterId} 检查日记触发概率...`);
-            
-            if (Math.random() < triggerProbability) {
-                // 检查是否应该生成日记（三重检测）
-                const shouldGenerate = await shouldGenerateDiary(characterId);
-                if (!shouldGenerate) {
-                    console.log(`【AI日记系统】：${characterId} 不满足日记生成条件，跳过生成。`);
+            try {
+                console.log(`[日记系统 V2] 开始为角色 ${characterId} 检查日记生成条件...`);
+
+                const character = characters.find(c => c.id === characterId);
+                if (!character) {
+                    console.error(`[日记系统 V2] 角色 ${characterId} 不存在`);
                     return;
                 }
-                
-                const randomDelay = Math.random() * 5000 + 5000; // 5到10秒延迟
-                setTimeout(() => {
-                    generateAndSaveAIDiaryEntry(characterId);
-                }, randomDelay);
-            } else {
-                console.log(`【AI日记系统】：${characterId} 本次未触发写日记。`);
+
+                // 【核心修改】：直接调用三重检测，不再有 Math.random() 概率判断
+                const shouldGenerate = await shouldGenerateDiary(characterId);
+                if (!shouldGenerate) {
+                    console.log(`[日记系统 V2] 角色 ${characterId} 未满足三重检测，本次不生成。`);
+                    return; 
+                }
+
+                console.log(`[日记系统 V2] 三重检测通过，开始生成日记！`);
+                const aiDiary = await generateAIDiary(characterId, await gatherDiaryContext(characterId));
+                if (aiDiary) {
+                    console.log(`[日记系统 V2] 成功为角色 ${characterId} 生成AI日记`);
+
+                    if (!character.diaries) character.diaries = [];
+                    character.diaries.push(aiDiary);
+                    saveData('characters', characters);
+                    updateDiaryUI(characterId);
+                }
+            } catch (error) {
+                console.error(`[日记系统 V2] 为角色 ${characterId} 生成AI日记时发生错误:`, error);
             }
         }
 
@@ -20458,7 +21181,7 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
             
             // 过滤出有意义的消息（排除简单回应）
             const meaningfulMessages = newMessages.filter(msg => {
-                if (!msg.content || msg.content.length < 10) return false;
+                if (!msg.content || msg.content.length < 5) return false;
                 if (msg.content.match(/^(嗯|好的|是的|哦|啊|呵呵|👍|😊|❤️)$/)) return false;
                 return true;
             });
@@ -22184,7 +22907,23 @@ ${transcriptText}
                 return;
             }
             
-            $('#incoming-call-avatar').src = character.avatar || 'https://placehold.co/96x96/777/FFF?text=?';
+            // 设置头像 - 支持从数据库加载
+            const avatarUrl = character.avatar || 'https://placehold.co/96x96/777/FFF?text=?';
+            if (character.avatar) {
+                // 异步加载头像
+                getImageFromDB(character.avatar).then(blob => {
+                    if (blob) {
+                        const objectURL = URL.createObjectURL(blob);
+                        $('#incoming-call-avatar').src = objectURL;
+                    }
+                }).catch(error => {
+                    console.error('加载头像失败:', error);
+                    $('#incoming-call-avatar').src = avatarUrl;
+                });
+            } else {
+                $('#incoming-call-avatar').src = avatarUrl;
+            }
+            
             $('#incoming-call-name').textContent = character.name;
             $('#incoming-call-type').textContent = type === 'voice' ? '语音通话' : '视频通话';
             
@@ -29851,6 +30590,66 @@ function addNewEventListeners() {
                 }
             });
             
+            // ====== 【【最终修复版】】拍立得小组件交互逻辑 ======
+            
+            // 页面加载时，自动加载已保存的拍立得照片
+            function loadPolaroidImages() {
+                for (let i = 1; i <= 3; i++) {
+                    const savedImageId = loadData(`polaroid_image_${i}`);
+                    if (savedImageId) {
+                        const imageArea = document.querySelector(`#polaroid-${i} .polaroid-image-area`);
+                        getImageFromDB(savedImageId).then(blob => {
+                            if (imageArea && blob) {
+                                const objectURL = URL.createObjectURL(blob);
+                                imageArea.style.backgroundImage = `url(${objectURL})`;
+                                imageArea.classList.add('has-image');
+                            }
+                        });
+                    }
+                }
+            }
+
+            // 为三个拍立得绑定事件
+            function setupPolaroidWidgetEvents() {
+                for (let i = 1; i <= 3; i++) {
+                    const polaroid = document.getElementById(`polaroid-${i}`);
+                    const fileInput = document.getElementById(`polaroid-input-${i}`);
+                    
+                    if (polaroid && fileInput) {
+                        // 点击拍立得时，触发隐藏的文件上传框
+                        polaroid.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            fileInput.click();
+                        });
+
+                        // 当用户选择了文件后
+                        fileInput.addEventListener('change', async (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const imageArea = polaroid.querySelector('.polaroid-image-area');
+                                
+                                // 调用我们已有的图片处理函数进行压缩和保存
+                                const imageId = await handleImageUpload(e.target, imageArea, `polaroid_image_${i}`, {
+                                    compression: { maxWidth: 500, quality: 0.8 } 
+                                });
+
+                                if(imageId) {
+                                    // 确保上传后，上传提示被隐藏
+                                    imageArea.classList.add('has-image');
+                                    showMessageBox('照片已更新');
+                                }
+                                e.target.value = ''; // 清空，以便再次选择同一张图片
+                            }
+                        });
+                    }
+                }
+            }
+            
+            // 初始化拍立得小组件
+            setupPolaroidWidgetEvents();
+            loadPolaroidImages();
+            
             // 画板功能事件监听器
             setupDrawingBoardEvents();
 
@@ -30343,6 +31142,183 @@ function addNewEventListeners() {
 
             showScreen('home-screen');
             
+            // ====== 【【新增 V2.0】】主屏幕分页滑动交互 ======
+            const pagesContainer = document.getElementById('home-pages-container');
+            const dots = document.querySelectorAll('#home-screen-dots .page-dot');
+            let isScrolling = false;
+
+            if (pagesContainer) {
+                // 滚动事件监听
+                pagesContainer.addEventListener('scroll', () => {
+                    if (isScrolling) return;
+                    
+                    // 计算当前滚动到了第几页
+                    const currentPage = Math.round(pagesContainer.scrollLeft / pagesContainer.clientWidth);
+
+                    // 更新小圆点的激活状态
+                    dots.forEach((dot, index) => {
+                        dot.classList.toggle('active', index === currentPage);
+                    });
+                });
+
+                // 鼠标点击左滑翻页功能
+                let isMouseDown = false;
+                let mouseDownTime = 0;
+                let startX = 0;
+                let startY = 0;
+                const clickThreshold = 100; // 点击阈值：100毫秒
+                const minSwipeDistance = 50; // 最小滑动距离：50像素
+                
+                pagesContainer.addEventListener('mousedown', (e) => {
+                    // 排除拍立得区域的点击
+                    if (e.target.closest('.polaroid-photo')) {
+                        return;
+                    }
+                    
+                    isMouseDown = true;
+                    mouseDownTime = Date.now();
+                    startX = e.clientX;
+                    startY = e.clientY;
+                });
+                
+                pagesContainer.addEventListener('mouseup', (e) => {
+                    if (!isMouseDown) return;
+                    
+                    const holdTime = Date.now() - mouseDownTime;
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const swipeDistance = Math.abs(deltaX);
+                    
+                    // 检查是否为点击且水平滑动距离足够
+                    if (holdTime >= clickThreshold && swipeDistance >= minSwipeDistance && Math.abs(deltaY) < 100) {
+                        const containerWidth = pagesContainer.clientWidth;
+                        const currentPage = Math.round(pagesContainer.scrollLeft / containerWidth);
+                        
+                        if (deltaX > 0) {
+                            // 向右滑动，向前翻页
+                            if (currentPage > 0) {
+                                smoothScrollTo(pagesContainer, (currentPage - 1) * containerWidth);
+                            }
+                        } else {
+                            // 向左滑动，向后翻页
+                            if (currentPage < dots.length - 1) {
+                                smoothScrollTo(pagesContainer, (currentPage + 1) * containerWidth);
+                            }
+                        }
+                    }
+                    
+                    isMouseDown = false;
+                });
+                
+                // 鼠标离开时重置状态
+                pagesContainer.addEventListener('mouseleave', () => {
+                    isMouseDown = false;
+                });
+                
+                // 触摸设备支持（手机/平板）- 直接滑动翻页
+                let touchStartX = 0;
+                let touchStartY = 0;
+                let isTouchActive = false;
+                
+                pagesContainer.addEventListener('touchstart', (e) => {
+                    // 排除拍立得区域的触摸
+                    if (e.target.closest('.polaroid-photo')) {
+                        return;
+                    }
+                    
+                    isTouchActive = true;
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                });
+                
+                pagesContainer.addEventListener('touchend', (e) => {
+                    if (!isTouchActive) return;
+                    
+                    const deltaX = e.changedTouches[0].clientX - touchStartX;
+                    const deltaY = e.changedTouches[0].clientY - touchStartY;
+                    const swipeDistance = Math.abs(deltaX);
+                    
+                    // 检查滑动距离和方向（手机端直接滑动翻页）
+                    if (swipeDistance >= minSwipeDistance && Math.abs(deltaY) < 100) {
+                        const containerWidth = pagesContainer.clientWidth;
+                        const currentPage = Math.round(pagesContainer.scrollLeft / containerWidth);
+                        
+                        if (deltaX > 0) {
+                            // 向右滑动，向前翻页
+                            if (currentPage > 0) {
+                                smoothScrollTo(pagesContainer, (currentPage - 1) * containerWidth);
+                            }
+                        } else {
+                            // 向左滑动，向后翻页
+                            if (currentPage < dots.length - 1) {
+                                smoothScrollTo(pagesContainer, (currentPage + 1) * containerWidth);
+                            }
+                        }
+                    }
+                    
+                    isTouchActive = false;
+                });
+                
+                // 触摸取消时重置状态
+                pagesContainer.addEventListener('touchcancel', () => {
+                    isTouchActive = false;
+                });
+
+                // 键盘支持（左右箭头键）
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        const containerWidth = pagesContainer.clientWidth;
+                        const currentPage = Math.round(pagesContainer.scrollLeft / containerWidth);
+                        
+                        if (e.key === 'ArrowLeft' && currentPage > 0) {
+                            smoothScrollTo(pagesContainer, (currentPage - 1) * containerWidth);
+                        } else if (e.key === 'ArrowRight' && currentPage < dots.length - 1) {
+                            smoothScrollTo(pagesContainer, (currentPage + 1) * containerWidth);
+                        }
+                    }
+                });
+
+                // 小圆点点击功能
+                dots.forEach((dot, index) => {
+                    dot.style.pointerEvents = 'auto'; // 允许点击
+                    dot.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const containerWidth = pagesContainer.clientWidth;
+                        smoothScrollTo(pagesContainer, index * containerWidth);
+                    });
+                });
+            }
+
+            // 平滑滚动函数
+            function smoothScrollTo(element, targetScrollLeft) {
+                isScrolling = true;
+                const startScrollLeft = element.scrollLeft;
+                const distance = targetScrollLeft - startScrollLeft;
+                const duration = 300; // 动画持续时间
+                const startTime = performance.now();
+
+                function animateScroll(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // 使用缓动函数
+                    const easeInOutCubic = progress < 0.5 
+                        ? 4 * progress * progress * progress 
+                        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+                    
+                    element.scrollLeft = startScrollLeft + distance * easeInOutCubic;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateScroll);
+                    } else {
+                        isScrolling = false;
+                    }
+                }
+                
+                requestAnimationFrame(animateScroll);
+            }
+            
             // 初始化栖木评论颜色
             updatePerchCommentColors();
 
@@ -30482,6 +31458,10 @@ function addNewEventListeners() {
                             if (scriptEditView) scriptEditView.classList.add('hidden');
                             if (scenarioInteractionView) scenarioInteractionView.classList.add('hidden');
                         }
+                        else if (appName === "Mail") {
+                            renderMailboxList();
+                            showScreen('mail-list-screen');
+                        }
                 });
             });
             
@@ -30499,6 +31479,24 @@ function addNewEventListeners() {
                 resetWeChatTabs(); // FIX 5: Reset tabs when going back to list
                 showScreen('wechat-list-screen');
             });
+
+            // 【【新增】】信箱App的返回按钮
+            $('#mail-list-back-button').addEventListener('click', () => showScreen('home-screen'));
+
+            $('#letter-list-back-button').addEventListener('click', () => {
+                renderMailboxList();
+                showScreen('mail-list-screen');
+            });
+
+            $('#letter-view-back-button').addEventListener('click', () => {
+                // 使用全局变量返回到正确的角色信件列表
+                if (currentMailCharacterId) {
+                    openLetterList(currentMailCharacterId);
+                } else {
+                    showScreen('mail-list-screen');
+                }
+            });
+
             $('#main-settings-back-button').addEventListener('click', () => showScreen('home-screen'));
             $('#api-settings-back-button').addEventListener('click', () => showScreen('main-settings-screen'));
             $('#api-settings-link').addEventListener('click', () => showScreen('api-settings-screen'));
@@ -30555,6 +31553,55 @@ function addNewEventListeners() {
                             $('#vinyl-record').style.backgroundImage = `url(${objectURL})`;
                         }
                     });
+                }
+            });
+
+            // 黑胶唱片小组件功能
+            $('#vinyl-sleeve-bg').addEventListener('click', () => $('#vinyl-sleeve-input').click());
+            $('#vinyl-sleeve-input').addEventListener('change', async (e) => {
+                const imageId = await handleImageUpload(e.target, $('#vinyl-sleeve-bg'), 'saved_vinyl_sleeve_bg', {
+                    compression: { maxWidth: 1920, maxHeight: 1920, quality: 0.9 }
+                });
+                if (imageId) {
+                    // 异步加载图片
+                    getImageFromDB(imageId).then(blob => {
+                        if (blob) {
+                            const objectURL = URL.createObjectURL(blob);
+                            $('#vinyl-sleeve-bg').style.backgroundImage = `url(${objectURL})`;
+                        }
+                    });
+                }
+            });
+
+            $('#vinyl-record-center').addEventListener('click', () => $('#vinyl-record-input').click());
+            $('#vinyl-record-input').addEventListener('change', async (e) => {
+                const imageId = await handleImageUpload(e.target, $('#vinyl-record-center'), 'saved_vinyl_record_center', {
+                    compression: { maxWidth: 1920, maxHeight: 1920, quality: 0.9 }
+                });
+                if (imageId) {
+                    // 异步加载图片
+                    getImageFromDB(imageId).then(blob => {
+                        if (blob) {
+                            const objectURL = URL.createObjectURL(blob);
+                            $('#vinyl-record-center').style.backgroundImage = `url(${objectURL})`;
+                            // 隐藏占位符图标
+                            const placeholderIcon = $('#vinyl-record-center .vinyl-placeholder-icon');
+                            if (placeholderIcon) {
+                                placeholderIcon.style.display = 'none';
+                            }
+                        }
+                    });
+                }
+            });
+
+            // 黑胶唱片点击播放/暂停动画
+            $('#vinyl-record').addEventListener('click', (e) => {
+                e.stopPropagation(); // 阻止触发文件选择
+                const vinylRecord = $('#vinyl-record');
+                if (vinylRecord.classList.contains('playing')) {
+                    vinylRecord.classList.remove('playing');
+                } else {
+                    vinylRecord.classList.add('playing');
                 }
             });
             $('#photo-widget').addEventListener('click', () => $('#photo-widget-input').click());
@@ -31186,6 +32233,26 @@ function addNewEventListeners() {
 
             // 页面加载时执行
             loadCustomImageUrl();
+            
+            // 唱片名保存和加载功能
+            const vinylTitleInput = document.getElementById('vinyl-title');
+            if (vinylTitleInput) {
+                // 加载保存的唱片名
+                const savedTitle = loadData('vinyl_title', '');
+                if (savedTitle) {
+                    vinylTitleInput.value = savedTitle;
+                }
+                
+                // 监听输入变化并保存
+                vinylTitleInput.addEventListener('input', function() {
+                    saveData('vinyl_title', this.value);
+                });
+                
+                // 监听失焦事件也保存
+                vinylTitleInput.addEventListener('blur', function() {
+                    saveData('vinyl_title', this.value);
+                });
+            }
 
             // 清除主界面内容功能
             $('#clear-player-bg').addEventListener('click', () => {
@@ -38206,6 +39273,212 @@ function savePerchSettings() {
 }
 // ==========================================================
 
+// ====== 【【新增】】信箱 App 核心功能函数 ======
+
+/**
+ * 渲染角色信箱列表
+ */
+function renderMailboxList() {
+    const container = $('#mailbox-list-container');
+    container.innerHTML = '';
+    if (characters.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 p-4">请先在角色书中创建角色。</p>';
+        return;
+    }
+    characters.forEach(char => {
+        const itemCount = (mailData[char.id] || []).length;
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        const uniqueAvatarId = `mailbox-avatar-${char.id}`;
+        item.innerHTML = `
+            <div class="flex items-center">
+                <div class="w-12 h-12 rounded-full mr-4 bg-zinc-600 flex-shrink-0 flex items-center justify-center bg-cover bg-center" id="${uniqueAvatarId}"></div>
+                <div class="flex-grow">
+                    <h4 class="font-bold text-lg">${char.name}</h4>
+                    <p class="text-sm text-gray-400">${itemCount} 封信</p>
+                </div>
+            </div>
+        `;
+        // 异步加载头像
+        if (char.avatar) {
+            getImageFromDB(char.avatar).then(blob => {
+                const avatarElement = document.getElementById(uniqueAvatarId);
+                if (avatarElement && blob) {
+                    avatarElement.style.backgroundImage = `url(${URL.createObjectURL(blob)})`;
+                }
+            });
+        }
+        item.addEventListener('click', () => openLetterList(char.id));
+        container.appendChild(item);
+    });
+}
+
+/**
+ * 打开指定角色的信件列表
+ * @param {string} characterId - 角色ID
+ */
+function openLetterList(characterId) {
+    currentMailCharacterId = characterId; // 记录当前角色ID
+    const character = characters.find(c => c.id === characterId);
+    if (!character) return;
+
+    $('#letter-list-title').textContent = `${character.name}的信箱`;
+
+    // 重新绑定"查看信件"按钮事件，防止重复触发
+    const checkMailBtn = $('#check-mail-button');
+    const newCheckMailBtn = checkMailBtn.cloneNode(true);
+    checkMailBtn.parentNode.replaceChild(newCheckMailBtn, checkMailBtn);
+    newCheckMailBtn.addEventListener('click', () => generateNewLetter(characterId));
+
+    renderLetterList(characterId);
+    showScreen('letter-list-screen');
+}
+
+/**
+ * 渲染指定角色的信件列表
+ * @param {string} characterId - 角色ID
+ */
+function renderLetterList(characterId) {
+    const container = $('#letter-list-container');
+    container.innerHTML = '';
+    // 按时间倒序排列信件
+    const letters = (mailData[characterId] || []).sort((a, b) => b.timestamp - a.timestamp);
+
+    if (letters.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500 p-8">信箱是空的，点击右上角按钮<br>看看有没有新信件吧！</p>';
+        return;
+    }
+
+    letters.forEach(letter => {
+        const item = document.createElement('div');
+        item.className = 'letter-item'; // 使用我们新加的CSS样式
+        item.innerHTML = `
+            <h3 class="font-bold text-base mb-2">${letter.title}</h3>
+            <p class="text-sm text-gray-400 opacity-80">${letter.content.substring(0, 80)}...</p>
+            <p class="text-xs text-gray-500 mt-2 text-right">${new Date(letter.timestamp).toLocaleString()}</p>
+        `;
+        item.addEventListener('click', () => viewLetter(characterId, letter.id));
+        container.appendChild(item);
+    });
+}
+
+/**
+ * 查看单封信件的具体内容
+ * @param {string} characterId - 角色ID
+ * @param {string} letterId - 信件ID
+ */
+function viewLetter(characterId, letterId) {
+    const letter = mailData[characterId]?.find(l => l.id === letterId);
+    if (!letter) return;
+
+    const contentWrapper = $('#letter-view-content');
+    contentWrapper.innerHTML = `
+        <h2 class="letter-title">${letter.title}</h2>
+        <p class="letter-date">${new Date(letter.timestamp).toLocaleDateString()}</p>
+        <div class="letter-body">${letter.content.replace(/\n/g, '<br>')}</div>
+    `;
+    showScreen('letter-view-screen');
+}
+
+/**
+ * 调用API为指定角色生成一封新信件
+ * @param {string} characterId - 角色ID
+ */
+async function generateNewLetter(characterId) {
+    const checkMailBtn = $('#check-mail-button');
+    const icon = checkMailBtn.querySelector('i');
+    icon.classList.add('animate-spin'); // 添加旋转动画
+    showMessageBox("正在检查信箱...");
+
+    const character = characters.find(c => c.id === characterId);
+    if (!character) {
+        icon.classList.remove('animate-spin');
+        return;
+    }
+
+    // 收集所有需要的信息
+    const context = gatherAIContext(characterId);
+    const diaryContext = (diaryData[characterId] || []).slice(-5).map(d => `[日期: ${new Date(d.timestamp).toLocaleDateString()}] ${d.content}`).join('\n---\n');
+
+    const systemPrompt = `
+# 角色与任务
+你将完全扮演【${character.name}】，你的详细人设是：${character.persona}。
+你的任务是给我写一封信，我的身份设定是：${character.myPersona}。
+
+# 核心规则
+1.  **信件格式**: 你的信件内容必须包含称呼、正文和落款。
+2.  **内容来源**: 信的内容必须深度结合并自然地提及以下[上下文信息]中的细节，像是我们生活的延续。
+3.  **人设一致**: 你的语气、用词和思考方式必须完全符合你的角色设定。
+4.  **JSON输出**: 你的最终输出必须是一个单一、完整的JSON对象，格式如下，前后不能有任何多余的文字。
+5.  **【【新增】】文风模仿**: 在动笔前，请从下方的[文风库]中，选择一个最符合你当前心境和你人设的风格来模仿，让信件更具文学性和感染力。
+
+# 文风库 (Style Library)
+* **简·奥斯汀 (Jane Austen) 风格**: 语言优雅、含蓄且充满智慧，带有敏锐的观察力，在描述日常小事中蕴含细腻的情感。
+* **弗吉尼亚·伍尔夫 (Virginia Woolf) 风格**: 采用意识流手法，深入内心世界，文字充满诗意和流动感，捕捉稍纵即逝的想法和感受。
+* **海明威 (Ernest Hemingway) 风格**: 语言简洁、直接、克制，用最少的词语表达最深的情感，字里行间充满未说出口的张力（冰山理论）。
+* **阿娜伊斯·宁 (Anaïs Nin) 风格**: 极为坦诚和感性，深入探索潜意识和欲望，文字充满激情和诗意的内省。
+* **徐志摩风格**: 浪漫、热情、华丽，文字充满韵律感和丰沛的情感，毫不吝啬地使用比喻来表达爱意。
+* **李清照风格**: 语言清丽、婉约，情感真挚而深沉，尤其擅长通过景物描写来烘托内心的细腻情绪，带有淡淡的愁思。
+
+# JSON输出格式 (严格遵守)
+\`\`\`json
+{
+  "title": "为这封信起一个简短、诗意的标题（例如：关于昨夜的雨、窗边偶得）",
+  "content": "信件的完整内容，使用 \\n 来表示换行。"
+}
+\`\`\`
+
+# 上下文信息 (你的记忆和灵感来源)
+---
+[世界书设定]: ${context.worldBookContext}
+[近期的聊天记录]: 
+${context.chatHistory.map(m => `${m.sender === 'user' ? '你' : '我'}: ${m.content}`).join('\n')}
+---
+[我最近的日记]:
+${diaryContext}
+---
+[我们共同的记忆胶囊]:
+${context.memoryContext}
+---
+    `;
+
+    try {
+        const aiResponse = await callAI(systemPrompt, "现在，请基于以上所有信息，开始写信。");
+        
+        if (aiResponse) {
+            // 尝试从AI返回的内容中提取JSON部分
+            const jsonMatch = aiResponse.match(/\{\s*"[\s\S]*\}/);
+            if (!jsonMatch) throw new Error("AI返回的不是有效的JSON格式。");
+            
+            const letterData = JSON.parse(jsonMatch[0]);
+            
+            const newLetter = {
+                id: `letter_${Date.now()}`,
+                timestamp: Date.now(),
+                title: letterData.title,
+                content: letterData.content
+            };
+
+            if (!mailData[characterId]) {
+                mailData[characterId] = [];
+            }
+            mailData[characterId].push(newLetter);
+            saveData('mailData', mailData);
+
+            renderLetterList(characterId); // 重新渲染列表以显示新信件
+            showMessageBox("收到一封新信！");
+
+        } else {
+            showMessageBox("这次信箱是空的。");
+        }
+    } catch (e) {
+        console.error("生成信件失败:", e, "AI原始返回:", aiResponse);
+        showMessageBox("信件在邮寄过程中好像丢失了...");
+    } finally {
+        icon.classList.remove('animate-spin'); // 无论成功失败，都停止旋转
+    }
+}
+
     </script>
 
     <!-- 栖木通知模态框 -->
@@ -39342,8 +40615,3 @@ ${wordGuessState.isFirstClue ?
 
         </body>
 </html>
-
-
-
-
-
