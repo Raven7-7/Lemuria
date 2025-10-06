@@ -14344,7 +14344,9 @@
                 <div class="app-header">
                     <button id="letter-view-back-button" class="app-header-btn"><i class="fas fa-chevron-left"></i></button>
                     <h3 class="app-header-title">Read Letters</h3>
-                    <div class="w-8"></div>
+                    <button id="letter-delete-button" class="app-header-btn text-red-500 hover:text-red-600 transition-colors" title="删除信件">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
                 <div id="letter-view-content-wrapper" class="flex-1 overflow-y-auto p-4">
                     <div id="letter-view-content" class="letter-paper p-6 rounded-lg shadow-lg">
@@ -15958,6 +15960,7 @@
         let chatCapsules = {}; // 新增：用于存储封存的聊天记录
         let mailData = {}; // 【【新增】】用于存储所有角色的信件
         let currentMailCharacterId = null; // 【【新增】】用于记录当前正在查看哪个角色的信箱
+        let currentLetterId = null; // 【【新增】】用于记录当前正在查看的信件ID
         let userStickers = []; 
         let userAvatars = {};
         let chatBackgrounds = {};
@@ -31552,6 +31555,16 @@ function addNewEventListeners() {
                 }
             });
 
+            // 删除信件按钮事件监听器
+            $('#letter-delete-button').addEventListener('click', () => {
+                if (currentMailCharacterId && currentLetterId) {
+                    // 确认删除
+                    if (confirm('确定要删除这封信件吗？删除后无法恢复。')) {
+                        deleteLetter(currentMailCharacterId, currentLetterId);
+                    }
+                }
+            });
+
             $('#main-settings-back-button').addEventListener('click', () => showScreen('home-screen'));
             $('#api-settings-back-button').addEventListener('click', () => showScreen('main-settings-screen'));
             $('#api-settings-link').addEventListener('click', () => showScreen('api-settings-screen'));
@@ -39426,6 +39439,10 @@ function viewLetter(characterId, letterId) {
     const letter = mailData[characterId]?.find(l => l.id === letterId);
     if (!letter) return;
 
+    // 存储当前查看的信件信息
+    currentMailCharacterId = characterId;
+    currentLetterId = letterId;
+
     const contentWrapper = $('#letter-view-content');
     contentWrapper.innerHTML = `
         <h2 class="letter-title">${letter.title}</h2>
@@ -39433,6 +39450,34 @@ function viewLetter(characterId, letterId) {
         <div class="letter-body">${letter.content.replace(/\n/g, '<br>')}</div>
     `;
     showScreen('letter-view-screen');
+}
+
+/**
+ * 删除指定的信件
+ * @param {string} characterId - 角色ID
+ * @param {string} letterId - 信件ID
+ */
+function deleteLetter(characterId, letterId) {
+    if (!mailData[characterId]) return;
+    
+    // 从数组中删除指定信件
+    mailData[characterId] = mailData[characterId].filter(letter => letter.id !== letterId);
+    
+    // 保存数据
+    saveData('mailData', mailData);
+    
+    // 重新渲染信件列表
+    renderLetterList(characterId);
+    
+    // 返回到信件列表界面
+    openLetterList(characterId);
+    
+    // 显示删除成功消息
+    showMessageBox("信件已删除");
+    
+    // 清空当前信件信息
+    currentMailCharacterId = null;
+    currentLetterId = null;
 }
 
 /**
