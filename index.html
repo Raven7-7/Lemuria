@@ -701,7 +701,14 @@
             position: relative;
             width: 120px;
             height: 140px;
-            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        /* 全屏模式下，唱片壳子变大 */
+        .fullscreen-active .vinyl-widget {
+            width: 150px;  /* 全屏尺寸：增加25% */
+            height: 175px; /* 全屏尺寸：增加25% */
+            margin-right: 25px; /* 相应增加右边距 */
         }
 
         .vinyl-sleeve {
@@ -772,8 +779,23 @@
                 0 2px 4px rgba(0, 0, 0, 0.5),
                 inset 0 1px 2px rgba(255, 255, 255, 0.1);
             bottom: 6px;
-            left: 6px;
+            right: 6px;
             z-index: 10;
+        }
+
+        /* 全屏模式下，钉子也相应变大 */
+        .fullscreen-active .vinyl-sleeve::after {
+            width: 10px;
+            height: 10px;
+            top: 7px;
+            left: 7px;
+        }
+
+        .fullscreen-active .vinyl-sleeve .nail-bottom {
+            width: 10px;
+            height: 10px;
+            bottom: 7px;
+            right: 7px;
         }
 
         .vinyl-sleeve:hover {
@@ -867,6 +889,19 @@
             font-size: 9px;
         }
 
+        /* 全屏模式下，唱片标题输入框字体变大 */
+        .fullscreen-active .vinyl-title-input {
+            font-size: 12px !important;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            height: 25px;
+        }
+
+        .fullscreen-active .vinyl-title-input::placeholder {
+            font-size: 11px;
+        }
+
 
         .vinyl-record {
             position: absolute;
@@ -884,6 +919,14 @@
             cursor: pointer;
             transition: all 0.3s ease;
             z-index: 10;
+        }
+
+        /* 全屏模式下，唱片也相应变大 */
+        .fullscreen-active .vinyl-record {
+            right: -31px; /* 调整位置 */
+            width: 156px; /* 增加25% */
+            height: 156px; /* 增加25% */
+            border: 3px solid #000000; /* 稍微增加边框 */
         }
 
         .vinyl-record:hover {
@@ -911,9 +954,21 @@
             background-repeat: no-repeat;
         }
 
+        /* 全屏模式下，唱片中心也相应变大 */
+        .fullscreen-active .vinyl-record-center {
+            width: 100px; /* 增加25% */
+            height: 100px; /* 增加25% */
+            border: 2px solid #555; /* 稍微增加边框 */
+        }
+
         .vinyl-placeholder-icon {
             color: #666;
             font-size: 24px;
+        }
+
+        /* 全屏模式下，占位符图标也相应变大 */
+        .fullscreen-active .vinyl-placeholder-icon {
+            font-size: 30px;
         }
 
         /* 黑胶唱片旋转动画 */
@@ -12696,8 +12751,8 @@
         
     </div>
     
-    <div class="flex gap-4 mt-4">
-        <div class="flex flex-col gap-4">
+    <div class="flex gap-4 mt-4 justify-between items-center">
+        <div class="flex flex-col gap-4 mx-auto">
             <div class="flex gap-4">
                 <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="Mail"><i class="ri-mail-line text-white text-2xl"></i></div>
                 <div class="rounded-xl flex items-center justify-center shadow-lg app-icon app-icon-glass" data-app-name="GroupChat"><i class="ri-group-line text-white text-2xl"></i></div>
