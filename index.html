@@ -17003,6 +17003,66 @@ function getChatBackgroundElement() {
             });
         }
         
+        /**
+         * 【【新增】】一次性数据迁移函数
+         * 将旧的 diaryData 中的日记，合并到新的 characters[id].diaries 结构中
+         */
+        function migrateOldDiaries() {
+            console.log("【数据迁移】：开始检查是否存在旧版日记数据...");
+
+            const oldDiaryData = loadData('diaryData');
+            const charactersData = loadData('characters');
+
+            // 如果旧数据不存在或新数据结构不存在，则无需迁移
+            if (!oldDiaryData || !charactersData) {
+                console.log("【数据迁移】：未发现旧版日记或角色数据，无需迁移。");
+                return;
+            }
+
+            let migrationNeeded = false;
+
+            // 遍历所有拥有旧日记的角色ID
+            Object.keys(oldDiaryData).forEach(characterId => {
+                const oldEntries = oldDiaryData[characterId];
+                if (oldEntries && oldEntries.length > 0) {
+                    // 在新的 characters 数组中找到对应的角色
+                    const character = charactersData.find(c => c.id === characterId);
+                    if (character) {
+                        // 如果角色还没 diaries 数组，先创建一个
+                        if (!character.diaries) {
+                            character.diaries = [];
+                        }
+
+                        // 使用 Set 来快速检查已存在的日记ID，防止重复添加
+                        const existingDiaryIds = new Set(character.diaries.map(d => d.id));
+
+                        // 遍历旧日记，只添加那些不存在的
+                        oldEntries.forEach(oldDiary => {
+                            if (!existingDiaryIds.has(oldDiary.id)) {
+                                character.diaries.push(oldDiary);
+                                migrationNeeded = true;
+                                console.log(`【数据迁移】：已将角色 ${character.name} 的一篇旧日记 (ID: ${oldDiary.id}) 迁移至新结构。`);
+                            }
+                        });
+                    }
+                }
+            });
+
+            if (migrationNeeded) {
+                // 如果执行了迁移，就保存更新后的 characters 数据
+                saveData('characters', charactersData);
+
+                // 【关键】迁移完成后，重命名旧的 diaryData，防止下次重复迁移
+                localStorage.setItem('diaryData_migrated_bak', JSON.stringify(oldDiaryData));
+                localStorage.removeItem('diaryData');
+
+                console.log("%c【数据迁移】：旧日记数据已成功迁移并备份！", "color: green; font-weight: bold;");
+                showMessageBox("历史日记数据已成功恢复！");
+            } else {
+                console.log("【数据迁移】：所有数据均为最新结构，无需迁移。");
+            }
+        }
+        
         // V7.0: Load new data
         async function loadAllData() {
             chatCapsules = loadData('chatCapsules', {}); // 新增：加载聊天胶囊数据
@@ -21848,7 +21908,21 @@ ${transcriptText}
 请以 ${character.name} 的身份，自然地回应这个事件。`;
                         }
 
-                        const callReactionPrompt = { content: promptContent, type: 'text' };
+                        // 1. 【【修改此处】】为指令对象添加 sender 字段，并设为内部类型
+                        const callReactionPrompt = { 
+                            content: promptContent, 
+                            sender: 'system', 
+                            type: 'system-internal', // 使用内部类型，使其不在聊天界面上显示
+                            timestamp: Date.now() 
+                        };
+                        
+                        // 2. 【【新增此行】】将这个完整的指令对象推入聊天历史
+                        chatHistories[currentChatCharacterId].history.push(callReactionPrompt);
+
+                        // 3. 【【新增此行】】立即保存，确保 getAIResponse 能读到
+                        saveData('chatHistories', chatHistories);
+
+                        // 4. 【保持不变】现在调用 getAIResponse，它会读取到我们刚刚添加的、格式正确的指令
                         await getAIResponse();
                     }
                 }
@@ -31397,6 +31471,10 @@ function addNewEventListeners() {
         document.addEventListener('DOMContentLoaded', async () => {
             await loadAllSavedData();
             await loadAllData();
+            
+            // ====== 【【新增】】一次性数据迁移检查 ======
+            migrateOldDiaries(); // 在所有数据加载后，执行一次数据迁移检查
+            // ===========================================
             
             // 初始化一些示例日记数据（如果还没有的话）
             if (Object.keys(diaryData).length === 0) {
