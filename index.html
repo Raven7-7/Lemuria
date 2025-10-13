@@ -13881,11 +13881,6 @@
         </h3>
         <div class="space-y-4">
             <div>
-                <label for="diary-min-interval" class="block text-sm font-medium mb-2">日记最小间隔 (小时)</label>
-                <input type="number" id="diary-min-interval" min="0.5" max="24" step="0.5" value="1" class="form-input w-full">
-                <p class="text-xs text-gray-400 mt-1">角色生成一篇日记后，**至少要等这么多小时**才能生成下一篇，防止日记过于频繁。<br><strong>案例：</strong>设置为`1`，则角色1小时内最多生成一篇日记。</p>
-            </div>
-            <div>
                 <label for="diary-similarity-threshold" class="block text-sm font-medium mb-2">内容相似度阈值 (%)</label>
                 <input type="number" id="diary-similarity-threshold" min="50" max="95" step="5" value="80" class="form-input w-full">
                 <p class="text-xs text-gray-400 mt-1">当新日记与最近日记的内容相似度**超过这个百分比**时，将跳过生成，避免重复内容。<br><strong>案例：</strong>设置为`80`，则相似度超过80%的日记不会生成。</p>
@@ -13895,6 +13890,29 @@
                 <input type="number" id="diary-min-messages" min="1" max="10" step="1" value="2" class="form-input w-full">
                 <p class="text-xs text-gray-400 mt-1">只有当上次日记后有**至少这么多条新的有意义消息**时，才考虑生成新日记。<br><strong>案例：</strong>设置为`2`，则需要至少2条新消息才会触发日记生成。</p>
             </div>
+            <div>
+                <label for="diary-min-rounds" class="block text-sm font-medium mb-2">最小对话轮数</label>
+                <input type="number" id="diary-min-rounds" min="1" max="100" step="1" value="10" class="form-input w-full">
+                <p class="text-xs text-gray-400 mt-1">在你发送了至少这么多条消息（即进行了这么多轮对话）之后，系统才会在AI下一次回复后，考虑为本轮对话写日记。<br><strong>案例：</strong>设置为`10`，则在你发送第10条消息、AI回复完毕时，系统会进行一次检查。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-4 rounded-lg bg-card mt-4 border border-blue-500/30">
+        <h3 class="font-bold mb-4 flex items-center text-blue-300">
+            <i class="ri-flask-line mr-2"></i>
+            手动生成（测试/补写）
+        </h3>
+        <div class="space-y-4">
+            <div>
+                <label for="force-diary-character-select" class="block text-sm font-medium mb-2">选择角色</label>
+                <select id="force-diary-character-select" class="form-select w-full">
+                </select>
+            </div>
+            <button id="force-diary-trigger-btn" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium transition-colors duration-200">
+                强制生成一篇日记
+            </button>
+            <p class="text-xs text-gray-400 mt-1">此操作将无视所有门槛（轮数、消息数、相似度），直接使用该角色最近的聊天内容生成一篇日记。</p>
         </div>
     </div>
 
@@ -15952,6 +15970,7 @@
         let worldBooks = [];
         let characters = [];
         let scriptsData = {}; // 新增：用于存储所有剧本
+        let diaryRoundCounters = {}; // 用于记录每个角色的对话轮数
         let currentScenarioId = null; // 【【新增】】当前正在进行的剧本ID
         let currentEditingScriptId = null; // 【新增】用于跟踪正在编辑的剧本ID
         let currentScenarioHistory = []; // 【【新增】】当前剧本的对话历史
@@ -16286,9 +16305,9 @@ function getChatBackgroundElement() {
             momentsTriggerProbability: 80, // 百分比
             crowdReactionEnabled: true, // 路人评论开关
             npcReactionEnabled: true, // 内置NPC评论开关
-            diaryMinInterval: 1, // 日记最小间隔（小时）
             diarySimilarityThreshold: 80, // 日记相似度阈值（百分比）
-            diaryMinMessages: 2 // 生成日记所需的最小新消息数
+            diaryMinMessages: 2, // 生成日记所需的最小新消息数
+            diaryMinRounds: 10 // 生成日记所需的最小对话轮数
         };
 
         // 加载心跳设置到界面
@@ -16317,9 +16336,9 @@ function getChatBackgroundElement() {
             document.getElementById('toggle-npc-reaction').checked = settings.npcReactionEnabled !== false; // 默认开启
             
             // 加载日记设置
-            document.getElementById('diary-min-interval').value = settings.diaryMinInterval;
             document.getElementById('diary-similarity-threshold').value = settings.diarySimilarityThreshold;
             document.getElementById('diary-min-messages').value = settings.diaryMinMessages;
+            document.getElementById('diary-min-rounds').value = settings.diaryMinRounds || 10;
         }
 
         // 保存心跳设置
@@ -16347,9 +16366,9 @@ function getChatBackgroundElement() {
                 npcReactionEnabled: document.getElementById('toggle-npc-reaction').checked,
                 
                 // 日记设置
-                diaryMinInterval: parseFloat(document.getElementById('diary-min-interval').value),
                 diarySimilarityThreshold: parseInt(document.getElementById('diary-similarity-threshold').value),
-                diaryMinMessages: parseInt(document.getElementById('diary-min-messages').value)
+                diaryMinMessages: parseInt(document.getElementById('diary-min-messages').value),
+                diaryMinRounds: parseInt(document.getElementById('diary-min-rounds').value)
             };
 
             saveData('heartbeatSettings', settings);
@@ -20274,50 +20293,7 @@ ${moduleStyleContext || "无"}
         }
 
         // [新代码开始] - 添加AI日记生成触发函数
-        async function triggerAIDiaryEntry(characterId) {
-            try {
-                console.log(`[日记系统] 开始为角色 ${characterId} 生成AI日记`);
-                
-                // 获取角色信息
-                const character = characters.find(c => c.id === characterId);
-                if (!character) {
-                    console.error(`[日记系统] 角色 ${characterId} 不存在`);
-                    return;
-                }
-
-                // 检查是否应该生成日记（使用三重检测）
-                const shouldGenerate = await shouldGenerateDiary(characterId);
-                if (!shouldGenerate) {
-                    console.log(`[日记系统] 角色 ${characterId} 不满足日记生成条件`);
-                    return;
-                }
-
-                // 获取日记生成上下文
-                const diaryContext = await gatherDiaryContext(characterId);
-                if (!diaryContext) {
-                    console.error(`[日记系统] 无法获取角色 ${characterId} 的日记上下文`);
-                    return;
-                }
-
-                // 生成AI日记
-                const aiDiary = await generateAIDiary(characterId, diaryContext);
-                if (aiDiary) {
-                    console.log(`[日记系统] 成功为角色 ${characterId} 生成AI日记`);
-                    
-                    // 保存日记到角色数据
-                    if (!character.diaries) character.diaries = [];
-                    character.diaries.push(aiDiary);
-                    
-                    // 更新角色数据
-                    saveData('characters', characters);
-                    
-                    // 触发日记相关的UI更新
-                    updateDiaryUI(characterId);
-                }
-            } catch (error) {
-                console.error(`[日记系统] 为角色 ${characterId} 生成AI日记失败:`, error);
-            }
-        }
+        // 【已废弃】旧版 triggerAIDiaryEntry 函数已被 V3.0 版本替代（见21163行）
 
         // 检查日记生成条件
         async function checkDiaryGenerationConditions(characterId) {
@@ -20371,52 +20347,9 @@ ${moduleStyleContext || "无"}
         }
 
         // 获取日记生成上下文
+        // 保留旧的函数名作为兼容（已被新的 getSmartDiaryContext 替代）
         async function gatherDiaryContext(characterId) {
-            try {
-                const character = characters.find(c => c.id === characterId);
-                if (!character) return null;
-
-                // 获取最近的聊天记录
-                const chatHistory = chatHistories[characterId]?.history || [];
-                const recentMessages = chatHistory
-                    .filter(msg => Date.now() - msg.timestamp < 24 * 60 * 60 * 1000)
-                    .slice(-10); // 最近10条消息
-
-                // 获取最近的朋友圈动态
-                const recentMoments = character.moments?.slice(-3) || [];
-
-                // 获取最近的日记
-                const recentDiaries = character.diaries?.slice(-3) || [];
-
-                // 构建上下文
-                const context = {
-                    character: {
-                        name: character.name,
-                        persona: character.persona,
-                        myPersona: character.myPersona
-                    },
-                    recentChat: recentMessages.map(msg => ({
-                        sender: msg.sender,
-                        content: msg.content,
-                        type: msg.type,
-                        timestamp: msg.timestamp
-                    })),
-                    recentMoments: recentMoments.map(moment => ({
-                        content: moment.content,
-                        timestamp: moment.timestamp
-                    })),
-                    recentDiaries: recentDiaries.map(diary => ({
-                        content: diary.content,
-                        timestamp: diary.timestamp
-                    })),
-                    worldBook: character.worldBook || ''
-                };
-
-                return context;
-            } catch (error) {
-                console.error('[日记系统] 获取日记上下文失败:', error);
-                return null;
-            }
+            return await getSmartDiaryContext(characterId);
         }
 
         // 生成AI日记
@@ -20467,7 +20400,7 @@ ${moduleStyleContext || "无"}
 特殊人称 (情感高点)：当情感达到顶峰，思念或爱意满溢时，可以偶尔切换到第二人称"你"。
 示例："今天他笑了，阳光很好。……我多想告诉你，那一刻，你就是我的全世界。"
 
-篇幅：100-300字。
+篇幅：400-600字。
 
 【【格式天条 (ABSOLUTELY FORBIDDEN)】】
 - **你的唯一任务**：只输出日记的【正文内容】。
@@ -20900,6 +20833,17 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
         }
 
         async function handleSendMessage() {
+            // ====== 【【轮数计数器】】 ======
+            if (currentChatCharacterId) {
+                if (!diaryRoundCounters[currentChatCharacterId]) {
+                    diaryRoundCounters[currentChatCharacterId] = 0;
+                }
+                diaryRoundCounters[currentChatCharacterId]++;
+                // F12调试日志，让你看到轮数在增加
+                console.log(`%c【轮数计数器】%c 角色: ${currentChatCharacterId}, 当前轮数: ${diaryRoundCounters[currentChatCharacterId]}`, 'color: #8A2BE2; font-weight: bold;', 'color: #000;');
+            }
+            // =====================================
+
             // --- 【硬指令拦截器】第一层防线 ---
             const chatInputValue = $('#chat-input').value.trim();
             if (chatInputValue.startsWith('指令：送礼物')) {
@@ -21161,92 +21105,214 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
          * 根据概率决定是否触发AI写日记。
          * @param {string} characterId - 角色ID。
          */
-        async function triggerAIDiaryEntry(characterId) {
-            try {
-                console.log(`[日记系统 V2] 开始为角色 ${characterId} 检查日记生成条件...`);
+        
+        // V3.1 日记生成冷却锁（防止重复生成）
+        let isGeneratingDiary = false;
+        
+        /**
+         * 【【新增】】强制为指定角色生成一篇日记
+         */
+        async function forceGenerateDiary() {
+            const characterId = document.getElementById('force-diary-character-select').value;
+            if (!characterId) {
+                showMessageBox("请先选择一个要为其写日记的角色。");
+                return;
+            }
 
-                const character = characters.find(c => c.id === characterId);
-                if (!character) {
-                    console.error(`[日记系统 V2] 角色 ${characterId} 不存在`);
+            const character = characters.find(c => c.id === characterId);
+            if (!character) {
+                showMessageBox("错误：找不到该角色。");
+                return;
+            }
+
+            showMessageBox(`正在强制为 ${character.name} 生成日记，请稍候...`);
+
+            try {
+                // 1. 直接使用"智能上下文"获取最佳写作素材，绕过所有门槛
+                const smartContext = await getSmartDiaryContext(characterId);
+                if (!smartContext || smartContext.length === 0) {
+                    showMessageBox("强制生成失败：最近的聊天内容不足以提炼出有价值的素材。");
                     return;
                 }
 
-                // 【核心修改】：直接调用三重检测，不再有 Math.random() 概率判断
-                const shouldGenerate = await shouldGenerateDiary(characterId);
-                if (!shouldGenerate) {
-                    console.log(`[日记系统 V2] 角色 ${characterId} 未满足三重检测，本次不生成。`);
-                    return; 
-                }
+                console.log(`[强制生成] 已为 ${character.name} 找到写作素材，共 ${smartContext.length} 条消息。`);
 
-                console.log(`[日记系统 V2] 三重检测通过，开始生成日记！`);
-                const aiDiary = await generateAIDiary(characterId, await gatherDiaryContext(characterId));
+                // 2. 打包素材
+                const diaryContextForAI = {
+                    character: { name: character.name, persona: character.persona, myPersona: character.myPersona },
+                    recentChat: smartContext,
+                    recentMoments: (character.moments || []).slice(-3),
+                    recentDiaries: (character.diaries || []).slice(-3),
+                    worldBook: getCharacterWorldContext(character)
+                };
+
+                // 3. 调用AI生成日记
+                const aiDiary = await generateAIDiary(characterId, diaryContextForAI);
+
+                // 4. 保存并更新
                 if (aiDiary) {
-                    console.log(`[日记系统 V2] 成功为角色 ${characterId} 生成AI日记`);
-
                     if (!character.diaries) character.diaries = [];
                     character.diaries.push(aiDiary);
                     saveData('characters', characters);
-                    updateDiaryUI(characterId);
+
+                    // 同样标记消息为"已使用"，避免影响下一次正常的自动触发
+                    smartContext.forEach(msg => {
+                        const historyMsg = chatHistories[characterId]?.history.find(h => h.timestamp === msg.timestamp);
+                        if (historyMsg) historyMsg.usedForDiary = true;
+                    });
+                    saveData('chatHistories', chatHistories);
+
+                    // UI更新
+                    showNotificationDot('diary');
+                    const updatedDiaries = loadData('updatedDiaries', []);
+                    if (!updatedDiaries.includes(characterId)) {
+                        updatedDiaries.push(characterId);
+                        saveData('updatedDiaries', updatedDiaries);
+                    }
+
+                    showMessageBox(`${character.name} 的日记已强制生成！`);
+                    console.log(`%c[强制生成]%c ${character.name} 的新日记已保存。`, 'color: #1E90FF; font-weight: bold;', 'color: #000;');
+
+                } else {
+                    showMessageBox("强制生成失败，AI未能返回有效内容。请检查API设置。");
+                }
+
+            } catch (error) {
+                console.error("[强制生成] 发生错误:", error);
+                showMessageBox("强制生成失败，详情请查看控制台。");
+            }
+        }
+
+        /**
+         * 【【V6.0 回合制+双保险 最终版】】AI日记生成触发器
+         */
+        async function triggerAIDiaryEntry(characterId) {
+            // 使用我们之前添加的"冷却锁"
+            if (isGeneratingDiary) {
+                console.log("[日记系统] 正在生成上一篇日记，本次触发被\"冷却锁\"阻止。");
+                return;
+            }
+
+            try {
+                isGeneratingDiary = true; // 上锁
+
+                // 1. 【【总闸门】】：检查轮数是否达到门槛
+                const settings = loadData('heartbeatSettings', defaultHeartbeatSettings);
+                const currentRounds = diaryRoundCounters[characterId] || 0;
+                if (currentRounds < settings.diaryMinRounds) {
+                    // F12调试日志，告诉你为什么没触发
+                    console.log(`%c[日记系统]%c 对话轮数不足 (${currentRounds}/${settings.diaryMinRounds})，跳过检查。`, 'color: #008B8B; font-weight: bold;', 'color: #000;');
+                    return; // 直接终止，连后面的检查都不做
+                }
+
+                console.log(`%c[日记系统]%c 轮数达标 (${currentRounds}/${settings.diaryMinRounds})，开始进行内容检查...`, 'color: #008B8B; font-weight: bold;', 'color: #000;');
+
+                const character = characters.find(c => c.id === characterId);
+                if (!character) return;
+
+                // 2. 使用我们修复后的"消息计数器"，这是第二道门槛
+                if (!hasSignificantContentChange(characterId)) {
+                    return; // 如果没有足够的新消息，直接停止
+                }
+
+                // 3. 使用"智能上下文"函数获取最佳写作素材
+                const smartContext = await getSmartDiaryContext(characterId);
+                if (!smartContext || smartContext.length === 0) {
+                    console.log(`[日记系统] ${character.name}: 未找到足够有价值的写作素材，本次跳过。`);
+                    return;
+                }
+
+                // 4. 使用"AI查重系统"，这是第三道门槛
+                if (await checkContentSimilarity(characterId, smartContext)) {
+                    console.log(`[日记系统] ${character.name}: 新内容与旧日记主题重合，本次跳过。`);
+                    return;
+                }
+
+                console.log(`[日记系统] ${character.name}: 已找到高质量素材并通过所有检查，准备生成日记...`);
+
+                // 5. 打包最终素材
+                const diaryContextForAI = {
+                    character: { name: character.name, persona: character.persona, myPersona: character.myPersona },
+                    recentChat: smartContext,
+                    recentMoments: (character.moments || []).slice(-3),
+                    recentDiaries: (character.diaries || []).slice(-3),
+                    worldBook: getCharacterWorldContext(character)
+                };
+
+                // 6. 生成并保存日记
+                const aiDiary = await generateAIDiary(characterId, diaryContextForAI);
+                if (aiDiary) {
+                    if (!character.diaries) character.diaries = [];
+                    character.diaries.push(aiDiary);
+                    saveData('characters', characters);
+
+                    // ====== 【【添加氛围感提示】】 ======
+                    showMessageBox(`嘘... ${character.name} 好像刚刚写了些什么。`);
+                    // ===========================================
+
+                    // 7. 【关键】为所有已使用的消息打上标记
+                    smartContext.forEach(msg => {
+                        const historyMsg = chatHistories[characterId].history.find(h => h.timestamp === msg.timestamp);
+                        if (historyMsg) {
+                            historyMsg.usedForDiary = true;
+                        }
+                    });
+                    saveData('chatHistories', chatHistories);
+                    console.log(`[日记系统] 已将 ${smartContext.length} 条消息标记为"已用于日记"。`);
+
+                    // 8. 【清零】日记成功生成后，清零轮数计数器
+                    diaryRoundCounters[characterId] = 0;
+                    // F12调试日志，告诉你计数器已重置
+                    console.log(`%c[日记系统]%c 日记已生成，角色 ${characterId} 的轮数计数器已清零。`, 'color: #008B8B; font-weight: bold;', 'color: #000;');
+
+                    // 9. 触发UI更新
+                    showNotificationDot('diary');
+                    const updatedDiaries = loadData('updatedDiaries', []);
+                    if (!updatedDiaries.includes(characterId)) {
+                        updatedDiaries.push(characterId);
+                        saveData('updatedDiaries', updatedDiaries);
+                    }
+                    if (!$('#wechat-diary-container').classList.contains('hidden')) {
+                        showDiaryBookshelf();
+                    }
+
+                    console.log(`[日记系统] ${character.name} 的新日记已保存。`);
                 }
             } catch (error) {
-                console.error(`[日记系统 V2] 为角色 ${characterId} 生成AI日记时发生错误:`, error);
+                console.error(`[日记系统] 生成日记时发生严重错误:`, error);
+            } finally {
+                // 延时解锁
+                setTimeout(() => {
+                    isGeneratingDiary = false;
+                    console.log("[日记系统] \"冷却锁\"已解除。");
+                }, 3000);
             }
         }
 
         /**
-         * 检查日记时间间隔
-         * @param {string} characterId - 角色ID
-         * @returns {boolean} 是否在时间间隔限制内
-         */
-        function checkDiaryTimeInterval(characterId) {
-            const character = characters.find(c => c.id === characterId);
-            if (!character || !character.diaries || character.diaries.length === 0) {
-                return false; // 没有日记，可以生成
-            }
-            
-            const heartbeatSettings = loadData('heartbeatSettings', defaultHeartbeatSettings);
-            const lastDiary = character.diaries[character.diaries.length - 1];
-            const timeDiff = Date.now() - lastDiary.timestamp;
-            const minInterval = heartbeatSettings.diaryMinInterval * 60 * 60 * 1000; // 转换为毫秒
-            
-            const withinInterval = timeDiff < minInterval;
-            if (withinInterval) {
-                console.log(`【日记系统】：${characterId} 距离上次日记仅${Math.round(timeDiff / 60000)}分钟，未达到${heartbeatSettings.diaryMinInterval}小时间隔要求`);
-            }
-            return withinInterval;
-        }
-
-        /**
-         * 检查聊天内容是否有实质性变化
-         * @param {string} characterId - 角色ID
-         * @returns {boolean} 是否有足够的新内容
+         * 【【V2.0 修复版】】检查聊天内容是否有实质性变化
          */
         function hasSignificantContentChange(characterId) {
             const chatHistory = chatHistories[characterId]?.history || [];
             const character = characters.find(c => c.id === characterId);
             const heartbeatSettings = loadData('heartbeatSettings', defaultHeartbeatSettings);
-            
-            if (chatHistory.length === 0) {
-                console.log(`【日记系统】：${characterId} 没有聊天记录`);
-                return false;
-            }
-            
-            // 获取上次日记后的新消息
+
             const lastDiaryTime = character?.diaries?.length > 0 ? 
                 character.diaries[character.diaries.length - 1].timestamp : 0;
-            
+
             const newMessages = chatHistory.filter(msg => msg.timestamp > lastDiaryTime);
-            
-            // 过滤出有意义的消息（排除简单回应）
+
+            // 【【核心修复】】只计算那些没有被标记为"已使用"的消息
             const meaningfulMessages = newMessages.filter(msg => {
-                if (!msg.content || msg.content.length < 5) return false;
+                if (msg.usedForDiary) return false; // 跳过已消费的消息
+                if (!msg.content || typeof msg.content !== 'string' || msg.content.length < 5) return false;
                 if (msg.content.match(/^(嗯|好的|是的|哦|啊|呵呵|👍|😊|❤️)$/)) return false;
                 return true;
             });
-            
+
             const hasEnoughMessages = meaningfulMessages.length >= heartbeatSettings.diaryMinMessages;
             if (!hasEnoughMessages) {
-                console.log(`【日记系统】：${characterId} 新消息数量不足(${meaningfulMessages.length}/${heartbeatSettings.diaryMinMessages})`);
+                console.log(`【日记系统】：${characterId} 新的、有意义且未使用的消息数量不足(${meaningfulMessages.length}/${heartbeatSettings.diaryMinMessages})`);
             }
             return hasEnoughMessages;
         }
@@ -21293,46 +21359,205 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
         }
 
         /**
-         * 检查内容相似度
+         * 【【V3.0 AI驱动版】】检查内容相似度
          * @param {string} characterId - 角色ID
-         * @returns {boolean} 是否内容重复
+         * @param {Array} contextMessages - 准备用于写作的上下文消息
+         * @returns {Promise<boolean>} - 是否主题重复
          */
-        async function checkContentSimilarity(characterId) {
+        async function checkContentSimilarity(characterId, contextMessages) {
             const character = characters.find(c => c.id === characterId);
-            const heartbeatSettings = loadData('heartbeatSettings', defaultHeartbeatSettings);
-            
-            if (!character?.diaries || character.diaries.length === 0) {
-                return false; // 没有历史日记，不重复
+
+            // 如果没有历史日记，或者写作素材为空，则不构成重复
+            if (!character?.diaries || character.diaries.length === 0 || contextMessages.length === 0) {
+                return false;
             }
-            
-            // 获取当前聊天内容
-            const chatHistory = chatHistories[characterId]?.history || [];
-            const lastDiaryTime = character.diaries[character.diaries.length - 1].timestamp;
-            const newMessages = chatHistory.filter(msg => msg.timestamp > lastDiaryTime);
-            const currentContent = newMessages.map(msg => msg.content).join(' ');
-            const currentKeywords = extractKeywords(currentContent);
-            
-            if (currentKeywords.length === 0) {
-                console.log(`【日记系统】：${characterId} 当前内容无关键词`);
-                return true; // 没有关键词，认为是重复
+
+            // 只跟最近的一篇日记比较就足够了
+            const lastDiary = character.diaries[character.diaries.length - 1];
+            const newContentText = contextMessages.map(msg => (typeof msg.content === 'string' ? msg.content : '')).join(' ');
+
+            // 【【核心逻辑】】：并行发起两个AI主题分析请求
+            console.log("[相似度检查] 正在请求AI分析新内容和旧日记的主题...");
+            const [newKeywords, oldKeywords] = await Promise.all([
+                getThemeKeywordsFromAI(newContentText),
+                getThemeKeywordsFromAI(lastDiary.content)
+            ]);
+
+            console.log(`[相似度检查] 新内容主题: [${newKeywords.join(', ')}]`);
+            console.log(`[相似度检查] 上一篇主题: [${oldKeywords.join(', ')}]`);
+
+            // 如果AI无法从任何一方提取出主题，就认为不重复，放行
+            if (newKeywords.length === 0 || oldKeywords.length === 0) {
+                return false;
             }
-            
-            // 检查最近3篇日记的相似度
-            const recentDiaries = character.diaries.slice(-3);
-            
-            for (const diary of recentDiaries) {
-                const diaryKeywords = extractKeywords(diary.content);
-                const similarity = calculateSimilarity(currentKeywords, diaryKeywords);
-                
-                console.log(`【日记系统】：${characterId} 与历史日记相似度: ${similarity}%`);
-                
-                if (similarity >= heartbeatSettings.diarySimilarityThreshold) {
-                    console.log(`【日记系统】：${characterId} 内容相似度过高(${similarity}% >= ${heartbeatSettings.diarySimilarityThreshold}%), 跳过生成`);
-                    return true; // 相似度过高
+
+            // 【【决策】】：只要有一个主题关键词重合，就判定为主题重复
+            const hasSharedTheme = newKeywords.some(theme => oldKeywords.includes(theme));
+
+            if (hasSharedTheme) {
+                console.log(`[相似度检查] 发现重合主题，判定为内容重复，阻止生成。`);
+                return true;
+            }
+
+            console.log(`[相似度检查] 主题不同，允许生成。`);
+            return false;
+        }
+
+        /**
+         * 【【V3.0 新增 - AI主题分析器】】
+         * 调用AI，从一段文本中提取核心主题关键词。
+         * @param {string} textContent - 需要分析的文本。
+         * @returns {Promise<string[]>} - 一个包含主题关键词的数组，例如 ["告白", "承诺", "幸福"]。
+         */
+        async function getThemeKeywordsFromAI(textContent) {
+            if (!textContent || textContent.trim().length < 10) {
+                return []; // 内容太短，没有分析价值
+            }
+
+            // 这是一个专门为提取关键词设计的、非常轻量级的Prompt
+            const systemPrompt = `你的任务是阅读一段文本，然后用2到4个最核心的中文关键词来总结它的主题。你的回答必须且只能是这些关键词，并用逗号分隔。`;
+            const userPrompt = `请为以下文本提取核心主题关键词：\n\n"${textContent}"`;
+
+            try {
+                const response = await callAI(systemPrompt, userPrompt);
+                if (response) {
+                    // 清理AI可能返回的多余字符，然后按逗号分割成数组
+                    return response.replace(/[\[\]"\s]/g, '').split(/[,，]/).filter(Boolean);
+                }
+            } catch (error) {
+                console.error("[AI主题分析] 提取关键词时出错:", error);
+            }
+            return []; // 如果出错，返回空数组
+        }
+
+        /**
+         * 【【V2.0 情绪光谱版】】计算单条消息的情感浓度得分
+         * @param {string} messageContent - 消息文本内容
+         * @returns {number} - 情感分数
+         */
+        function calculateEmotionScore(messageContent) {
+            if (typeof messageContent !== 'string' || messageContent.length < 2) { // 长度阈值放宽到2
+                return 0;
+            }
+
+            let score = 0;
+            const content = messageContent.toLowerCase();
+
+            // V2.0 新增：负面情绪词库 (同样加分，因为情感强度高)
+            const negativeKeywords = ['难过', '烦', '累', '不想说话', '算了', '无聊', '讨厌', '生气', '委屈', '痛苦', '孤独', '对不起', '抱歉'];
+
+            // V2.0 新增：内省/犹豫类词库 (捕捉内敛情感)
+            const hesitationKeywords = ['但是', '其实', '我不知道', '也许', '可能', '有点'];
+
+            // V2.0 新增：主题性词库 (捕捉深度对话)
+            const thematicKeywords = ['未来', '过去', '回忆', '梦想', '我们', '一起', '家', '关系'];
+
+            // 原始的情感词库
+            const highWeightKeywords = ['爱', '永远', '秘密', '承诺', '第一次', '结婚', '心跳', '吻', '拥抱'];
+            const mediumWeightKeywords = ['开心', '伤心', '感动', '幸福', '害怕', '担心', '吃醋', '约会', '旅行'];
+
+            // 调节器
+            const negationWords = ['不', '没', '不是'];
+            const intensifiers = {'很': 1.5, '非常': 2, '超级': 2, '真的': 1.5, '太': 1.5};
+
+            // V2.0 升级：结构化线索，增加对省略号的识别
+            if (content.includes('！') || content.includes('!!!')) score += 1;
+            if (content.includes('？') || content.includes('???')) score += 0.5;
+            if (content.includes('...') || content.includes('……')) score += 1.5; // 长时间的沉默或犹豫，分值很高
+            if (content.length > 50) score += 1; // 较长的文本本身就代表了更强的表达意愿
+
+            // 关键词计分函数
+            const calculateKeywordScore = (keywords, weight) => {
+                keywords.forEach(kw => {
+                    let tempScore = 0;
+                    if (content.includes(kw)) {
+                        tempScore = weight;
+                        negationWords.forEach(neg => {
+                            if (content.includes(neg + kw)) tempScore = -weight; // 否定词反转分数
+                        });
+                        for (const intensifier in intensifiers) {
+                            if (content.includes(intensifier + kw)) tempScore *= intensifiers[intensifier];
+                        }
+                        score += tempScore;
+                    }
+                });
+            };
+
+            // 进行所有词库的计分
+            calculateKeywordScore(highWeightKeywords, 3);
+            calculateKeywordScore(mediumWeightKeywords, 2);
+            calculateKeywordScore(negativeKeywords, 2); // 负面词给予中等权重
+            calculateKeywordScore(hesitationKeywords, 1); // 犹豫词给予低等权重
+            calculateKeywordScore(thematicKeywords, 1.5); // 主题词权重略高于犹豫词
+
+            // 核心逻辑：我们关心的是情感的"强度"，而不是"好坏"，所以最终返回绝对值
+            return Math.abs(score);
+        }
+
+        /**
+         * 【【新增】】从消息列表中找到情感最浓烈的片段（滑动窗口算法）
+         * @param {Array} messages - 消息对象数组
+         * @param {number} windowSize - 滑动窗口大小（例如7条）
+         * @returns {Array} - 情感最浓烈的消息片段
+         */
+        function findEmotionalStorm(messages, windowSize = 7) {
+            if (messages.length <= windowSize) {
+                return messages; // 如果消息总数不足，则返回全部
+            }
+
+            let maxScore = -Infinity;
+            let bestSlice = [];
+
+            // 滑动窗口遍历
+            for (let i = 0; i <= messages.length - windowSize; i++) {
+                const currentSlice = messages.slice(i, i + windowSize);
+                const currentScore = currentSlice.reduce((total, msg) => total + calculateEmotionScore(msg.content), 0);
+
+                if (currentScore > maxScore) {
+                    maxScore = currentScore;
+                    bestSlice = currentSlice;
                 }
             }
-            
-            return false; // 相似度可接受
+
+            console.log(`【情感风暴定位器】：在${messages.length}条消息中找到最高分(${maxScore})的片段。`);
+            return bestSlice;
+        }
+
+        /**
+         * 【【V2.0 新增】】智能获取日记上下文，实现"20/100"情感风暴方案
+         */
+        async function getSmartDiaryContext(characterId) {
+            const chatHistory = chatHistories[characterId]?.history || [];
+            // 【修复】确保过滤掉已用于日记的消息
+            const availableHistory = chatHistory.filter(msg => !msg.usedForDiary);
+
+            if (availableHistory.length < 5) return null;
+
+            const SCORE_THRESHOLD = 1.0; 
+
+            // 快速路径：检查最近20条可用消息
+            const recent20 = availableHistory.slice(-20);
+            const fastPathScore = recent20.reduce((total, msg) => total + calculateEmotionScore(msg.content), 0);
+
+            if (recent20.length > 0 && (fastPathScore / recent20.length) >= SCORE_THRESHOLD) {
+                console.log(`【智能上下文】：快速路径命中！`);
+                return recent20;
+            }
+
+            // 深度搜索路径：检查最近100条可用消息
+            const recent100 = availableHistory.slice(-100);
+            const emotionalStorm = findEmotionalStorm(recent100, 7);
+
+            if (emotionalStorm.length > 0) {
+                const stormScore = emotionalStorm.reduce((total, msg) => total + calculateEmotionScore(msg.content), 0);
+                if ((stormScore / emotionalStorm.length) >= SCORE_THRESHOLD) {
+                    console.log(`【智能上下文】：深度搜索成功！找到情感风暴片段。`);
+                    return emotionalStorm;
+                }
+            }
+
+            console.log(`【智能上下文】：未找到足够精彩的新内容。`);
+            return null;
         }
 
         /**
@@ -21341,27 +21566,21 @@ ${chatHistory.map(m => `${m.sender === 'user' ? '对方' : '我'}: ${m.content}`
          * @returns {boolean} 是否应该生成日记
          */
         async function shouldGenerateDiary(characterId) {
-            console.log(`【日记系统】：开始为 ${characterId} 进行三重检测...`);
+            console.log(`【日记系统】：开始为 ${characterId} 进行检测...`);
             
-            // 检测1：时间间隔
-            if (checkDiaryTimeInterval(characterId)) {
-                console.log(`【日记系统】：${characterId} 时间间隔检测未通过`);
-                return false;
-            }
-            
-            // 检测2：内容变化
+            // 检测1：内容变化
             if (!hasSignificantContentChange(characterId)) {
                 console.log(`【日记系统】：${characterId} 内容变化检测未通过`);
                 return false;
             }
             
-            // 检测3：相似度检测
+            // 检测2：相似度检测
             if (await checkContentSimilarity(characterId)) {
                 console.log(`【日记系统】：${characterId} 相似度检测未通过`);
                 return false;
             }
             
-            console.log(`【日记系统】：${characterId} 三重检测全部通过，可以生成日记`);
+            console.log(`【日记系统】：${characterId} 检测全部通过，可以生成日记`);
             return true;
         }
         // [新代码结束]
@@ -26433,7 +26652,19 @@ function replyToComment(momentId, commentId, originalAuthor) {
             }
 
             currentOpenBook.ownerId = ownerId;
-            currentOpenBook.entries = (diaryData[ownerId] || []).slice().sort((a, b) => a.timestamp - b.timestamp);
+            
+            // V34.0 修复：统一数据源，从 characters 数组读取日记
+            let ownerObject;
+            if (ownerId === 'user') {
+                // 用户的日记逻辑我们还没动，暂时保持从旧的 diaryData 读取
+                ownerObject = { diaries: diaryData['user'] || [] };
+            } else {
+                // 对于AI角色，我们去 characters 数组里查找
+                ownerObject = characters.find(c => c.id === ownerId);
+            }
+            // 从找到的对象中获取 diaries 数组
+            currentOpenBook.entries = (ownerObject?.diaries || []).slice().sort((a, b) => a.timestamp - b.timestamp);
+            
             currentOpenBook.currentPage = currentOpenBook.entries.length > 0 ? currentOpenBook.entries.length - 1 : 0;
             currentOpenBook.isNotebook = false;
 
@@ -26579,10 +26810,20 @@ function replyToComment(momentId, commentId, originalAuthor) {
                 currentOpenBook.notebookData.lastModified = Date.now();
                 saveData('notebookData', notebookData);
             } else {
-                // 更新日记数据
-                if (currentOpenBook.ownerId) {
-                    diaryData[currentOpenBook.ownerId] = currentOpenBook.entries;
+                // 这是日记的逻辑
+                if (currentOpenBook.ownerId === 'user') {
+                    // 用户的日记，依然操作 diaryData
+                    diaryData['user'] = currentOpenBook.entries;
                     saveData('diaryData', diaryData);
+                } else {
+                    // AI 角色的日记，必须去修改 characters 数组
+                    const charIndex = characters.findIndex(c => c.id === currentOpenBook.ownerId);
+                    if (charIndex > -1) {
+                        // 找到角色，更新他的 diaries 列表
+                        characters[charIndex].diaries = currentOpenBook.entries;
+                        // 保存整个 characters 对象
+                        saveData('characters', characters); 
+                    }
                 }
             }
             
@@ -31583,11 +31824,31 @@ function addNewEventListeners() {
             $('#font-settings-back-button').addEventListener('click', () => showScreen('main-settings-screen'));
             $('#heartbeat-settings-link').addEventListener('click', () => {
                 loadHeartbeatSettings();
+
+                // ====== 【【添加新代码】】 START ======
+                // 动态填充强制生成日记的角色选择框
+                const selectEl = document.getElementById('force-diary-character-select');
+                selectEl.innerHTML = '<option value="">-- 请选择一个角色 --</option>'; // 添加一个默认选项
+                characters.forEach(char => {
+                    const option = document.createElement('option');
+                    option.value = char.id;
+                    option.textContent = char.name;
+                    selectEl.appendChild(option);
+                });
+                // ====== 【【添加新代码结束】】 ======
+
                 showScreen('heartbeat-settings-screen');
             });
             $('#heartbeat-settings-back-button').addEventListener('click', () => showScreen('main-settings-screen'));
             $('#save-heartbeat-settings').addEventListener('click', saveHeartbeatSettings);
             $('#reset-heartbeat-settings').addEventListener('click', resetHeartbeatSettings);
+            
+            // ====== 【【添加强制生成日记按钮事件】】 ======
+            const forceDiaryBtn = document.getElementById('force-diary-trigger-btn');
+            if (forceDiaryBtn) {
+                forceDiaryBtn.addEventListener('click', forceGenerateDiary);
+            }
+            // =====================================
             
             // 朋友圈测试功能
             $('#test-moments-trigger').addEventListener('click', startMomentsTest);
