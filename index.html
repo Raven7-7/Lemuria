@@ -23,6 +23,21 @@
     <!-- 星空图缩放库 -->
     <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom@4.5.1/dist/panzoom.min.js"></script>
     <style>
+        /* ====== 【【新增】】HTML内容防溢出安全网 ====== */
+        .html-content-bubble > * {
+            /* 核心规则：让HTML内容的最大宽度不超过其父容器（也就是我们的透明气泡） */
+            max-width: 100% !important;
+            /* 确保元素的边框和内边距被包含在其总宽度内，这是防止溢出的关键 */
+            box-sizing: border-box !important;
+        }
+
+        .html-content-bubble img {
+            /* 专门为图片设置，防止图片被拉伸变形 */
+            max-width: 100% !important;
+            height: auto !important;
+            display: block; /* 移除图片下方的多余空白 */
+        }
+
         /* ====== 【【V6.1 黑底粉字美观版】】爱之迷宫主题样式 ====== */
         #love-map-board {
             display: grid;
@@ -18821,6 +18836,12 @@ if (type === 'image') {
 
                 messageBubble.appendChild(stickerImg);
             }
+            // 【【在这里添加新代码块】】
+            else if (type === 'html') {
+                messageBubble.className = `chat-message ${senderClass} html-content-bubble`; // 应用透明气泡和安全网样式
+                messageBubble.innerHTML = content; // 使用 innerHTML 来渲染HTML
+            }
+            // 【【添加结束】】
             // 正确连接到后续的 voice 判断
             else if (type === 'voice') {
                 messageBubble.className = `chat-message ${senderClass} voice-message`;
@@ -20256,8 +20277,14 @@ ${moduleStyleContext || "无"}
                 triggerIncomingCall(callMatch[1].toLowerCase(), characterId);
                 return;
             } 
-
-            if (stickerMatch) {
+            
+            // --- 【【在这里添加新代码块】】 ---
+            if (isHtml) { // HTML类型优先处理
+                messageType = 'html';
+                messageContent = part;
+            }
+            // --- 【【添加结束】】 ---
+            else if (stickerMatch) {
                 messageType = 'sticker';
                 const rawKeyword = stickerMatch[1];
                 const normalizedKeyword = normalizeKeyword(rawKeyword.trim());
