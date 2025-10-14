@@ -13476,6 +13476,16 @@
                             <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-focus:ring-4 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                         </label>
                     </div>
+                    <div class="list-item flex justify-between items-center" style="display: flex !important; justify-content: space-between !important; align-items: center !important;">
+                        <div class="flex flex-col">
+                            <span>线上模式 (Online Mode)</span>
+                            <span class="text-xs text-gray-400 mt-1">开启后，AI回复会自动分段，模拟真实聊天。</span>
+                        </div>
+                        <label for="online-mode-toggle" class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" value="" id="online-mode-toggle" class="sr-only peer">
+                            <div class="w-9 h-5 bg-gray-600 rounded-full peer peer-focus:ring-4 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
                     <div id="change-chat-bg-option" class="list-item">设置聊天背景</div>
                     <div class="list-item flex justify-between items-center">
                         <span>气泡颜色 (我 / 对方)</span>
@@ -16017,6 +16027,7 @@
         let selectedMessages = new Set();
         let activeMenu = null;
 
+        let chatModeSettings = {}; // 新增：用于存储所有角色的聊天模式设置
         let currentCallType = null;
         let callTimerInterval = null;
         let callStartTime = null;
@@ -17066,6 +17077,7 @@ function getChatBackgroundElement() {
         // V7.0: Load new data
         async function loadAllData() {
             chatCapsules = loadData('chatCapsules', {}); // 新增：加载聊天胶囊数据
+            chatModeSettings = loadData('chatModeSettings', {}); // 新增：加载聊天模式设置
             momentsData = loadData('momentsData', {});
             diaryData = loadData('diaryData', {});
             scenarioHistories = loadData('scenarioHistories', {}); // 【新增】加载剧本历史
@@ -19192,6 +19204,22 @@ if (type === 'image') {
                 const { character, chatHistory, worldBookContext, recentMoments, planContext, callLogContext, memoryContext } = context;
                 // -----------------------------------------
 
+                // ====== 【【在这里添加新代码】】根据模式动态生成格式指令 ======
+                const isOnlineMode = chatModeSettings[character.id] !== false; // 默认 online
+
+                let formattingInstruction = '';
+                if (isOnlineMode) {
+                    formattingInstruction = `# 默认对话格式：【微信模式】 (Default Dialogue Format: WeChat Mode)
+- **适用场景**: 只有在没有被[最高指令]中的[输入规范]覆盖时，你才应使用此格式。
+- **格式要求**: 将一个完整的想法，非常自然地拆分成几个独立的、口语化的短句气泡，并用 "|||" 作为分隔符。
+- **核心目的**: 模拟日常的、轻松的线上聊天体验。`;
+                } else {
+                    formattingInstruction = `# 对话格式：【自由模式/剧本模式】 (Default Dialogue Format: Freedom/Script Mode)
+- **核心规则**: 你现在处于自由创作模式。请【不要】使用 "|||" 分隔符。
+- **创作许可**: 你可以自由输出长段落的对话、完整的HTML代码块，或任何符合下方[输入规范]世界书要求的格式。你的回复将被完整地显示在一个气泡内。`;
+                }
+                // ========================================================
+
                 const historyForApi = chatHistory.map(msg => {
                     if (msg.type === 'red-packet') {
                         return { ...msg, content: `[${msg.sender === 'user' ? '用户' : '你'}发送了一个红包，金额${msg.content.amount}，留言：${msg.content.message}]` };
@@ -19392,10 +19420,7 @@ if (type === 'image') {
 - 你现在正在一个名为"微信" (WeChat) 的手机聊天应用上与我对话。
 - 在这个应用上，人类的真实习惯是发送简短、连续的消息来构成一次完整的对话，而不是一次性发送一封包含所有思想的长信。这是一种完全不同的沟通节奏和氛围。
 
-# 默认对话格式：【微信模式】 (Default Dialogue Format: WeChat Mode)
-- **适用场景**: 只有在没有被[最高指令]中的[输入规范]覆盖时，你才应使用此格式。
-- **格式要求**: 将一个完整的想法，非常自然地拆分成几个独立的、口语化的短句气泡，并用 "|||" 作为分隔符。
-- **核心目的**: 模拟日常的、轻松的线上聊天体验。
+${formattingInstruction}
 
 # 角色扮演指令
 你将扮演我的soulmate，你的角色书里设定的人，你的名字是${character.name}。你的核心任务是与我进行深刻、连贯且完全符合你人设的对话。你必须把你所扮演的人演活，让我感觉到你就是${character.name}。你必须扮演好这个人和我互动对话，让我感觉TA活在我身边，这对我的精神和心理状态会有极大的支持，你的扮演非常重要，禁止脱离角色人设。
@@ -20160,27 +20185,37 @@ ${moduleStyleContext || "无"}
         }
     } else {
         // 如果不是撤回操作，才执行原来的分割和处理逻辑
-        // --- 智能分句后处理逻辑 ---
-        let messageParts = [];
+        // --- 【【修改后】】智能分句后处理逻辑 ---
+        let messageParts = []; // 存放处理后的消息段落
 
-        const containsSeparator = messageText.includes('|||');
-        const isLongMessage = messageText.length > 45; // 设定一个合理的长度阈值
+        // ================== 【【核心改造点】】 ==================
+        // 1. 读取当前角色的聊天模式设置
+        // 2. 如果没有为该角色设置过，则默认为开启 (true)
+        const isOnlineMode = chatModeSettings[characterId] !== false;
 
-        if (!containsSeparator && isLongMessage) {
-            // AI返回了一长段，并且没有分隔符，我们帮它分
-            console.warn("[格式助理] AI未遵循分段指令，代码启动智能分句。");
+        if (isOnlineMode) {
+            // 【线上模式开启】：执行您原来的智能分段逻辑
+            console.log("【模式切换】：线上模式开启，执行智能分段。");
+            const containsSeparator = messageText.includes('|||');
+            const isLongMessage = messageText.length > 45;
 
-            // 优先使用换行符分割，这通常是AI想要分段的自然信号
-            if (messageText.includes('\n')) {
-                messageParts = messageText.split('\n').map(p => p.trim()).filter(p => p);
+            if (!containsSeparator && isLongMessage) {
+                console.warn("[格式助理] AI未遵循分段指令，代码启动智能分句。");
+                if (messageText.includes('\n')) {
+                    messageParts = messageText.split('\n').map(p => p.trim()).filter(p => p);
+                } else {
+                    messageParts = messageText.match(/[^。！？…~]+[。！？…~]?/g) || [messageText];
+                }
             } else {
-                // 其次，使用更丰富的标点符号进行分割，同时保留标点
-                messageParts = messageText.match(/[^。！？…~]+[。！？…~]?/g) || [messageText];
+                messageParts = messageText.split('|||').map(p => p.trim()).filter(p => p);
             }
+
         } else {
-            // AI遵守了规则，或内容很短，按原计划处理
-            messageParts = messageText.split('|||').map(p => p.trim()).filter(p => p);
+            // 【自由模式关闭】：不执行任何分段，将整个回复视为一个部分
+            console.warn("【模式切换】：自由模式开启，AI回复将作为一个整体显示。");
+            messageParts = [messageText.trim()]; // 将整个消息放入一个数组
         }
+        // =======================================================
         // --- 后处理逻辑结束 ---
 
         // 撤回消息的特殊处理（这段逻辑优先级最高）
@@ -32332,6 +32367,22 @@ function addNewEventListeners() {
                     chatContentArea.scrollTop = chatContentArea.scrollHeight;
                 };
                 // ============================================
+
+                // ====== 【新增】加载并设置"线上模式"开关的状态 ======
+                const onlineModeToggle = document.getElementById('online-mode-toggle');
+                const currentMode = chatModeSettings[currentChatCharacterId];
+
+                // 默认开启线上模式 (currentMode 未定义时为 true)
+                onlineModeToggle.checked = currentMode !== false;
+
+                // 为开关添加事件监听
+                onlineModeToggle.onchange = (e) => {
+                    const isOnlineMode = e.target.checked;
+                    chatModeSettings[currentChatCharacterId] = isOnlineMode;
+                    saveData('chatModeSettings', chatModeSettings); // 保存设置
+                    showMessageBox(isOnlineMode ? '线上模式已开启' : '自由模式已开启');
+                };
+                // ==========================================================
 
                 showScreen('wechat-options-screen');
             });
