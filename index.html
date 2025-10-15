@@ -17492,13 +17492,33 @@ function getChatBackgroundElement() {
         }
 
         /**
-         * 【V2.0】打开并渲染指定的群聊界面
+         * 【【【最终修复版 - 根源解决】】】打开并渲染指定的群聊界面
          */
         function openGroupChat(groupId) {
             currentGroupId = groupId;
-            renderGroupChatHistory(groupId);
             const groupData = groupChatHistories[groupId];
+
+            // ====== 状态初始化防火墙 (Root Cause Fix) START ======
+            // 在渲染任何内容之前，强制重置UI到默认状态，防止状态污染
+            
+            // 1. 显示"普通标题栏"
+            document.getElementById('group-chat-header-normal').classList.remove('hidden');
+            
+            // 2. 隐藏"多选标题栏"
+            const multiSelectHeader = document.getElementById('group-chat-header-multiselect');
+            multiSelectHeader.classList.add('hidden');
+            multiSelectHeader.classList.remove('flex'); // 确保 flex 样式也被移除
+            
+            // 3. 重置相关的JavaScript状态变量
+            isGroupMultiSelectMode = false;
+            selectedGroupMessages.clear();
+            
+            // 4. 更新群聊名称
             document.getElementById('group-chat-name').textContent = groupData?.name || '群聊';
+            // ====== 状态初始化防火墙 END ======
+            
+            // 在所有状态都正确之后，再渲染历史记录和显示屏幕
+            renderGroupChatHistory(groupId);
             showScreen('group-chat-screen');
         }
 
