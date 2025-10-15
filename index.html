@@ -43050,7 +43050,15 @@ ${wordGuessState.isFirstClue ?
         
         // 编辑群聊消息
         function editGroupMessageHandler(timestamp, bubble) {
-            const msgIndex = groupChatHistories[currentGroupId].history.findIndex(m => String(m.timestamp) === timestamp);
+            // 从 bubble 的父元素（messageWrapper）获取 senderId
+            const messageWrapper = bubble.closest('.chat-message-wrapper');
+            const senderId = messageWrapper ? messageWrapper.dataset.sender : null;
+            if (!senderId) return;
+            
+            // 同时使用 timestamp 和 senderId 来精确定位消息
+            const msgIndex = groupChatHistories[currentGroupId].history.findIndex(m => 
+                String(m.timestamp) === timestamp && m.senderId === senderId
+            );
             if (msgIndex === -1) return;
 
             const p = bubble.querySelector('p');
