@@ -9599,7 +9599,7 @@
         
         /* 新增：确保在真正的移动设备上标题栏始终可见 */
         @media (max-width: 768px) and (pointer: coarse) {
-            body:not(.fullscreen-active) .app-header {
+            body:not(.fullscreen-active) .app-header:not(.hidden) {
                 display: flex !important;
                 visibility: visible !important;
                 opacity: 1 !important;
