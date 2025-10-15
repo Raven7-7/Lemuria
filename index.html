@@ -9617,7 +9617,7 @@
         }
         
         /* 新增：精确调整所有App顶栏在全屏下的位置 */
-        .fullscreen-active .app-header {
+        .fullscreen-active .app-header:not(.hidden) {
             /* 在全屏模式下保持标题栏显示 */
             display: flex !important;
             visibility: visible !important;
@@ -9626,7 +9626,7 @@
         
         /* 高优先级：确保全屏模式下标题栏正常显示，不受任何媒体查询影响 */
         @media all {
-            .fullscreen-active .app-header {
+            .fullscreen-active .app-header:not(.hidden) {
                 display: flex !important;
                 visibility: visible !important;
                 opacity: 1 !important;
@@ -12693,10 +12693,13 @@
             position: relative;
             z-index: 10;
             transition: all 0.2s ease;
+            /* 默认不显示背景 */
+            padding: 0;
+            margin: 0;
         }
 
-        /* 只有有内容时才显示背景 */
-        #group-chat-typing-indicators:not(:empty) {
+        /* 只有有子元素时才显示背景 */
+        #group-chat-typing-indicators:has(.typing-indicator) {
             padding: 8px 16px;
             background: rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(8px);
@@ -12704,11 +12707,11 @@
             margin: 4px 8px;
         }
 
-        body.dark-mode #group-chat-typing-indicators:not(:empty) {
+        body.dark-mode #group-chat-typing-indicators:has(.typing-indicator) {
             background: rgba(0, 0, 0, 0.5);
         }
 
-        body:not(.dark-mode) #group-chat-typing-indicators:not(:empty) {
+        body:not(.dark-mode) #group-chat-typing-indicators:has(.typing-indicator) {
             background: rgba(255, 255, 255, 0.7);
         }
 
@@ -14864,8 +14867,7 @@
                 <div id="group-chat-content" class="flex-1 overflow-y-auto p-2 space-y-1">
                     </div>
                 <!-- 【新增】正在输入提示容器 -->
-                <div id="group-chat-typing-indicators">
-                </div>
+                <div id="group-chat-typing-indicators"></div>
                 <div id="group-chat-footer" class="flex-shrink-0">
                     <!-- 【【V2.5新增】】@ 成员列表弹出层 -->
                     <div id="group-chat-mentions-list" class="absolute bottom-full left-2 right-2 mb-1 p-2 backdrop-blur-md rounded-lg shadow-lg max-h-40 overflow-y-auto hidden z-50">
@@ -17784,6 +17786,12 @@ function getChatBackgroundElement() {
          */
         function openGroupChat(groupId) {
             currentGroupId = groupId;
+            
+            // 【修复】确保退出多选模式
+            if (isGroupMultiSelectMode) {
+                exitGroupMultiSelectMode();
+            }
+            
             renderGroupChatHistory(groupId);
             const groupData = groupChatHistories[groupId];
             document.getElementById('group-chat-name').textContent = groupData?.name || '群聊';
