@@ -3225,7 +3225,64 @@
         }
         .dark-mode .chat-input-bar { border-color: rgba(255, 255, 255, 0.1); }
         .light-mode .chat-input-bar { border-color: rgba(0, 0, 0, 0.1); }
-        #chat-input {
+        
+        /* 【【V2.5新增】】@ 成员列表样式 */
+        #group-chat-footer {
+            position: relative; /* 确保 @ 成员列表能正确定位 */
+        }
+        #group-chat-mentions-list {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .dark-mode #group-chat-mentions-list {
+            background-color: rgba(31, 41, 55, 0.95); /* 深色模式：深灰色半透明背景 */
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e5e7eb;
+        }
+        .light-mode #group-chat-mentions-list {
+            background-color: rgba(255, 255, 255, 0.95); /* 浅色模式：白色半透明背景 */
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #1f2937;
+        }
+        #group-chat-mentions-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .mention-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .dark-mode .mention-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .light-mode .mention-item:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+        .mention-item .avatar {
+            width: 1.75rem; /* 28px */
+            height: 1.75rem; /* 28px */
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            background-size: cover;
+            background-position: center;
+            flex-shrink: 0;
+        }
+        .dark-mode .mention-item .avatar {
+            background-color: #4b5563; /* 深色模式头像默认底色 */
+        }
+        .light-mode .mention-item .avatar {
+            background-color: #9ca3af; /* 浅色模式头像默认底色 */
+        }
+        .mention-item .name {
+            font-weight: 500;
+        }
+        
+        #chat-input,
+        #group-chat-input {
             border: 1px solid transparent;
             box-shadow: none;
             transition: background-color 0.3s, box-shadow 0.3s, height 0.2s ease-in-out;
@@ -3233,10 +3290,27 @@
             overflow-y: auto;
             line-height: 1.5;
         }
-        .dark-mode #chat-input { background-color: transparent; color: #ffffff; }
-        .light-mode #chat-input { background-color: transparent; color: #1f2937; }
-        #chat-input::placeholder {
-            color: var(--placeholder-color, rgba(156, 163, 175, 0.7));
+        .dark-mode #chat-input,
+        .dark-mode #group-chat-input { 
+            background-color: transparent; 
+            color: #ffffff; 
+        }
+        .light-mode #chat-input,
+        .light-mode #group-chat-input { 
+            background-color: transparent; 
+            color: #1f2937; 
+        }
+        #chat-input::placeholder,
+        #group-chat-input::placeholder {
+            transition: color 0.3s;
+        }
+        .dark-mode #chat-input::placeholder,
+        .dark-mode #group-chat-input::placeholder {
+            color: rgba(156, 163, 175, 0.6);
+        }
+        .light-mode #chat-input::placeholder,
+        .light-mode #group-chat-input::placeholder {
+            color: rgba(107, 114, 128, 0.7);
         }
         .status-bar.transparent-override {
             background-color: transparent !important;
@@ -3262,6 +3336,33 @@
         .light-mode #wechat-chat-screen.has-custom-bg #chat-quick-actions-bar {
              background: transparent !important; /* 同样设置为完全透明 */
         }
+
+        /* 【新增】群聊背景图层样式 */
+        #group-chat-background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* 确保在最底层 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            pointer-events: none; /* 让它不影响点击 */
+        }
+
+        /* 【新增】当群聊有自定义背景时，应用特殊样式 */
+        #group-chat-screen.has-custom-bg {
+            background: transparent !important; /* 让主屏幕透明 */
+        }
+        #group-chat-screen.has-custom-bg .app-header,
+        #group-chat-screen.has-custom-bg #group-chat-footer {
+            background: transparent !important; /* 让头部和尾部全透明 */
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border-color: transparent !important;
+        }
+
         .chat-time-divider {
             display: none;
         }
@@ -3883,8 +3984,33 @@
             font-size: 1.25rem;  /* 图标字体大小 */
             padding: 0.5rem;    /* 按钮的内边距 */
             flex-shrink: 0;
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
+            border-radius: 0.5rem;
+            cursor: pointer;
         }
+        
+        /* 深色模式按钮样式 */
+        .dark-mode #chat-input-bar .chat-input-btn,
+        .dark-mode #group-chat-footer .chat-input-btn {
+            color: #d1d5db;
+        }
+        .dark-mode #chat-input-bar .chat-input-btn:hover,
+        .dark-mode #group-chat-footer .chat-input-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+        
+        /* 浅色模式按钮样式 */
+        .light-mode #chat-input-bar .chat-input-btn,
+        .light-mode #group-chat-footer .chat-input-btn {
+            color: #4b5563;
+        }
+        .light-mode #chat-input-bar .chat-input-btn:hover,
+        .light-mode #group-chat-footer .chat-input-btn:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+            color: #1f2937;
+        }
+        
         #chat-input-bar .chat-input-btn:active,
         #group-chat-footer .chat-input-btn:active {
             transform: scale(0.9); /* 统一点击效果 */
@@ -9473,7 +9599,7 @@
         
         /* 新增：确保在真正的移动设备上标题栏始终可见 */
         @media (max-width: 768px) and (pointer: coarse) {
-            body:not(.fullscreen-active) .app-header:not(.hidden) {
+            body:not(.fullscreen-active) .app-header {
                 display: flex !important;
                 visibility: visible !important;
                 opacity: 1 !important;
@@ -9491,7 +9617,7 @@
         }
         
         /* 新增：精确调整所有App顶栏在全屏下的位置 */
-        .fullscreen-active .app-header:not(.hidden) {
+        .fullscreen-active .app-header {
             /* 在全屏模式下保持标题栏显示 */
             display: flex !important;
             visibility: visible !important;
@@ -9500,7 +9626,7 @@
         
         /* 高优先级：确保全屏模式下标题栏正常显示，不受任何媒体查询影响 */
         @media all {
-            .fullscreen-active .app-header:not(.hidden) {
+            .fullscreen-active .app-header {
                 display: flex !important;
                 visibility: visible !important;
                 opacity: 1 !important;
@@ -12562,6 +12688,100 @@
         }
         /* ====== 群聊专属样式 END ====== */
 
+        /* ====== 【新增】"正在输入..."提示样式 ====== */
+        #group-chat-typing-indicators {
+            position: relative;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+
+        /* 只有有内容时才显示背景 */
+        #group-chat-typing-indicators:not(:empty) {
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 8px;
+            margin: 4px 8px;
+        }
+
+        body.dark-mode #group-chat-typing-indicators:not(:empty) {
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        body:not(.dark-mode) #group-chat-typing-indicators:not(:empty) {
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        #group-chat-typing-indicators .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            animation: fadeIn 0.3s ease-out;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        #group-chat-typing-indicators .typing-indicator:last-child {
+            margin-bottom: 0;
+        }
+
+        /* 文字颜色跟随主题 */
+        body.dark-mode #group-chat-typing-indicators .typing-indicator span {
+            color: #e5e7eb;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        body:not(.dark-mode) #group-chat-typing-indicators .typing-indicator span {
+            color: #1f2937;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #group-chat-typing-indicators .typing-dots {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 6px;
+        }
+
+        /* 省略号颜色跟随主题 */
+        body.dark-mode #group-chat-typing-indicators .typing-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+            margin: 0 1px;
+            animation: typing-dots 1.2s infinite ease-in-out;
+        }
+
+        body:not(.dark-mode) #group-chat-typing-indicators .typing-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #4b5563;
+            border-radius: 50%;
+            margin: 0 1px;
+            animation: typing-dots 1.2s infinite ease-in-out;
+        }
+
+        #group-chat-typing-indicators .typing-dots span:nth-child(1) { 
+            animation-delay: -0.32s; 
+        }
+        
+        #group-chat-typing-indicators .typing-dots span:nth-child(2) { 
+            animation-delay: -0.16s; 
+        }
+
+        @keyframes typing-dots {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.0); }
+        }
+        /* ====== "正在输入..."提示样式 END ====== */
+
     </style>
 </head>
 <body class="dark-mode">
@@ -12590,6 +12810,7 @@
     <input type="file" id="sticker-upload-input" class="hidden" accept="image/*">
     <input type="file" id="user-video-image-input" class="hidden" accept="image/*">
     <input type="file" id="my-video-image-input" class="hidden" accept="image/*">
+    <input type="file" id="group-chat-bg-input" class="hidden" accept="image/*">
                     <div class="phone-frame">
         
         <div id="phone-screen" class="phone-screen flex-1 overflow-hidden relative animate-fade-in">
@@ -14642,7 +14863,14 @@
                 </div>
                 <div id="group-chat-content" class="flex-1 overflow-y-auto p-2 space-y-1">
                     </div>
+                <!-- 【新增】正在输入提示容器 -->
+                <div id="group-chat-typing-indicators">
+                </div>
                 <div id="group-chat-footer" class="flex-shrink-0">
+                    <!-- 【【V2.5新增】】@ 成员列表弹出层 -->
+                    <div id="group-chat-mentions-list" class="absolute bottom-full left-2 right-2 mb-1 p-2 backdrop-blur-md rounded-lg shadow-lg max-h-40 overflow-y-auto hidden z-50">
+                    </div>
+                    
                     <div class="chat-input-bar flex items-center p-2">
                         <textarea id="group-chat-input" placeholder="在群里说点什么..." class="chat-input flex-1 rounded-full px-4 py-2 mx-2 focus:ring-2 focus:ring-gray-500" rows="1"></textarea>
                         <button id="send-group-chat-button" class="chat-input-btn"><i class="far fa-paper-plane"></i></button>
@@ -14912,6 +15140,14 @@
                     <label class="block text-sm font-medium mb-2">群聊名称</label>
                     <input type="text" id="group-chat-name-input" class="form-input w-full">
                 </div>
+
+                <div class="mt-4">
+                    <label class="block text-sm font-medium mb-2">聊天背景</label>
+                    <div class="flex gap-2">
+                        <button id="change-group-bg-btn" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">选择图片</button>
+                        <button id="remove-group-bg-btn" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm">移除背景</button>
+                    </div>
+                </div>
                 <div class="mb-6 p-4 rounded-lg bg-black/20 border border-gray-700/50">
                     <div class="flex items-center justify-between">
                         <div class="flex flex-col">
@@ -14928,6 +15164,30 @@
                     <label class="block text-sm font-medium mb-2">关联世界书 (可多选)</label>
                     <div id="group-worldbook-select" class="space-y-1 max-h-32 overflow-y-auto p-2 rounded-lg border border-gray-600">
                         <!-- 世界书列表将动态生成 -->
+                    </div>
+                </div>
+
+                <div class="mt-4 p-4 rounded-lg bg-black/20 border border-gray-700/50">
+                    <h4 class="font-semibold mb-3">外观设置</h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">气泡颜色 (我 / AI)</span>
+                            <div class="flex items-center space-x-3">
+                                <input type="color" id="group-user-bubble-color-picker" class="color-picker-input">
+                                <input type="color" id="group-ai-bubble-color-picker" class="color-picker-input">
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm">文字颜色 (我 / AI / 昵称)</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="color" id="group-user-text-color-picker" class="color-picker-input">
+                                <input type="color" id="group-ai-text-color-picker" class="color-picker-input">
+                                <input type="color" id="group-author-name-color-picker" class="color-picker-input">
+                            </div>
+                        </div>
+                        <div class="pt-2">
+                            <button id="reset-group-appearance-btn" class="w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-md text-sm">重置外观设置</button>
+                        </div>
                     </div>
                 </div>
                 <div>
@@ -16197,16 +16457,23 @@
         function applyOtherTextColor(color) {
             console.log('应用其他文字颜色:', color);
             
-            // 应用到输入框
+            // 【修复】移除输入框的强制颜色设置，让 CSS 类根据日夜间模式自动控制
             const chatInput = $('#chat-input');
             if (chatInput) {
-                chatInput.style.color = color;
+                chatInput.style.removeProperty('color');
+            }
+            
+            // 【修复】移除群聊输入框的强制颜色设置
+            const groupChatInput = $('#group-chat-input');
+            if (groupChatInput) {
+                groupChatInput.style.removeProperty('color');
             }
             
             // 应用到所有聊天相关按钮
+            // 【修复】移除强制颜色设置，让 CSS 类根据日夜间模式自动控制
             const buttons = document.querySelectorAll('.chat-input-btn, .quick-action-btn, #send-chat-button, #receive-chat-button, #add-feature-btn, #emoji-btn');
             buttons.forEach(button => {
-                button.style.color = color;
+                button.style.removeProperty('color');
             });
             
             // 应用到更多功能面板的按钮
@@ -16221,13 +16488,15 @@
                 element.style.color = color;
             });
             
-            // 应用到输入框的占位符颜色
-            if (chatInput) {
-                chatInput.style.setProperty('--placeholder-color', color);
-            }
+            // 【修复】移除输入框占位符颜色的强制设置，让 CSS 自动控制
+            // （注释掉以下代码）
+            // if (chatInput) {
+            //     chatInput.style.setProperty('--placeholder-color', color);
+            // }
             
-            // 应用到其他可能的文本元素
-            const textElements = document.querySelectorAll('.chat-input-bar button i, .quick-actions button i, .wechat-screen .icon, .wechat-screen span:not(.message-text)');
+            // 【修复】移除按钮图标的强制颜色设置，让 CSS 类根据日夜间模式自动控制
+            // 只保留微信屏幕的图标和文本的颜色设置
+            const textElements = document.querySelectorAll('.wechat-screen .icon, .wechat-screen span:not(.message-text)');
             textElements.forEach(element => {
                 element.style.color = color;
             });
@@ -16382,6 +16651,8 @@
         let groupMemories = {};
         let isGroupReceiving = false; // 群聊接收锁
         let currentGroupId = null; // 用于追踪当前所在的群聊ID
+        let groupChatBackgrounds = {}; // 【新增】群聊背景图存储
+        let groupChatAppearanceSettings = {}; // 用于存储群聊的外观设置 (气泡/文字颜色)
         // ====== 群聊全局变量 END ======
 
         let chatModeSettings = {}; // 新增：用于存储所有角色的聊天模式设置
@@ -16420,6 +16691,23 @@ function getChatBackgroundElement() {
     }
     return bgElement;
 } // 新增：用于追踪打字机动画
+
+        /**
+         * 【新增】创建或获取群聊专用的背景图层元素
+         */
+        function getGroupChatBackgroundElement() {
+            const chatScreen = document.getElementById('group-chat-screen');
+            if (!chatScreen) return null;
+
+            let bgElement = document.getElementById('group-chat-background-layer');
+            if (!bgElement) {
+                bgElement = document.createElement('div');
+                bgElement.id = 'group-chat-background-layer';
+                // CSS样式已在<style>中定义，这里无需重复
+                chatScreen.prepend(bgElement); // 插入为第一个子元素，确保在最底层
+            }
+            return bgElement;
+        }
 
         // 【【新增函数1：开始回复模式】】
         function startReplyMode(timestamp) {
@@ -17492,34 +17780,43 @@ function getChatBackgroundElement() {
         }
 
         /**
-         * 【【【最终修复版 - 根源解决】】】打开并渲染指定的群聊界面
+         * 【V2.0】打开并渲染指定的群聊界面
          */
         function openGroupChat(groupId) {
             currentGroupId = groupId;
-            const groupData = groupChatHistories[groupId];
-
-            // ====== 状态初始化防火墙 (Root Cause Fix) START ======
-            // 在渲染任何内容之前，强制重置UI到默认状态，防止状态污染
-            
-            // 1. 显示"普通标题栏"
-            document.getElementById('group-chat-header-normal').classList.remove('hidden');
-            
-            // 2. 隐藏"多选标题栏"
-            const multiSelectHeader = document.getElementById('group-chat-header-multiselect');
-            multiSelectHeader.classList.add('hidden');
-            multiSelectHeader.classList.remove('flex'); // 确保 flex 样式也被移除
-            
-            // 3. 重置相关的JavaScript状态变量
-            isGroupMultiSelectMode = false;
-            selectedGroupMessages.clear();
-            
-            // 4. 更新群聊名称
-            document.getElementById('group-chat-name').textContent = groupData?.name || '群聊';
-            // ====== 状态初始化防火墙 END ======
-            
-            // 在所有状态都正确之后，再渲染历史记录和显示屏幕
             renderGroupChatHistory(groupId);
+            const groupData = groupChatHistories[groupId];
+            document.getElementById('group-chat-name').textContent = groupData?.name || '群聊';
             showScreen('group-chat-screen');
+            
+            // --- 应用群聊背景 ---
+            const chatScreen = document.getElementById('group-chat-screen');
+            const bgElement = getGroupChatBackgroundElement();
+            const savedBg = groupChatBackgrounds[groupId];
+
+            if (savedBg && bgElement) {
+                getImageFromDB(savedBg).then(blob => {
+                    if (blob) {
+                        const objectURL = URL.createObjectURL(blob);
+                        bgElement.style.backgroundImage = `url(${objectURL})`;
+                        chatScreen.classList.add('has-custom-bg');
+                        // 确保状态栏也透明
+                        document.getElementById('status-bar').classList.add('transparent-override');
+                    }
+                });
+            } else if (bgElement) {
+                // 如果没有背景，确保移除相关样式
+                bgElement.style.backgroundImage = '';
+                chatScreen.classList.remove('has-custom-bg');
+                document.getElementById('status-bar').classList.remove('transparent-override');
+            }
+            // --- 背景应用逻辑结束 ---
+            
+            // 【【V2.5新增】】每次打开群聊时重新绑定 @ 成员事件监听器
+            // 使用 setTimeout 确保 DOM 完全加载
+            setTimeout(() => {
+                setupMentionEventListeners();
+            }, 100);
         }
 
         /**
@@ -17577,7 +17874,7 @@ function getChatBackgroundElement() {
             }
             // =======================================================
 
-            const uniqueAvatarId = `group-avatar-${senderId}-${timestamp}`;
+            const uniqueAvatarId = `group-avatar-${senderId}-${timestamp}-${Math.random()}`;
 
             // ============ 【【【【【 核心修正点 ② 】】】】】 ============
             // 不再手动控制 visibility，只负责创建头像元素，显示与否完全交给CSS
@@ -17639,6 +17936,34 @@ function getChatBackgroundElement() {
             
             contentWrapper.appendChild(messageBubble);
 
+            // --- 应用自定义外观 ---
+            const appearance = groupChatAppearanceSettings[currentGroupId] || {};
+            const bubbleColors = appearance.bubble;
+            const textColors = appearance.text;
+
+            if (bubbleColors) {
+                if (isUser && bubbleColors.user) {
+                    messageBubble.style.background = bubbleColors.user;
+                } else if (!isUser && bubbleColors.ai) {
+                    messageBubble.style.background = bubbleColors.ai;
+                }
+            }
+
+            if (textColors) {
+                if (isUser && textColors.user) {
+                    messageBubble.style.color = textColors.user;
+                } else if (!isUser && textColors.ai) {
+                    messageBubble.style.color = textColors.ai;
+                }
+
+                // 应用昵称颜色
+                const authorNameEl = contentWrapper.querySelector('.chat-author-name');
+                if (authorNameEl && textColors.author) {
+                    authorNameEl.style.color = textColors.author;
+                }
+            }
+            // --- 自定义外观应用结束 ---
+
             // 【【【核心修正点 ③：简化组装逻辑】】】
             // 无论是用户还是AI，头像元素都必须存在
             if (isUser) {
@@ -17670,13 +17995,53 @@ function getChatBackgroundElement() {
                 const history = groupChatHistories[currentGroupId].history;
                 const isNewSender = history.length === 0 || history[history.length - 1].senderId !== 'user';
                 
-                const message = { senderId: 'user', content, timestamp: Date.now() };
+                const message = { senderId: 'user', content, timestamp: Date.now(), type: 'text' };
                 groupChatHistories[currentGroupId].history.push(message);
                 saveData('groupChatHistories', groupChatHistories);
                 
                 appendGroupMessage(message, isNewSender); // 传递isNewSender参数
                 input.value = '';
                 input.style.height = 'auto';
+            }
+        }
+
+        /**
+         * 【新增】显示某个角色的"正在输入"提示
+         * @param {object} character - 角色对象
+         */
+        function showTypingIndicator(character) {
+            const container = document.getElementById('group-chat-typing-indicators');
+            if (!container) return;
+
+            // 防止重复显示
+            if (document.getElementById(`typing-${character.id}`)) return;
+
+            const indicator = document.createElement('div');
+            indicator.id = `typing-${character.id}`;
+            indicator.className = 'typing-indicator';
+            indicator.innerHTML = `
+                <span>${character.name} 正在输入</span>
+                <div class="typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            container.appendChild(indicator);
+            
+            // 滚动到底部，确保提示可见
+            const chatArea = document.getElementById('group-chat-content');
+            if (chatArea) {
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        }
+
+        /**
+         * 【新增】隐藏某个角色的"正在输入"提示
+         * @param {string} characterId - 角色ID
+         */
+        function hideTypingIndicator(characterId) {
+            const indicator = document.getElementById(`typing-${characterId}`);
+            if (indicator) {
+                indicator.remove();
             }
         }
 
@@ -17691,7 +18056,41 @@ function getChatBackgroundElement() {
             const receiveBtn = document.getElementById('receive-group-chat-button').querySelector('i');
             receiveBtn.classList.add('spinning');
 
+            let typingCharacterNames = []; // 【【【 保存将要发言的角色名单 】】】
+
             try {
+                // 【【【【【 第一阶段：快速选角 】】】】】
+                const group = groupChatHistories[currentGroupId];
+                const aiMembers = group.members
+                    .filter(id => id !== 'user')
+                    .map(id => characters.find(c => c.id === id))
+                    .filter(Boolean);
+                
+                if (aiMembers.length === 0) {
+                    throw new Error("群聊中没有AI角色。");
+                }
+
+                // 1. 第一阶段：快速调用AI进行"选角"
+                console.log("【群聊流程】第一阶段：正在请求导演选角...");
+                const speakingCharacterNames = await getSpeakingCharactersFromAI(group, aiMembers);
+                
+                if (speakingCharacterNames && speakingCharacterNames.length > 0) {
+                    console.log("【群聊流程】导演选角完成:", speakingCharacterNames);
+                    typingCharacterNames = speakingCharacterNames; // 保存名单用于后续清理
+
+                    // 2. 根据准确的名单，显示"正在输入"
+                    speakingCharacterNames.forEach(name => {
+                        const character = characters.find(c => c.name === name);
+                        if (character) {
+                            showTypingIndicator(character);
+                        }
+                    });
+                } else {
+                    console.warn("【群聊流程】导演未能确定演员，将跳过'正在输入'提示。");
+                }
+                
+                // 3. 第二阶段：正常调用"导演AI"获取完整剧本
+                console.log("【群聊流程】第二阶段：正在请求导演编写剧本...");
                 await triggerGroupChatAIResponses(currentGroupId);
             } catch (error) {
                 console.error("接收群聊消息失败:", error);
@@ -17699,7 +18098,75 @@ function getChatBackgroundElement() {
             } finally {
                 isGroupReceiving = false;
                 receiveBtn.classList.remove('spinning');
+
+                // 【【【【【 新增/修改这里的逻辑 】】】】】
+                // 不论成功失败，都根据【准确的名单】清除"正在输入"的提示
+                console.log("【群聊流程】结束，清除'正在输入'提示:", typingCharacterNames);
+                typingCharacterNames.forEach(name => {
+                    const character = characters.find(c => c.name === name);
+                    if (character) {
+                        hideTypingIndicator(character.id);
+                    }
+                });
             }
+        }
+
+        /**
+         * 【【新增】】调用导演AI进行"选角"，快速获取将要发言的角色列表
+         * @param {object} group - 当前群聊对象
+         * @param {Array<object>} aiMembers - 参与讨论的AI角色对象数组
+         * @returns {Promise<string[]|null>} 一个包含角色名字的数组，例如 ["Sylus", "乌鸦"]
+         */
+        async function getSpeakingCharactersFromAI(group, aiMembers) {
+            // 这部分的信息收集和您现有的 generateGroupChatScript 函数基本一致
+            const recentHistory = group.history.slice(-15);
+            const chatHistoryForPrompt = recentHistory.map(msg => {
+                const senderName = msg.senderId === 'user' ? 'USER' : (characters.find(c => c.id === msg.senderId)?.name || '未知角色');
+                return `[${senderName}]: ${msg.content}`;
+            }).join('\n');
+            const membersInfo = aiMembers.map(char => `  - ${char.name}: ${char.persona}`).join('\n');
+            
+            // 为了追求极致的速度，可以在这里省略关系网和世界书的构建，但保留可以提高选角准确性
+            // 此处我们保留以获得更准的预测
+
+            // 【【【 核心区别：一个极其轻量化的新指令 】】】
+            const systemPrompt = `
+# 核心身份：群聊剧本导演 (选角模式)
+
+# 核心任务
+分析下面的[最近的聊天记录]，并根据每个角色的性格，快速判断接下来最有可能发言的1到3个角色是谁。
+
+# 输出格式 (至关重要！！！)
+你的回复【必须且只能是】一个JSON数组，其中只包含角色的名字字符串。绝对不能有任何其他文字或解释。
+格式如下:
+\`\`\`json
+["最可能发言的角色A名字", "可能附和的角色B名字"]
+\`\`\`
+
+# 输入信息
+[群聊成员设定]:
+${membersInfo}
+[最近的聊天记录]:
+${chatHistoryForPrompt}
+
+---
+现在，请作为导演，快速输出下一幕的"演员名单"（JSON数组格式）。`;
+
+            const aiResponse = await callAI(systemPrompt, "请根据你的指令，输出演员名单。");
+
+            if (aiResponse) {
+                try {
+                    // 优化JSON解析，更稳健地从AI的回复中提取出JSON数组
+                    const jsonMatch = aiResponse.match(/\[\s*"[^"]*"(?:\s*,\s*"[^"]*")*\s*\]/);
+                    if (jsonMatch) {
+                        // 解析并返回角色名字数组
+                        return JSON.parse(jsonMatch[0]);
+                    }
+                } catch (e) {
+                    console.error("【AI选角】解析角色名单失败:", e, "原始返回:", aiResponse);
+                }
+            }
+            return null; // 如果失败则返回null
         }
 
         /**
@@ -17963,7 +18430,7 @@ ${chatHistoryForPrompt}
                     messageParts.forEach((part, index) => {
                         const message = { senderId: charId, content: part, timestamp: Date.now(), isFirstMessage: index === 0 };
                         if (!groupChatHistories[groupId]) groupChatHistories[groupId] = { history: [] };
-                        groupChatHistories[groupId].history.push({ senderId: message.senderId, content: message.content, timestamp: message.timestamp });
+                        groupChatHistories[groupId].history.push({ senderId: message.senderId, content: message.content, timestamp: message.timestamp, type: 'text' });
                         saveData('groupChatHistories', groupChatHistories);
                         appendGroupMessage(message, message.isFirstMessage);
                     });
@@ -17975,6 +18442,7 @@ ${chatHistoryForPrompt}
             // 【【核心修改】】获取上一条消息的发送者，用于判断是否是新发言人
             const history = groupChatHistories[groupId]?.history || [];
             let lastSpeakerId = history.length > 0 ? history[history.length - 1].senderId : null;
+            let currentTurnLastSpeaker = lastSpeakerId;
 
             // 1. 解析剧本，将每个角色的发言切分成小段
             script.forEach(turn => {
@@ -17988,13 +18456,14 @@ ${chatHistoryForPrompt}
                             senderId: character.id,
                             content: part,
                             timestamp: Date.now(),
-                            // 【核心】判断是否是这个角色的第一句话，或者发言人变了
-                            isNewSender: index === 0 && character.id !== lastSpeakerId
+                            // 只有当这是一个新发言者的第一句话时，才标记为 isNewSender
+                            isNewSender: index === 0 && character.id !== currentTurnLastSpeaker
                         });
                     });
 
                     if (messageParts.length > 0) {
-                        lastSpeakerId = character.id; // 更新最后的发言人
+                        // 在处理完一个角色的所有发言后，更新临时变量
+                        currentTurnLastSpeaker = character.id;
                     }
                 }
             });
@@ -18008,7 +18477,8 @@ ${chatHistoryForPrompt}
                     groupChatHistories[groupId].history.push({
                         senderId: message.senderId,
                         content: message.content,
-                        timestamp: message.timestamp
+                        timestamp: message.timestamp,
+                        type: 'text'
                     });
                     saveData('groupChatHistories', groupChatHistories);
 
@@ -18017,7 +18487,7 @@ ${chatHistoryForPrompt}
 
                 }, delay);
 
-                delay += Math.random() * 1200 + 400; // 随机增加 0.4 到 1.6 秒的延迟
+                delay += Math.random() * 600 + 200; // 【优化】随机增加 0.2 到 0.8 秒的延迟
             });
         }
 
@@ -18066,6 +18536,22 @@ ${chatHistoryForPrompt}
             // 默认开启线上模式 (如果未设置过)
             onlineModeToggle.checked = (group.onlineMode !== false); 
             // ====== 【【新增】】加载并设置"线上模式"开关的状态 END ======
+            
+            // --- 加载并显示当前群聊的外观设置 ---
+            const appearance = groupChatAppearanceSettings[currentGroupId] || {};
+            const bubbleColors = appearance.bubble || {};
+            const textColors = appearance.text || {};
+            const isDarkMode = document.body.classList.contains('dark-mode');
+
+            // 设置气泡颜色选择器的默认值
+            document.getElementById('group-user-bubble-color-picker').value = bubbleColors.user || '#374151';
+            document.getElementById('group-ai-bubble-color-picker').value = bubbleColors.ai || (isDarkMode ? '#2a2a2e' : '#e5e7eb');
+
+            // 设置文字颜色选择器的默认值
+            document.getElementById('group-user-text-color-picker').value = textColors.user || '#ffffff';
+            document.getElementById('group-ai-text-color-picker').value = textColors.ai || (isDarkMode ? '#e5e7eb' : '#1f2937');
+            document.getElementById('group-author-name-color-picker').value = textColors.author || '#9ca3af';
+            // --- 外观设置加载结束 ---
             
             document.getElementById('group-chat-settings-modal').classList.add('visible');
         }
@@ -18134,6 +18620,25 @@ ${chatHistoryForPrompt}
             groupChatHistories[currentGroupId].onlineMode = document.getElementById('group-chat-online-mode-toggle').checked;
             // ====== 【【新增】】保存"线上模式"开关的状态 END ======
             
+            // --- 保存外观设置 ---
+            if (!groupChatAppearanceSettings[currentGroupId]) {
+                groupChatAppearanceSettings[currentGroupId] = {};
+            }
+            groupChatAppearanceSettings[currentGroupId].bubble = {
+                user: document.getElementById('group-user-bubble-color-picker').value,
+                ai: document.getElementById('group-ai-bubble-color-picker').value
+            };
+            groupChatAppearanceSettings[currentGroupId].text = {
+                user: document.getElementById('group-user-text-color-picker').value,
+                ai: document.getElementById('group-ai-text-color-picker').value,
+                author: document.getElementById('group-author-name-color-picker').value
+            };
+            saveData('groupChatAppearanceSettings', groupChatAppearanceSettings);
+
+            // 立即刷新聊天界面以应用新颜色
+            renderGroupChatHistory(currentGroupId);
+            // --- 外观设置保存结束 ---
+            
             showMessageBox("群聊设置已保存！");
             document.getElementById('group-chat-settings-modal').classList.remove('visible');
         }
@@ -18166,6 +18671,27 @@ ${chatHistoryForPrompt}
             renderGroupChatList();
             
             showMessageBox(`群聊"${groupName}"已删除。`);
+        }
+
+        /**
+         * 【新增】重置当前群聊的外观设置为默认值
+         */
+        function resetGroupAppearance() {
+            if (!currentGroupId) return;
+
+            if (groupChatAppearanceSettings[currentGroupId]) {
+                delete groupChatAppearanceSettings[currentGroupId];
+                saveData('groupChatAppearanceSettings', groupChatAppearanceSettings);
+
+                // 重新渲染UI以恢复默认颜色
+                renderGroupChatHistory(currentGroupId);
+                // 重新打开设置面板以更新颜色选择器
+                openGroupChatSettings();
+
+                showMessageBox("当前群聊的外观已重置为默认。");
+            } else {
+                showMessageBox("当前群聊已是默认外观，无需重置。");
+            }
         }
 
         // ====== 群聊核心功能函数 END ======
@@ -18250,6 +18776,8 @@ ${chatHistoryForPrompt}
                 console.warn("检测到旧的或不兼容的 groupChatHistories 数据格式，已重置为空对象。");
                 groupChatHistories = {};
             }
+            groupChatBackgrounds = loadData('groupChatBackgrounds', {}); // 【新增】加载群聊背景数据
+            groupChatAppearanceSettings = loadData('groupChatAppearanceSettings', {}); // 【新增】加载群聊外观设置数据
             // ====== 群聊数据加载结束 ======
             
             // 如果没有剧本数据，创建一个测试剧本
@@ -42579,6 +43107,180 @@ ${wordGuessState.isFirstClue ?
 
         // ================== 群聊气泡菜单核心功能 END ==================
 
+        // ====== 【【新增 V2.5】】群聊 @ 成员功能核心逻辑 START ======
+
+        /**
+         * 显示并填充 @ 成员列表
+         * @param {string} searchTerm - 用户在@后输入的搜索词
+         */
+        function showMentionsList(searchTerm = '') {
+            const listContainer = document.getElementById('group-chat-mentions-list');
+            if (!currentGroupId) {
+                console.warn('未选择群聊');
+                return;
+            }
+            if (!listContainer) {
+                console.warn('未找到@成员列表容器');
+                return;
+            }
+
+            const group = groupChatHistories[currentGroupId];
+            if (!group || !group.members) {
+                console.warn('群聊数据或成员列表不存在');
+                return;
+            }
+            
+            console.log('当前群聊ID:', currentGroupId, '成员数:', group.members.length);
+
+            // 1. 获取所有成员信息（包括用户自己）
+            const myName = loadData('perch_username') || '我';
+            const myAvatar = loadData('perch_avatar') || null;
+            const allMembers = [
+                { id: 'user', name: myName, avatar: myAvatar }, // 把"我"也加进去
+                ...group.members
+                    .filter(id => id !== 'user')
+                    .map(id => characters.find(c => c.id === id))
+                    .filter(Boolean) // 过滤掉可能不存在的角色
+            ];
+
+            // 2. 根据搜索词过滤成员
+            const filteredMembers = allMembers.filter(member =>
+                member.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            if (filteredMembers.length === 0) {
+                hideMentionsList();
+                return;
+            }
+
+            // 3. 渲染列表
+            listContainer.innerHTML = ''; // 清空旧列表
+            const ul = document.createElement('ul');
+            filteredMembers.forEach(member => {
+                const li = document.createElement('li');
+                li.className = 'mention-item';
+                li.dataset.mentionName = member.name;
+
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'avatar';
+                
+                // 使用您已有的 loadAvatar 函数来智能加载头像
+                loadAvatar(member.avatar, avatarDiv, member.name.charAt(0));
+
+                li.innerHTML = `<span class="name">${member.name}</span>`;
+                li.prepend(avatarDiv); // 将头像元素插入到最前面
+
+                // 4. 绑定点击事件
+                li.addEventListener('click', () => {
+                    insertMention(member.name);
+                });
+                ul.appendChild(li);
+            });
+
+            listContainer.appendChild(ul);
+            listContainer.classList.remove('hidden');
+            console.log('@ 成员列表已显示，共', filteredMembers.length, '个成员');
+        }
+
+        /**
+         * 隐藏 @ 成员列表
+         */
+        function hideMentionsList() {
+            const listContainer = document.getElementById('group-chat-mentions-list');
+            if (listContainer) {
+                listContainer.classList.add('hidden');
+                listContainer.innerHTML = '';
+            }
+        }
+
+        /**
+         * 将选择的成员名字插入到输入框
+         * @param {string} name - 要插入的名字
+         */
+        function insertMention(name) {
+            const input = document.getElementById('group-chat-input');
+            const currentValue = input.value;
+            
+            // 使用正则表达式替换掉 @触发词和搜索词
+            const newValue = currentValue.replace(/@\S*$/, `@${name} `);
+
+            input.value = newValue;
+            hideMentionsList();
+            input.focus(); // 将光标重新聚焦到输入框
+            
+            // 将光标移动到末尾
+            const end = input.value.length;
+            input.setSelectionRange(end, end);
+        }
+
+        /**
+         * 设置 @ 功能的所有事件监听器
+         */
+        function setupMentionEventListeners() {
+            const input = document.getElementById('group-chat-input');
+            if (!input) {
+                console.warn('群聊输入框未找到，无法绑定@成员事件');
+                return;
+            }
+
+            // 移除旧的监听器（如果存在）
+            if (input._mentionHandler) {
+                input.removeEventListener('input', input._mentionHandler);
+            }
+
+            // 创建新的监听器
+            input._mentionHandler = function() {
+                const text = input.value;
+                const cursorPos = input.selectionStart; // 获取光标位置
+                
+                // 寻找光标前的最后一个@
+                const lastAt = text.lastIndexOf('@', cursorPos - 1);
+
+                if (lastAt !== -1) {
+                    // 检查@后面是否是空格，如果是则不触发
+                    const charAfterAt = text.substring(lastAt + 1, lastAt + 2);
+                    if (charAfterAt === ' ' || charAfterAt === '@') {
+                         hideMentionsList();
+                         return;
+                    }
+                    
+                    // 提取搜索词
+                    const searchTerm = text.substring(lastAt + 1, cursorPos);
+                    // 确保搜索词中没有空格
+                    if (!/\s/.test(searchTerm)) {
+                        console.log('触发@成员列表，搜索词:', searchTerm);
+                        showMentionsList(searchTerm);
+                        return;
+                    }
+                }
+                
+                hideMentionsList();
+            };
+
+            // 绑定新的监听器
+            input.addEventListener('input', input._mentionHandler);
+
+            // 点击其他地方时隐藏列表（只绑定一次）
+            if (!document._mentionClickHandlerBound) {
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('#group-chat-footer')) {
+                        hideMentionsList();
+                    }
+                });
+                document._mentionClickHandlerBound = true;
+            }
+            
+            const sendButton = document.getElementById('send-group-chat-button');
+            if(sendButton && !sendButton._mentionClickHandlerBound) {
+                sendButton.addEventListener('click', hideMentionsList);
+                sendButton._mentionClickHandlerBound = true;
+            }
+            
+            console.log('@ 成员功能事件监听器已激活');
+        }
+
+        // ====== 群聊 @ 成员功能核心逻辑 END ======
+
         // ====== 【【新增 V2.0】】群聊事件绑定 START ======
         function setupGroupChatEvents() {
             const groupChatIcon = document.querySelector('.app-icon[data-app-name="GroupChat"]');
@@ -42708,6 +43410,72 @@ ${wordGuessState.isFirstClue ?
             });
             // ====== 群聊头像上传事件绑定 END ======
 
+            // ====== 【新增】群聊背景设置事件绑定 START ======
+            const changeGroupBgBtn = document.getElementById('change-group-bg-btn');
+            const removeGroupBgBtn = document.getElementById('remove-group-bg-btn');
+            const groupChatBgInput = document.getElementById('group-chat-bg-input');
+
+            if (changeGroupBgBtn) {
+                changeGroupBgBtn.addEventListener('click', () => {
+                    if (groupChatBgInput) groupChatBgInput.click();
+                });
+            }
+
+            if (groupChatBgInput) {
+                groupChatBgInput.addEventListener('change', async (e) => {
+                    if (!currentGroupId) return;
+                    const file = e.target.files[0];
+                    if (file) {
+                        try {
+                            const imageId = await handleImageUpload(e.target, null, null, {
+                                compression: { maxWidth: 1920, maxHeight: 1920, quality: 0.9 }
+                            });
+
+                            if (imageId) {
+                                groupChatBackgrounds[currentGroupId] = imageId;
+                                saveData('groupChatBackgrounds', groupChatBackgrounds);
+
+                                // 实时预览效果
+                                const blob = await getImageFromDB(imageId);
+                                if (blob) {
+                                    const chatScreen = document.getElementById('group-chat-screen');
+                                    const bgElement = getGroupChatBackgroundElement();
+                                    const objectURL = URL.createObjectURL(blob);
+                                    bgElement.style.backgroundImage = `url(${objectURL})`;
+                                    chatScreen.classList.add('has-custom-bg');
+                                    document.getElementById('status-bar').classList.add('transparent-override');
+                                }
+                                showMessageBox('群聊背景已更换');
+                            }
+                        } catch (error) {
+                            console.error("处理群聊背景失败:", error);
+                            showMessageBox('背景图片处理失败');
+                        }
+                    }
+                    e.target.value = ''; // 重置输入，以便再次选择相同文件
+                });
+            }
+
+            if (removeGroupBgBtn) {
+                removeGroupBgBtn.addEventListener('click', () => {
+                    if (!currentGroupId) return;
+
+                    // 从数据中移除
+                    delete groupChatBackgrounds[currentGroupId];
+                    saveData('groupChatBackgrounds', groupChatBackgrounds);
+
+                    // 实时移除效果
+                    const chatScreen = document.getElementById('group-chat-screen');
+                    const bgElement = getGroupChatBackgroundElement();
+                    if (bgElement) bgElement.style.backgroundImage = '';
+                    chatScreen.classList.remove('has-custom-bg');
+                    document.getElementById('status-bar').classList.remove('transparent-override');
+
+                    showMessageBox('群聊背景已移除');
+                });
+            }
+            // ====== 群聊背景设置事件绑定 END ======
+
             // ====== 【【新增】】群聊用户头像点击更换事件 ======
             const groupUserAvatarInput = document.getElementById('group-user-avatar-input');
             if (groupUserAvatarInput) {
@@ -42795,6 +43563,15 @@ ${wordGuessState.isFirstClue ?
                 });
             }
             // ================================================
+            
+            // 【【V2.5新增】】激活 @ 成员功能的事件监听
+            setupMentionEventListeners();
+            
+            // 【新增】绑定重置外观按钮
+            const resetAppearanceBtn = document.getElementById('reset-group-appearance-btn');
+            if (resetAppearanceBtn) {
+                resetAppearanceBtn.addEventListener('click', resetGroupAppearance);
+            }
         }
         
         // 在页面加载后初始化群聊事件
