@@ -9473,7 +9473,7 @@
         
         /* 新增：确保在真正的移动设备上标题栏始终可见 */
         @media (max-width: 768px) and (pointer: coarse) {
-            body:not(.fullscreen-active) .app-header {
+            body:not(.fullscreen-active) .app-header:not(.hidden) {
                 display: flex !important;
                 visibility: visible !important;
                 opacity: 1 !important;
@@ -9491,7 +9491,7 @@
         }
         
         /* 新增：精确调整所有App顶栏在全屏下的位置 */
-        .fullscreen-active .app-header {
+        .fullscreen-active .app-header:not(.hidden) {
             /* 在全屏模式下保持标题栏显示 */
             display: flex !important;
             visibility: visible !important;
@@ -9500,7 +9500,7 @@
         
         /* 高优先级：确保全屏模式下标题栏正常显示，不受任何媒体查询影响 */
         @media all {
-            .fullscreen-active .app-header {
+            .fullscreen-active .app-header:not(.hidden) {
                 display: flex !important;
                 visibility: visible !important;
                 opacity: 1 !important;
