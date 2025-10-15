@@ -35223,56 +35223,61 @@ function addNewEventListeners() {
                 if (msgIndex === -1 || chatHistories[currentChatCharacterId].history[msgIndex].type !== 'text') return;
 
                 const originalText = chatHistories[currentChatCharacterId].history[msgIndex].content;
-                bubble.contentEditable = true;
-                bubble.focus();
+                const contentWrapper = bubble.parentElement;
 
-                const sel = window.getSelection();
-                sel.selectAllChildren(bubble);
-                sel.collapseToEnd();
+                // 1. 隐藏原始气泡
+                bubble.style.display = 'none';
 
-                const saveEdit = () => {
-                    // 从innerHTML获取原始HTML内容
-                    const htmlContent = bubble.innerHTML;
+                // 2. 创建一个临时的编辑区域
+                const editContainer = document.createElement('div');
+                const textarea = document.createElement('textarea');
+                textarea.className = 'turn-edit-textarea'; // 复用剧场功能的样式，非常合适
+                textarea.value = originalText;
 
-                    // 手动将<br>和</p></div>等标签转换成换行符，然后剥离所有剩余的HTML标签
-                    const newText = htmlContent
-                        .replace(/<br\s*\/?>/gi, '\n')      // 将 <br> 或 <br/> 转换成换行
-                        .replace(/<\/div>|<\/p>/gi, '\n')  // 将 </div> 或 </p> 结尾也转换成换行
-                        .replace(/<[^>]+>/g, '')         // 移除所有剩余的HTML标签（如<b><i>）
-                        .replace(/&nbsp;/g, ' ')         // 将空格实体转换成普通空格
-                        .trim();
-                    if (newText && newText !== originalText) {
-                        chatHistories[currentChatCharacterId].history[msgIndex].content = newText;
-                        saveData('chatHistories', chatHistories);
-                    }
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'edit-mode-actions'; // 复用剧场功能的样式
 
-                    // 保存后，重新按换行符渲染回多个<p>标签的结构
-                    const lines = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>').split('\n').filter(line => line.trim() !== '');
-                    if (lines.length > 1) {
-                        bubble.innerHTML = lines.map(line => `<p>${line}</p>`).join('');
-                    } else {
-                        bubble.innerHTML = `<p>${newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>')}</p>`;
-                    }
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = '保存';
+                saveBtn.className = 'edit-mode-btn save-btn';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = '取消';
+                cancelBtn.className = 'edit-mode-btn cancel-btn';
+
+                actionsDiv.appendChild(cancelBtn);
+                actionsDiv.appendChild(saveBtn);
+
+                editContainer.appendChild(textarea);
+                editContainer.appendChild(actionsDiv);
+                contentWrapper.appendChild(editContainer);
+
+                textarea.focus();
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+
+                // 3. 定义清理函数
+                const cleanup = () => {
+                    editContainer.remove();
+                    bubble.style.display = 'block';
                 };
 
-                bubble.addEventListener('blur', () => {
-                    bubble.contentEditable = false;
-                    saveEdit();
-                }, { once: true });
+                // 4. 绑定事件
+                saveBtn.onclick = () => {
+                    const newText = textarea.value.trim();
+                    if (newText && newText !== originalText) {
+                        // 保存数据
+                        chatHistories[currentChatCharacterId].history[msgIndex].content = newText;
+                        saveData('chatHistories', chatHistories);
 
-                bubble.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); bubble.blur(); }
-                    if (e.key === 'Escape') {
-                        // 按下Esc时，恢复原始内容
-                        const lines = originalText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>').split('\n').filter(line => line.trim() !== '');
-                        if (lines.length > 1) {
-                            bubble.innerHTML = lines.map(line => `<p>${line}</p>`).join('');
-                        } else {
-                            bubble.innerHTML = `<p>${originalText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>')}</p>`;
-                        }
-                        bubble.blur();
+                        // 更新UI
+                        const lines = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>').split('\n').filter(line => line.trim() !== '');
+                        bubble.innerHTML = lines.length > 1 ? lines.map(line => `<p>${line}</p>`).join('') : `<p>${newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>')}</p>`;
                     }
-                });
+                    cleanup();
+                };
+
+                cancelBtn.onclick = cleanup;
             }
 
             async function retryMessageHandler(timestamp) {
@@ -43074,35 +43079,65 @@ ${wordGuessState.isFirstClue ?
         
         // 编辑群聊消息
         function editGroupMessageHandler(timestamp, bubble) {
-            // 从 bubble 的父元素（messageWrapper）获取 senderId
-            const messageWrapper = bubble.closest('.chat-message-wrapper');
-            const senderId = messageWrapper ? messageWrapper.dataset.sender : null;
-            if (!senderId) return;
-            
-            // 同时使用 timestamp 和 senderId 来精确定位消息
-            const msgIndex = groupChatHistories[currentGroupId].history.findIndex(m => 
-                String(m.timestamp) === timestamp && m.senderId === senderId
-            );
+            const msgIndex = groupChatHistories[currentGroupId].history.findIndex(m => String(m.timestamp) === timestamp);
             if (msgIndex === -1) return;
 
-            const p = bubble.querySelector('p');
             const originalText = groupChatHistories[currentGroupId].history[msgIndex].content;
-            p.contentEditable = true;
-            p.focus();
-            
-            const saveEdit = () => {
-                const newText = p.innerText.trim();
-                if (newText && newText !== originalText) {
-                    groupChatHistories[currentGroupId].history[msgIndex].content = newText;
-                    saveData('groupChatHistories', groupChatHistories);
-                }
-                p.innerHTML = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>');
+            const contentWrapper = bubble.parentElement;
+
+            // 1. 隐藏原始气泡
+            bubble.style.display = 'none';
+
+            // 2. 创建编辑区域
+            const editContainer = document.createElement('div');
+            const textarea = document.createElement('textarea');
+            textarea.className = 'turn-edit-textarea';
+            textarea.value = originalText;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'edit-mode-actions';
+
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = '保存';
+            saveBtn.className = 'edit-mode-btn save-btn';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = '取消';
+            cancelBtn.className = 'edit-mode-btn cancel-btn';
+
+            actionsDiv.appendChild(cancelBtn);
+            actionsDiv.appendChild(saveBtn);
+
+            editContainer.appendChild(textarea);
+            editContainer.appendChild(actionsDiv);
+            contentWrapper.appendChild(editContainer);
+
+            textarea.focus();
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+
+            // 3. 定义清理函数
+            const cleanup = () => {
+                editContainer.remove();
+                bubble.style.display = 'block';
             };
 
-            p.addEventListener('blur', () => { p.contentEditable = false; saveEdit(); }, { once: true });
-            p.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); p.blur(); }
-            });
+            // 4. 绑定事件
+            saveBtn.onclick = () => {
+                const newText = textarea.value.trim();
+                if (newText && newText !== originalText) {
+                    // 保存到正确的群聊历史
+                    groupChatHistories[currentGroupId].history[msgIndex].content = newText;
+                    saveData('groupChatHistories', groupChatHistories);
+
+                    // 更新UI
+                    const lines = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>').split('\n').filter(line => line.trim() !== '');
+                    bubble.innerHTML = lines.length > 1 ? lines.map(line => `<p>${line}</p>`).join('') : `<p>${newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>')}</p>`;
+                }
+                cleanup();
+            };
+
+            cancelBtn.onclick = cleanup;
         }
         
         // 重生成群聊AI消息
