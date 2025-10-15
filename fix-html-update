@@ -35231,8 +35231,16 @@ function addNewEventListeners() {
                 sel.collapseToEnd();
 
                 const saveEdit = () => {
-                    // 从整个气泡读取文本，保留换行
-                    const newText = bubble.innerText.trim();
+                    // 从innerHTML获取原始HTML内容
+                    const htmlContent = bubble.innerHTML;
+
+                    // 手动将<br>和</p></div>等标签转换成换行符，然后剥离所有剩余的HTML标签
+                    const newText = htmlContent
+                        .replace(/<br\s*\/?>/gi, '\n')      // 将 <br> 或 <br/> 转换成换行
+                        .replace(/<\/div>|<\/p>/gi, '\n')  // 将 </div> 或 </p> 结尾也转换成换行
+                        .replace(/<[^>]+>/g, '')         // 移除所有剩余的HTML标签（如<b><i>）
+                        .replace(/&nbsp;/g, ' ')         // 将空格实体转换成普通空格
+                        .trim();
                     if (newText && newText !== originalText) {
                         chatHistories[currentChatCharacterId].history[msgIndex].content = newText;
                         saveData('chatHistories', chatHistories);
