@@ -1552,6 +1552,11 @@
             margin-top: 0.1rem !important; /* 为每条消息之间都设置一个固定的间距 */
         }
         
+        /* 【微信聊天专属】显示头像时的消息间距 */
+        #wechat-content-chat:not(.no-avatars) .chat-message-wrapper + .chat-message-wrapper {
+            margin-top: 0.6rem !important; /* 显示头像时普通消息间距 */
+        }
+        
         /* 【微信聊天专属】不同发送者之间增加间距 */
         #wechat-content-chat .chat-message-wrapper.received + .chat-message-wrapper.sent,
         #wechat-content-chat .chat-message-wrapper.sent + .chat-message-wrapper.received {
@@ -1560,7 +1565,7 @@
         
         /* 针对多行气泡后的消息增加额外间距（仅在显示头像模式下） */
         #wechat-content-chat:not(.no-avatars) .chat-message-wrapper.has-multiline + .chat-message-wrapper {
-            margin-top: 0.7rem !important; /* 多行气泡后需要更大间距 */
+            margin-top: 0.6rem !important; /* 多行气泡后间距 */
         }
         /* ====== 【【V10.3 - 终极间距与对齐修复方案 (用户头像修复版)】】 ====== */
 
@@ -1869,7 +1874,8 @@
             box-shadow: 0 3px 15px rgba(0,0,0,0.08), 0 1px 6px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
         /* 用户气泡颜色修改 - 水滴毛玻璃效果 */
-        .dark-mode .chat-message.sent { 
+        /* 注释掉默认背景，让调色板颜色生效 */
+        /* .dark-mode .chat-message.sent { 
             background: linear-gradient(135deg, rgba(55, 65, 81, 0.4), rgba(31, 41, 55, 0.3));
             color: #f3f4f6;
         }
@@ -1882,7 +1888,7 @@
         }
         .light-mode .chat-message.received { 
             background: linear-gradient(135deg, rgba(229, 231, 250, 0.4), rgba(214, 219, 230, 0.3));
-        }
+        } */
         .dark-mode .chat-message.sent.image-message, .light-mode .chat-message.sent.image-message { border: 2px solid #4b5563; }
         .dark-mode .chat-message.received.image-message, .light-mode .chat-message.received.image-message { border: 2px solid rgba(229, 231, 250, 0.8); }
 
@@ -16455,56 +16461,35 @@
             }
         }
 
-        // 应用其他文字颜色的全局函数
+        // 【【请用这个优化版本，替换旧的 applyOtherTextColor 函数】】
         function applyOtherTextColor(color) {
-            console.log('应用其他文字颜色:', color);
+            console.log('应用其他文字颜色 (输入栏按钮图标):', color);
+            const isDarkMode = document.body.classList.contains('dark-mode');
             
-            // 【修复】移除输入框的强制颜色设置，让 CSS 类根据日夜间模式自动控制
-            const chatInput = $('#chat-input');
-            if (chatInput) {
-                chatInput.style.removeProperty('color');
+            // 1. 获取当前主题的默认按钮图标颜色
+            const defaultColor = isDarkMode ? '#d1d5db' : '#4b5563';
+            // 如果传入的 color 是 null 或 undefined，就使用主题默认颜色
+            const finalColor = color || defaultColor;
+
+            // 2. 更新【私聊聊天界面】输入栏旁边的按钮图标颜色
+            const chatScreen = document.getElementById('wechat-chat-screen');
+            if (chatScreen) {
+                // 更新输入框旁边的按钮图标（加号、表情、发送、接收按钮）
+                const inputButtons = chatScreen.querySelectorAll('.chat-input-btn');
+                console.log('找到输入栏按钮数量:', inputButtons.length, '应用颜色:', finalColor);
+                inputButtons.forEach(btn => {
+                    btn.style.setProperty('color', finalColor, 'important');
+                });
+
+                // 更新快捷操作栏的按钮图标（语音、语音通话、视频通话）
+                const quickActionButtons = chatScreen.querySelectorAll('.quick-action-btn');
+                console.log('找到快捷操作按钮数量:', quickActionButtons.length, '应用颜色:', finalColor);
+                quickActionButtons.forEach(btn => {
+                    btn.style.setProperty('color', finalColor, 'important');
+                });
+            } else {
+                console.warn('未找到聊天界面元素 #wechat-chat-screen');
             }
-            
-            // 【修复】移除群聊输入框的强制颜色设置
-            const groupChatInput = $('#group-chat-input');
-            if (groupChatInput) {
-                groupChatInput.style.removeProperty('color');
-            }
-            
-            // 应用到所有聊天相关按钮
-            // 【修复】移除强制颜色设置，让 CSS 类根据日夜间模式自动控制
-            const buttons = document.querySelectorAll('.chat-input-btn, .quick-action-btn, #send-chat-button, #receive-chat-button, #add-feature-btn, #emoji-btn');
-            buttons.forEach(button => {
-                button.style.removeProperty('color');
-            });
-            
-            // 应用到更多功能面板的按钮
-            const moreFeaturesButtons = document.querySelectorAll('#more-features-panel button, .feature-btn');
-            moreFeaturesButtons.forEach(button => {
-                button.style.color = color;
-            });
-            
-            // 应用到聊天设置区域的文字
-            const settingsElements = document.querySelectorAll('#chat-settings-screen .setting-label, #chat-settings-screen .color-label, #chat-settings-screen button:not(#reset-colors-btn)');
-            settingsElements.forEach(element => {
-                element.style.color = color;
-            });
-            
-            // 【修复】移除输入框占位符颜色的强制设置，让 CSS 自动控制
-            // （注释掉以下代码）
-            // if (chatInput) {
-            //     chatInput.style.setProperty('--placeholder-color', color);
-            // }
-            
-            // 【修复】移除按钮图标的强制颜色设置，让 CSS 类根据日夜间模式自动控制
-            // 只保留微信屏幕的图标和文本的颜色设置
-            const textElements = document.querySelectorAll('.wechat-screen .icon, .wechat-screen span:not(.message-text)');
-            textElements.forEach(element => {
-                element.style.color = color;
-            });
-            
-            // 重新渲染聊天历史以应用消息颜色
-            renderChatHistory();
         }
 
         // 全屏模式切换功能
@@ -16811,15 +16796,19 @@ function getChatBackgroundElement() {
             statusBar.classList.toggle('on-home', screenId === 'home-screen');
             
             // 新增：确保在屏幕切换后标题栏始终可见
+            // [修复] 只显示正常头部，不要显示多选头部
             setTimeout(() => {
                 const currentScreen = document.getElementById(screenId);
                 if (currentScreen) {
-                    const appHeader = currentScreen.querySelector('.app-header');
-                    if (appHeader) {
-                        appHeader.style.display = 'flex';
-                        appHeader.style.visibility = 'visible';
-                        appHeader.style.opacity = '1';
-                    }
+                    // 只处理正常模式的头部，不处理多选头部
+                    const normalHeaders = currentScreen.querySelectorAll('.app-header:not([id*="multiselect"])');
+                    normalHeaders.forEach(header => {
+                        if (!header.id.includes('multiselect')) {
+                            header.style.display = 'flex';
+                            header.style.visibility = 'visible';
+                            header.style.opacity = '1';
+                        }
+                    });
                 }
             }, 100);
             
@@ -17792,6 +17781,17 @@ function getChatBackgroundElement() {
                 exitGroupMultiSelectMode();
             }
             
+            // [修复] 强制确保显示正常头部，隐藏多选头部
+            const normalHeader = document.getElementById('group-chat-header-normal');
+            const multiselectHeader = document.getElementById('group-chat-header-multiselect');
+            if (normalHeader && multiselectHeader) {
+                normalHeader.classList.remove('hidden');
+                normalHeader.style.display = 'flex';
+                multiselectHeader.classList.add('hidden');
+                multiselectHeader.classList.remove('flex');
+                multiselectHeader.style.display = 'none';
+            }
+            
             renderGroupChatHistory(groupId);
             const groupData = groupChatHistories[groupId];
             document.getElementById('group-chat-name').textContent = groupData?.name || '群聊';
@@ -17833,6 +17833,18 @@ function getChatBackgroundElement() {
         function renderGroupChatHistory(groupId) {
             const chatArea = document.getElementById('group-chat-content');
             chatArea.innerHTML = '';
+            
+            // [修复] 确保正常头部显示，隐藏多选头部
+            const normalHeader = document.getElementById('group-chat-header-normal');
+            const multiselectHeader = document.getElementById('group-chat-header-multiselect');
+            if (normalHeader && multiselectHeader) {
+                normalHeader.classList.remove('hidden');
+                normalHeader.style.display = 'flex';
+                multiselectHeader.classList.add('hidden');
+                multiselectHeader.classList.remove('flex');
+                multiselectHeader.style.display = 'none';
+            }
+            
             const group = groupChatHistories[groupId];
             if (!group || !group.history || group.history.length === 0) {
                 chatArea.innerHTML = `<p class="text-center text-gray-500 text-xs py-4">群里现在很安静，说点什么吧！</p>`;
@@ -18463,7 +18475,7 @@ ${chatHistoryForPrompt}
                         allMessages.push({
                             senderId: character.id,
                             content: part,
-                            timestamp: Date.now(),
+                            timestamp: Date.now() + allMessages.length,
                             // 只有当这是一个新发言者的第一句话时，才标记为 isNewSender
                             isNewSender: index === 0 && character.id !== currentTurnLastSpeaker
                         });
@@ -19584,23 +19596,29 @@ ${chatHistoryForPrompt}
         function toggleTheme() {
             body.classList.toggle('dark-mode');
             body.classList.toggle('light-mode');
-            // 为Tailwind CSS添加dark类支持
             body.classList.toggle('dark');
             const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
             $('#theme-icon').className = `fas fa-${theme === 'dark' ? 'moon' : 'sun'} text-lg`;
             saveData('theme', theme);
             
-            // 主题切换后更新聊天消息的背景色
+            // 【核心修改】检查当前私聊角色是否有自定义"其他颜色"
+            const currentCustomOtherColor = chatTextColors[currentChatCharacterId]?.other;
+            
+            if (!currentCustomOtherColor) {
+                // 如果没有自定义，则调用新版函数并传入null，使其应用新主题的默认"其他颜色"
+                applyOtherTextColor(null);
+            }
+            // 如果有自定义颜色，则什么都不做，保持用户的设置。
+
+            // 总是需要更新气泡和评论的颜色以适应新主题
             updateChatBubbleColors();
-            
-            // 主题切换后更新朋友圈评论的背景色
             updateMomentsCommentColors();
-            
-            // 主题切换后更新栖木评论的背景色
             updatePerchCommentColors();
-            
-            // 主题切换后更新其他文字颜色（如果当前角色没有自定义设置）
-            updateOtherTextColorForTheme();
+
+            // 如果当前在群聊界面，也需要刷新以应用新主题
+            if (currentGroupId && !$('#group-chat-screen').classList.contains('hidden')) {
+                 renderGroupChatHistory(currentGroupId);
+            }
         }
         
         // 主题切换时更新其他文字颜色
@@ -19930,6 +19948,14 @@ ${chatHistoryForPrompt}
             if (!currentChatCharacterId) {
                 console.warn('没有选择聊天角色');
                 return;
+            }
+            
+            // [修复] 确保正常头部显示，隐藏多选头部
+            if (isMultiSelectMode) {
+                $('#chat-header-normal').classList.remove('hidden');
+                $('#chat-header-multiselect').classList.add('hidden');
+                $('#chat-header-multiselect').classList.remove('flex');
+                isMultiSelectMode = false;
             }
             
             chatContentArea.innerHTML = '';
@@ -20338,6 +20364,39 @@ if (type === 'image') {
                 // 文本消息
                 messageBubble.className = `chat-message ${senderClass}`;
                 messageBubble.textContent = content;
+            }
+
+            // 应用自定义气泡颜色和文字颜色
+            if (!['system', 'red-packet', 'transfer', 'sticker', 'gift'].includes(type)) {
+                const customColors = chatBubbleColors[currentChatCharacterId];
+                const customTextColors = chatTextColors[currentChatCharacterId];
+                const isDarkMode = body.classList.contains('dark-mode');
+                let bubbleColor;
+                let textColor;
+                
+                // 处理气泡颜色
+                if (customColors) {
+                    const colorHex = sender === 'user' ? customColors.user : customColors.ai;
+                    if (colorHex) {
+                        const colorRgba = hexToRgba(colorHex, 0.6); // 使用0.6透明度（60%不透明）
+                        if (colorRgba) {
+                            bubbleColor = colorRgba;
+                            messageBubble.style.backgroundColor = bubbleColor;
+                        }
+                    }
+                }
+                
+                // 处理文字颜色
+                if (customTextColors) {
+                    const textColorHex = sender === 'user' ? customTextColors.user : customTextColors.ai;
+                    if (textColorHex) {
+                        textColor = textColorHex;
+                        messageBubble.style.color = textColor;
+                        // 如果消息内容包含段落标签，也设置段落颜色
+                        const paragraphs = messageBubble.querySelectorAll('p');
+                        paragraphs.forEach(p => p.style.color = textColor);
+                    }
+                }
             }
 
             contentWrapper.appendChild(messageBubble);
@@ -20753,7 +20812,7 @@ if (type === 'image') {
                 if (customColors) {
                     const colorHex = sender === 'user' ? customColors.user : customColors.ai;
                     if (colorHex) {
-                        const colorRgba = hexToRgba(colorHex, isDarkMode ? 0.6 : 0.7);
+                        const colorRgba = hexToRgba(colorHex, 0.6); // 使用0.6透明度（60%不透明）
                         if (colorRgba) {
                             bubbleColor = colorRgba;
                             messageBubble.style.backgroundColor = bubbleColor;
@@ -23723,6 +23782,11 @@ ${transcriptText}
             resetChatUIState();
             // -----------------------
             
+            // [修复] 强制退出多选模式，防止多选框异常显示
+            if (isMultiSelectMode) {
+                exitMultiSelectMode();
+            }
+            
             // [新增] 清除未读计数
             if (unreadCounts[characterId] && unreadCounts[characterId] > 0) {
                 unreadCounts[characterId] = 0;
@@ -23793,24 +23857,25 @@ ${transcriptText}
                     statusBar.classList.remove('transparent-override');
                 }
 
-                // ====== 在这里加入下面的代码 ======
-                // 应用保存的文字颜色设置
-                const savedTextColors = chatTextColors[characterId];
-                if (savedTextColors && savedTextColors.other) {
-                    applyOtherTextColor(savedTextColors.other);
-                } else {
-                    // 如果没有保存的设置，根据当前主题应用默认颜色
-                    const isDarkMode = document.body.classList.contains('dark-mode');
-                    const defaultOtherTextColor = isDarkMode ? '#ffffff' : '#000000';
-                    applyOtherTextColor(defaultOtherTextColor);
-                }
-                
                 const chatOptions = loadData('chatOptions', {});
                 const shouldHideAvatars = chatOptions[characterId]?.hideAvatars || false;
                 document.getElementById('wechat-content-chat').classList.toggle('no-avatars', shouldHideAvatars);
-                // ==================================
                 
                 showScreen('wechat-chat-screen');
+                
+                // ====== 【重要】在界面显示后再应用按钮颜色 ======
+                // 应用保存的文字颜色设置（输入栏按钮图标）
+                setTimeout(() => {
+                    const savedTextColors = chatTextColors[characterId];
+                    if (savedTextColors && savedTextColors.other) {
+                        // 应用该角色保存的自定义"其他颜色"
+                        applyOtherTextColor(savedTextColors.other);
+                    } else {
+                        // 应用当前主题的默认"其他颜色"
+                        applyOtherTextColor(null);
+                    }
+                }, 50); // 延迟50ms确保DOM已渲染
+                // ==================================
                 
                 // 为聊天容器添加滚动事件监听器，实现虚拟滚动
                 chatContentArea.onscroll = () => {
@@ -34265,90 +34330,46 @@ function addNewEventListeners() {
             // 重置颜色和背景设置功能
             function resetColorsToDefault() {
                 if (!currentChatCharacterId) return;
-                
                 const isDarkMode = body.classList.contains('dark-mode');
-                
-                // 定义默认颜色值
-                const defaultColors = {
-                    user: '#374151',
-                    ai: isDarkMode ? '#4a4a4a' : '#e5e7eb'
-                };
-                
-                const defaultTextColors = {
-                    user: '#ffffff',
-                    ai: '#000000',
-                    other: isDarkMode ? '#ffffff' : '#000000'
-                };
-                
-                // 重置气泡颜色
+
+                // 1. 清除当前角色所有已保存的颜色和背景数据
                 if (chatBubbleColors[currentChatCharacterId]) {
                     delete chatBubbleColors[currentChatCharacterId];
-                } else {
-                    chatBubbleColors[currentChatCharacterId] = {};
+                    saveData('chatBubbleColors', chatBubbleColors);
                 }
-                
-                // 重置文字颜色
                 if (chatTextColors[currentChatCharacterId]) {
                     delete chatTextColors[currentChatCharacterId];
-                } else {
-                    chatTextColors[currentChatCharacterId] = {};
+                    saveData('chatTextColors', chatTextColors);
                 }
-                
-                // 重置聊天背景
-                try {
-                    const bgElement = getChatBackgroundElement();
-                    if (bgElement) {
-                        bgElement.style.backgroundImage = 'none';
-                        bgElement.style.backgroundColor = ''; // 清除背景色
-                    }
-                    
-                    // 重置聊天屏幕背景
-                    const chatScreen = $('#wechat-chat-screen');
-                    if (chatScreen) {
-                        chatScreen.style.backgroundColor = '';
-                        chatScreen.style.backgroundImage = 'none';
-                    }
-                    
-                    // 清除保存的背景数据
-                    const chatBackgrounds = loadData('chatBackgrounds', {});
-                    if (chatBackgrounds[currentChatCharacterId]) {
-                        delete chatBackgrounds[currentChatCharacterId];
-                        saveData('chatBackgrounds', chatBackgrounds);
-                    }
-                } catch (error) {
-                    console.warn('重置背景时出现错误:', error);
+                const chatBackgrounds = loadData('chatBackgrounds', {});
+                if (chatBackgrounds[currentChatCharacterId]) {
+                    delete chatBackgrounds[currentChatCharacterId];
+                    saveData('chatBackgrounds', chatBackgrounds);
                 }
-                
-                // 保存到本地存储
-                saveData('chatBubbleColors', chatBubbleColors);
-                saveData('chatTextColors', chatTextColors);
-                
-                // 更新颜色选择器的显示值
-                $('#user-bubble-color-picker').value = defaultColors.user;
-                $('#ai-bubble-color-picker').value = defaultColors.ai;
-                $('#user-text-color-picker').value = defaultTextColors.user;
-                $('#ai-text-color-picker').value = defaultTextColors.ai;
-                $('#other-text-color-picker').value = defaultTextColors.other;
-                
-                // 重新渲染聊天历史以应用默认颜色
+
+                // 2. 移除聊天背景
+                const bgElement = getChatBackgroundElement();
+                if (bgElement) bgElement.style.backgroundImage = '';
+                const chatScreen = $('#wechat-chat-screen');
+                 if(chatScreen){
+                    chatScreen.style.backgroundColor = '';
+                    chatScreen.classList.remove('has-custom-bg');
+                    statusBar.classList.remove('transparent-override');
+                 }
+
+                // 3. 【核心修改】调用新版函数并传入 null，它会自动应用当前主题的默认"其他"颜色
+                applyOtherTextColor(null);
+
+                // 4. 更新设置界面中的颜色选择器，使其显示为默认值
+                $('#user-bubble-color-picker').value = '#374151';
+                $('#ai-bubble-color-picker').value = isDarkMode ? '#2a2a2e' : '#e5e7eb';
+                $('#user-text-color-picker').value = '#ffffff';
+                $('#ai-text-color-picker').value = isDarkMode ? '#e5e7eb' : '#1f2937';
+                $('#other-text-color-picker').value = isDarkMode ? '#ffffff' : '#1f2937';
+
+                // 5. 重新渲染聊天历史以应用默认颜色
                 renderChatHistory();
-                
-                // 应用"其他"文字颜色
-                applyOtherTextColor(defaultTextColors.other);
-                
-                // 强制重新应用默认颜色到界面元素，确保完全重置
-                setTimeout(() => {
-                    console.log('强制重置其他文字颜色为:', defaultTextColors.other);
-                    applyOtherTextColor(defaultTextColors.other);
-                    
-                    // 额外确保颜色选择器显示正确的值
-                    const otherColorPicker = $('#other-text-color-picker');
-                    if (otherColorPicker) {
-                        otherColorPicker.value = defaultTextColors.other;
-                    }
-                }, 100);
-                
-                // 显示成功提示
+
                 showMessageBox('颜色和背景设置已重置为默认值！', 'success');
             }
 
@@ -35222,33 +35243,62 @@ function addNewEventListeners() {
                 const msgIndex = chatHistories[currentChatCharacterId].history.findIndex(m => String(m.timestamp) === timestamp);
                 if (msgIndex === -1 || chatHistories[currentChatCharacterId].history[msgIndex].type !== 'text') return;
 
-                const p = bubble.querySelector('p');
                 const originalText = chatHistories[currentChatCharacterId].history[msgIndex].content;
-                p.contentEditable = true;
-                p.focus();
+                const contentWrapper = bubble.parentElement;
 
-                const sel = window.getSelection();
-                sel.selectAllChildren(p);
-                sel.collapseToEnd();
+                // 1. 隐藏原始气泡
+                bubble.style.display = 'none';
 
-                const saveEdit = () => {
-                    const newText = p.innerText.trim();
-                    if (newText && newText !== originalText) {
-                        chatHistories[currentChatCharacterId].history[msgIndex].content = newText;
-                        saveData('chatHistories', chatHistories);
-                    }
-                    p.innerHTML = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>');
+                // 2. 创建一个临时的编辑区域
+                const editContainer = document.createElement('div');
+                const textarea = document.createElement('textarea');
+                textarea.className = 'turn-edit-textarea'; // 复用剧场功能的样式，非常合适
+                textarea.value = originalText;
+
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'edit-mode-actions'; // 复用剧场功能的样式
+
+                const saveBtn = document.createElement('button');
+                saveBtn.textContent = '保存';
+                saveBtn.className = 'edit-mode-btn save-btn';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.textContent = '取消';
+                cancelBtn.className = 'edit-mode-btn cancel-btn';
+
+                actionsDiv.appendChild(cancelBtn);
+                actionsDiv.appendChild(saveBtn);
+
+                editContainer.appendChild(textarea);
+                editContainer.appendChild(actionsDiv);
+                contentWrapper.appendChild(editContainer);
+
+                textarea.focus();
+                textarea.style.height = 'auto';
+                textarea.style.height = (textarea.scrollHeight) + 'px';
+
+                // 3. 定义清理函数
+                const cleanup = () => {
+                    editContainer.remove();
+                    bubble.style.display = 'block';
                 };
 
-                p.addEventListener('blur', () => {
-                    p.contentEditable = false;
-                    saveEdit();
-                }, { once: true });
+                // 4. 绑定事件
+                saveBtn.onclick = () => {
+                    const newText = textarea.value.trim();
+                    if (newText && newText !== originalText) {
+                        // 保存数据
+                        chatHistories[currentChatCharacterId].history[msgIndex].content = newText;
+                        saveData('chatHistories', chatHistories);
 
-                p.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); p.blur(); }
-                    if (e.key === 'Escape') { p.innerText = originalText; p.blur(); }
-                });
+                        // 更新UI
+                        const lines = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>').split('\n').filter(line => line.trim() !== '');
+                        bubble.innerHTML = lines.length > 1 ? lines.map(line => `<p>${line}</p>`).join('') : `<p>${newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>')}</p>`;
+                    }
+                    cleanup();
+                };
+
+                cancelBtn.onclick = cleanup;
             }
 
             async function retryMessageHandler(timestamp) {
@@ -43050,35 +43100,65 @@ ${wordGuessState.isFirstClue ?
         
         // 编辑群聊消息
         function editGroupMessageHandler(timestamp, bubble) {
-            // 从 bubble 的父元素（messageWrapper）获取 senderId
-            const messageWrapper = bubble.closest('.chat-message-wrapper');
-            const senderId = messageWrapper ? messageWrapper.dataset.sender : null;
-            if (!senderId) return;
-            
-            // 同时使用 timestamp 和 senderId 来精确定位消息
-            const msgIndex = groupChatHistories[currentGroupId].history.findIndex(m => 
-                String(m.timestamp) === timestamp && m.senderId === senderId
-            );
+            const msgIndex = groupChatHistories[currentGroupId].history.findIndex(m => String(m.timestamp) === timestamp);
             if (msgIndex === -1) return;
 
-            const p = bubble.querySelector('p');
             const originalText = groupChatHistories[currentGroupId].history[msgIndex].content;
-            p.contentEditable = true;
-            p.focus();
-            
-            const saveEdit = () => {
-                const newText = p.innerText.trim();
-                if (newText && newText !== originalText) {
-                    groupChatHistories[currentGroupId].history[msgIndex].content = newText;
-                    saveData('groupChatHistories', groupChatHistories);
-                }
-                p.innerHTML = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>');
+            const contentWrapper = bubble.parentElement;
+
+            // 1. 隐藏原始气泡
+            bubble.style.display = 'none';
+
+            // 2. 创建编辑区域
+            const editContainer = document.createElement('div');
+            const textarea = document.createElement('textarea');
+            textarea.className = 'turn-edit-textarea';
+            textarea.value = originalText;
+
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'edit-mode-actions';
+
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = '保存';
+            saveBtn.className = 'edit-mode-btn save-btn';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.textContent = '取消';
+            cancelBtn.className = 'edit-mode-btn cancel-btn';
+
+            actionsDiv.appendChild(cancelBtn);
+            actionsDiv.appendChild(saveBtn);
+
+            editContainer.appendChild(textarea);
+            editContainer.appendChild(actionsDiv);
+            contentWrapper.appendChild(editContainer);
+
+            textarea.focus();
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+
+            // 3. 定义清理函数
+            const cleanup = () => {
+                editContainer.remove();
+                bubble.style.display = 'block';
             };
 
-            p.addEventListener('blur', () => { p.contentEditable = false; saveEdit(); }, { once: true });
-            p.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); p.blur(); }
-            });
+            // 4. 绑定事件
+            saveBtn.onclick = () => {
+                const newText = textarea.value.trim();
+                if (newText && newText !== originalText) {
+                    // 保存到正确的群聊历史
+                    groupChatHistories[currentGroupId].history[msgIndex].content = newText;
+                    saveData('groupChatHistories', groupChatHistories);
+
+                    // 更新UI
+                    const lines = newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>').split('\n').filter(line => line.trim() !== '');
+                    bubble.innerHTML = lines.length > 1 ? lines.map(line => `<p>${line}</p>`).join('') : `<p>${newText.replace(/(\*|_)(.*?)\1/g, '<i>$2</i>')}</p>`;
+                }
+                cleanup();
+            };
+
+            cancelBtn.onclick = cleanup;
         }
         
         // 重生成群聊AI消息
